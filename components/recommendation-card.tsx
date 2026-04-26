@@ -1,13 +1,19 @@
 import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
-import { Palette, UserCircle } from "lucide-react-native"
 import { Text, View } from "react-native"
+
+import {
+  TimeIcon,
+  getFieldIcon,
+  getTypeIcon,
+} from "@/lib/recommendation-icons"
 
 interface RecommendationCardProps {
   title: string
   imageUrl: string
   type: string
   field: string
+  estimatedTime?: string
 }
 
 export function RecommendationCard({
@@ -15,7 +21,11 @@ export function RecommendationCard({
   imageUrl,
   type,
   field,
+  estimatedTime,
 }: RecommendationCardProps) {
+  const TypeIcon = getTypeIcon(type)
+  const FieldIcon = getFieldIcon(field)
+
   return (
     <View className="overflow-hidden rounded-2xl bg-white shadow-sm">
       <View className="relative h-40 w-full">
@@ -34,15 +44,21 @@ export function RecommendationCard({
         </Text>
       </View>
 
-      <View className="flex-row gap-6 px-4 py-3">
+      <View className="flex-row flex-wrap gap-x-6 gap-y-2 px-4 py-3">
         <View className="flex-row items-center gap-2">
-          <Palette size={16} color="#4b5563" />
+          <TypeIcon size={16} color="#4b5563" />
           <Text className="text-sm text-gray-600">{type}</Text>
         </View>
         <View className="flex-row items-center gap-2">
-          <UserCircle size={16} color="#4b5563" />
+          <FieldIcon size={16} color="#4b5563" />
           <Text className="text-sm text-gray-600">{field}</Text>
         </View>
+        {estimatedTime ? (
+          <View className="flex-row items-center gap-2">
+            <TimeIcon size={16} color="#4b5563" />
+            <Text className="text-sm text-gray-600">{estimatedTime}</Text>
+          </View>
+        ) : null}
       </View>
     </View>
   )

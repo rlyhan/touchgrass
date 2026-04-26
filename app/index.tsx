@@ -51,6 +51,7 @@ export default function RecommendationsPage() {
               imageUrl={rec.imageUrl}
               type={rec.type}
               field={rec.field}
+              estimatedTime={rec.estimated_time}
             />
           ))}
         </View>
