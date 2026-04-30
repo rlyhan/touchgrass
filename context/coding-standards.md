@@ -7,4 +7,3 @@
 * Use Tailwind utility classes for styling where possible
 * Avoid premature backend work unless specifically requested
 * Prioritise UI + recommendation experience before infrastructure
-* Recommendation quality matters more than technical complexity

@@ -44,41 +44,14 @@ import {
   type LucideIcon,
 } from "lucide-react-native"
 
-export type RecommendationType =
-  | "Constructive"
-  | "Active"
-  | "Artistic"
-  | "Intellectual"
-  | "Outdoorsy"
-  | "Social"
-  | "Reflective"
-  | "Creative"
-  | "Adventurous"
-  | "Professional"
+import type {
+  ActivityField,
+  ActivityType,
+} from "@/lib/types"
 
-export type RecommendationField =
-  | "Music"
-  | "Martial Arts"
-  | "Literature"
-  | "Cooking"
-  | "Photography"
-  | "Gaming"
-  | "Fitness"
-  | "Coding"
-  | "Science"
-  | "Nature"
-  | "Film"
-  | "Theater"
-  | "Visual Art"
-  | "Writing"
-  | "Dance"
-  | "Cycling"
-  | "Hiking"
-  | "Travel"
-  | "Wellness"
-  | "Astronomy"
+export type { ActivityField, ActivityType }
 
-const TYPE_ICONS: Record<RecommendationType, LucideIcon> = {
+const ACTIVITY_TYPE_ICONS: Record<ActivityType, LucideIcon> = {
   Constructive: Wrench,
   Active: Dumbbell,
   Artistic: Palette,
@@ -91,7 +64,7 @@ const TYPE_ICONS: Record<RecommendationType, LucideIcon> = {
   Professional: Briefcase,
 }
 
-const FIELD_ICONS: Record<RecommendationField, LucideIcon> = {
+const FIELD_ICONS: Record<ActivityField, LucideIcon> = {
   Music: Guitar,
   "Martial Arts": Sword,
   Literature: BookOpen,
@@ -115,18 +88,18 @@ const FIELD_ICONS: Record<RecommendationField, LucideIcon> = {
 }
 
 // Fallbacks ensure unknown labels still render a sensible icon rather than nothing.
-export function getTypeIcon(type: string): LucideIcon {
-  return TYPE_ICONS[type as RecommendationType] ?? Sparkle
+export function getActivityTypeIcon(type: string): LucideIcon {
+  return ACTIVITY_TYPE_ICONS[type as ActivityType] ?? Sparkle
 }
 
 export function getFieldIcon(field: string): LucideIcon {
-  return FIELD_ICONS[field as RecommendationField] ?? Target
+  return FIELD_ICONS[field as ActivityField] ?? Target
 }
 
 export const TimeIcon: LucideIcon = Clock
 
 // Re-export the full icon set so callers can extend mappings without re-importing from lucide.
-export const RecommendationIcons = {
+export const Icons = {
   Atom,
   Bike,
   BookOpen,

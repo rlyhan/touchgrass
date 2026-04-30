@@ -4,9 +4,9 @@ import { Text, View } from "react-native"
 
 import {
   TimeIcon,
+  getActivityTypeIcon,
   getFieldIcon,
-  getTypeIcon,
-} from "@/lib/recommendation-icons"
+} from "@/lib/icons"
 
 interface RecommendationCardProps {
   title: string
@@ -23,7 +23,7 @@ export function RecommendationCard({
   field,
   estimatedTime,
 }: RecommendationCardProps) {
-  const TypeIcon = getTypeIcon(type)
+  const TypeIcon = getActivityTypeIcon(type)
   const FieldIcon = getFieldIcon(field)
 
   return (
