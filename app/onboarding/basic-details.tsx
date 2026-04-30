@@ -1,4 +1,5 @@
 import { router, type Href } from "expo-router"
+import { Controller, useWatch } from "react-hook-form"
 import { View } from "react-native"
 
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
@@ -10,21 +11,30 @@ import {
   BUILD_OPTIONS,
   EMPLOYMENT_OPTIONS,
   GENDER_OPTIONS,
-  useOnboarding,
+  useOnboardingForm,
 } from "@/lib/onboarding-context"
 
 const BIRTHDATE_PATTERN = /^\d{2}\/\d{2}\/\d{4}$/
 
+const validateBirthdate = (value: string) =>
+  BIRTHDATE_PATTERN.test(value.trim())
+
+const validateNonEmpty = (value: string) => value.trim().length > 0
+
 export default function BasicDetailsScreen() {
-  const { profile, update } = useOnboarding()
+  const { control } = useOnboardingForm()
+  const [birthdate, heightCm, gender, build, location, employment] = useWatch({
+    control,
+    name: ["birthdate", "heightCm", "gender", "build", "location", "employment"],
+  })
 
   const canContinue =
-    BIRTHDATE_PATTERN.test(profile.birthdate.trim()) &&
-    profile.heightCm.trim().length > 0 &&
-    profile.gender !== null &&
-    profile.build !== null &&
-    profile.location.trim().length > 0 &&
-    profile.employment !== null
+    validateBirthdate(birthdate) &&
+    heightCm.trim().length > 0 &&
+    gender !== null &&
+    build !== null &&
+    location.trim().length > 0 &&
+    employment !== null
 
   return (
     <OnboardingScreenShell
@@ -40,72 +50,115 @@ export default function BasicDetailsScreen() {
       }
     >
       <View className="gap-6">
-        <TextField
-          label="Birthdate"
-          value={profile.birthdate}
-          onChangeText={(value) => update("birthdate", value)}
-          placeholder="DD/MM/YYYY"
-          keyboardType="number-pad"
-          maxLength={10}
+        <Controller
+          control={control}
+          name="birthdate"
+          rules={{ required: true, validate: validateBirthdate }}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <TextField
+              label="Birthdate"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder="DD/MM/YYYY"
+              keyboardType="number-pad"
+              maxLength={10}
+            />
+          )}
         />
 
-        <TextField
-          label="Height (cm)"
-          value={profile.heightCm}
-          onChangeText={(value) =>
-            update("heightCm", value.replace(/[^0-9]/g, ""))
-          }
-          placeholder="e.g. 175"
-          keyboardType="number-pad"
-          maxLength={3}
+        <Controller
+          control={control}
+          name="heightCm"
+          rules={{ required: true, validate: validateNonEmpty }}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <TextField
+              label="Height (cm)"
+              value={value}
+              onChangeText={(v) => onChange(v.replace(/[^0-9]/g, ""))}
+              onBlur={onBlur}
+              placeholder="e.g. 175"
+              keyboardType="number-pad"
+              maxLength={3}
+            />
+          )}
         />
 
-        <FieldRow label="Gender">
-          <ChipGroup>
-            {GENDER_OPTIONS.map((g) => (
-              <Chip
-                key={g}
-                label={g}
-                selected={profile.gender === g}
-                onPress={() => update("gender", g)}
-              />
-            ))}
-          </ChipGroup>
-        </FieldRow>
-
-        <FieldRow label="Build">
-          <ChipGroup>
-            {BUILD_OPTIONS.map((b) => (
-              <Chip
-                key={b}
-                label={b}
-                selected={profile.build === b}
-                onPress={() => update("build", b)}
-              />
-            ))}
-          </ChipGroup>
-        </FieldRow>
-
-        <TextField
-          label="Current location"
-          value={profile.location}
-          onChangeText={(value) => update("location", value)}
-          placeholder="City, country"
-          autoCapitalize="words"
+        <Controller
+          control={control}
+          name="gender"
+          rules={{ validate: (v) => v !== null }}
+          render={({ field: { value, onChange } }) => (
+            <FieldRow label="Gender">
+              <ChipGroup>
+                {GENDER_OPTIONS.map((g) => (
+                  <Chip
+                    key={g}
+                    label={g}
+                    selected={value === g}
+                    onPress={() => onChange(g)}
+                  />
+                ))}
+              </ChipGroup>
+            </FieldRow>
+          )}
         />
 
-        <FieldRow label="Are you working or studying?">
-          <ChipGroup>
-            {EMPLOYMENT_OPTIONS.map((e) => (
-              <Chip
-                key={e}
-                label={e}
-                selected={profile.employment === e}
-                onPress={() => update("employment", e)}
-              />
-            ))}
-          </ChipGroup>
-        </FieldRow>
+        <Controller
+          control={control}
+          name="build"
+          rules={{ validate: (v) => v !== null }}
+          render={({ field: { value, onChange } }) => (
+            <FieldRow label="Build">
+              <ChipGroup>
+                {BUILD_OPTIONS.map((b) => (
+                  <Chip
+                    key={b}
+                    label={b}
+                    selected={value === b}
+                    onPress={() => onChange(b)}
+                  />
+                ))}
+              </ChipGroup>
+            </FieldRow>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="location"
+          rules={{ required: true, validate: validateNonEmpty }}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <TextField
+              label="Current location"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder="City, country"
+              autoCapitalize="words"
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="employment"
+          rules={{ validate: (v) => v !== null }}
+          render={({ field: { value, onChange } }) => (
+            <FieldRow label="Are you working or studying?">
+              <ChipGroup>
+                {EMPLOYMENT_OPTIONS.map((e) => (
+                  <Chip
+                    key={e}
+                    label={e}
+                    selected={value === e}
+                    onPress={() => onChange(e)}
+                  />
+                ))}
+              </ChipGroup>
+            </FieldRow>
+          )}
+        />
       </View>
     </OnboardingScreenShell>
   )

@@ -1,15 +1,17 @@
 import { router, type Href } from "expo-router"
+import { Controller, useWatch } from "react-hook-form"
 
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { TextField } from "@/components/ui/text-field"
-import { useOnboarding } from "@/lib/onboarding-context"
+import { useOnboardingForm } from "@/lib/onboarding-context"
 
 const NEXT: Href = "/onboarding/basic-details" as Href
 
 export default function NameScreen() {
-  const { profile, update } = useOnboarding()
-  const canContinue = profile.name.trim().length > 0
+  const { control } = useOnboardingForm()
+  const name = useWatch({ control, name: "name" })
+  const canContinue = name.trim().length > 0
 
   return (
     <OnboardingScreenShell
@@ -24,17 +26,25 @@ export default function NameScreen() {
         />
       }
     >
-      <TextField
-        label="Name"
-        value={profile.name}
-        onChangeText={(value) => update("name", value)}
-        placeholder="Your name"
-        autoCapitalize="words"
-        autoFocus
-        returnKeyType="next"
-        onSubmitEditing={() => {
-          if (canContinue) router.push(NEXT)
-        }}
+      <Controller
+        control={control}
+        name="name"
+        rules={{ required: true, validate: (v) => v.trim().length > 0 }}
+        render={({ field: { value, onChange, onBlur } }) => (
+          <TextField
+            label="Name"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            placeholder="Your name"
+            autoCapitalize="words"
+            autoFocus
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              if (canContinue) router.push(NEXT)
+            }}
+          />
+        )}
       />
     </OnboardingScreenShell>
   )

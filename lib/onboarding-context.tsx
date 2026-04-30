@@ -1,10 +1,5 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react"
+import { type ReactNode } from "react"
+import { FormProvider, useForm, useFormContext } from "react-hook-form"
 
 import {
   DEFAULT_PERSONALITY_SCORES,
@@ -22,7 +17,7 @@ export type Gender =
 
 export type Build = "Slim" | "Athletic" | "Average" | "Heavy"
 
-export type OnboardingProfile = {
+export type OnboardingFormValues = {
   name: string
   birthdate: string
   heightCm: string
@@ -35,7 +30,7 @@ export type OnboardingProfile = {
   motivations: string[]
 }
 
-const initialProfile: OnboardingProfile = {
+export const ONBOARDING_DEFAULT_VALUES: OnboardingFormValues = {
   name: "",
   birthdate: "",
   heightCm: "",
@@ -48,42 +43,17 @@ const initialProfile: OnboardingProfile = {
   motivations: [],
 }
 
-type OnboardingContextValue = {
-  profile: OnboardingProfile
-  update: <K extends keyof OnboardingProfile>(
-    key: K,
-    value: OnboardingProfile[K],
-  ) => void
-  reset: () => void
-}
-
-const OnboardingContext = createContext<OnboardingContextValue | null>(null)
-
 export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<OnboardingProfile>(initialProfile)
+  const form = useForm<OnboardingFormValues>({
+    mode: "onChange",
+    defaultValues: ONBOARDING_DEFAULT_VALUES,
+  })
 
-  const value = useMemo<OnboardingContextValue>(
-    () => ({
-      profile,
-      update: (key, val) => setProfile((prev) => ({ ...prev, [key]: val })),
-      reset: () => setProfile(initialProfile),
-    }),
-    [profile],
-  )
-
-  return (
-    <OnboardingContext.Provider value={value}>
-      {children}
-    </OnboardingContext.Provider>
-  )
+  return <FormProvider {...form}>{children}</FormProvider>
 }
 
-export function useOnboarding() {
-  const ctx = useContext(OnboardingContext)
-  if (!ctx) {
-    throw new Error("useOnboarding must be used inside OnboardingProvider")
-  }
-  return ctx
+export function useOnboardingForm() {
+  return useFormContext<OnboardingFormValues>()
 }
 
 export const MOTIVATION_OPTIONS = [
