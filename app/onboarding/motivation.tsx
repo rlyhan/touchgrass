@@ -1,22 +1,23 @@
 import { router, type Href } from "expo-router"
+import { Controller, useWatch } from "react-hook-form"
 import { View } from "react-native"
 
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { OptionCard } from "@/components/ui/option-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
-import { MOTIVATION_OPTIONS, useOnboarding } from "@/lib/onboarding-context"
+import {
+  MOTIVATION_OPTIONS,
+  useOnboardingForm,
+} from "@/lib/onboarding-context"
 
 export default function MotivationScreen() {
-  const { profile, update } = useOnboarding()
+  const { control, handleSubmit } = useOnboardingForm()
+  const motivations = useWatch({ control, name: "motivations" })
+  const canContinue = motivations.length >= 1
 
-  const toggle = (option: string) => {
-    const next = profile.motivations.includes(option)
-      ? profile.motivations.filter((m) => m !== option)
-      : [...profile.motivations, option]
-    update("motivations", next)
-  }
-
-  const canContinue = profile.motivations.length >= 1
+  const onSubmit = handleSubmit(() => {
+    router.replace("/onboarding/loading" as Href)
+  })
 
   return (
     <OnboardingScreenShell
@@ -27,20 +28,36 @@ export default function MotivationScreen() {
         <PrimaryButton
           label="Finish"
           disabled={!canContinue}
-          onPress={() => router.replace("/recommendations" as Href)}
+          onPress={onSubmit}
         />
       }
     >
-      <View className="gap-3">
-        {MOTIVATION_OPTIONS.map((option) => (
-          <OptionCard
-            key={option}
-            label={option}
-            selected={profile.motivations.includes(option)}
-            onPress={() => toggle(option)}
-          />
-        ))}
-      </View>
+      <Controller
+        control={control}
+        name="motivations"
+        rules={{ validate: (v) => v.length >= 1 }}
+        render={({ field: { value, onChange } }) => {
+          const toggle = (option: string) => {
+            const next = value.includes(option)
+              ? value.filter((m) => m !== option)
+              : [...value, option]
+            onChange(next)
+          }
+
+          return (
+            <View className="gap-3">
+              {MOTIVATION_OPTIONS.map((option) => (
+                <OptionCard
+                  key={option}
+                  label={option}
+                  selected={value.includes(option)}
+                  onPress={() => toggle(option)}
+                />
+              ))}
+            </View>
+          )
+        }}
+      />
     </OnboardingScreenShell>
   )
 }
