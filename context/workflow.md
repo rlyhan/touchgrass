@@ -9,7 +9,7 @@ This is the common workflow that we will use for every single feature/fix:
 5. **Iterate** - Iterate and change things if needed
 6. **Log** If build passes and everything works, update CHANGELOG.md with the completed feature/fix
 7. **Commit** - Only after build passes and everything works
-8. **Merge** - Merge to master
+8. **Merge** - Merge to main
 9. **Delete Branch** - Delete branch after merge
 10. **Review** - Review AI-generated code periodically and on demand.
 
