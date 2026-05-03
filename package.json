@@ -1,6 +1,6 @@
 {
   "name": "touchgrass",
-  "main": "expo-router/entry",
+  "main": "index.js",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
@@ -8,10 +8,15 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "storybook": "EXPO_PUBLIC_STORYBOOK=true expo start",
+    "storybook:ios": "EXPO_PUBLIC_STORYBOOK=true expo start --ios",
+    "storybook:android": "EXPO_PUBLIC_STORYBOOK=true expo start --android",
+    "storybook:web": "EXPO_PUBLIC_STORYBOOK=true expo start --web"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/slider": "5.0.1",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
@@ -45,9 +50,15 @@
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
+    "@storybook/addon-ondevice-actions": "^10.3.2",
+    "@storybook/addon-ondevice-backgrounds": "^10.3.2",
+    "@storybook/addon-ondevice-controls": "^10.3.2",
+    "@storybook/addon-ondevice-notes": "^10.3.2",
+    "@storybook/react-native": "^10.3.2",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "storybook": "^10.3.6",
     "typescript": "~5.9.2"
   },
   "private": true
