@@ -39,9 +39,9 @@ yarn-error.*
 app-example
 
 # generated native folders
-/ios
-/android
+**/ios
+**/android
 
 # storybook
-.storybook/storybook.requires.ts
+**/.storybook/storybook.requires.ts
 
