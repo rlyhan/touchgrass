@@ -9,5 +9,6 @@
 7. Reset current-feature.md:
    - Change H1 back to `# Current Feature`
    - Clear Requirements and Notes sections
+   - Leave the parent branch name in the file
 
 DO NOT update CHANGELOG.md as we only do this in a full feature.
