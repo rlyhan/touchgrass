@@ -244,6 +244,14 @@ export const BFAS_TRAITS: BFASTraitDefinition[] = [
   },
 ]
 
+export const BFAS_PARENT_LABELS: Record<PersonalityType, string> = {
+  Openness: "Openness to Experience",
+  Conscientiousness: "Conscientiousness",
+  Extraversion: "Extraversion",
+  Agreeableness: "Agreeableness",
+  Neuroticism: "Neuroticism",
+}
+
 export const DEFAULT_BFAS_SCORES: BFASScores = {
   Openness: 50,
   Intellect: 50,
