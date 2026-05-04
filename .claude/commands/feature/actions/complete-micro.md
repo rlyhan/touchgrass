@@ -9,3 +9,5 @@
 7. Reset current-feature.md:
    - Change H1 back to `# Current Feature`
    - Clear Requirements and Notes sections
+
+DO NOT update CHANGELOG.md as we only do this in a full feature.
