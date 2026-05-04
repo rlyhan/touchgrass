@@ -7,5 +7,5 @@
    - 'Create new parent branch from main'
 4. Ask for the parent branch name, then create and checkout that branch
 5. Populate ## Parent Branch in current-feature.md with the confirmed parent branch name
-6. Create and switch to new branch: `{parent-branch}/{micro-feature-name}` based on a derived name from the current-feature.md H1, otherwise ask for a microfeature name and suggest a branch name before doing so
+6. Create and switch to new branch: `{micro-feature-name}` based on a derived name from the current-feature.md H1, otherwise ask for a microfeature name and suggest a branch name before doing so
 7. List the requirements, then implement them one by one

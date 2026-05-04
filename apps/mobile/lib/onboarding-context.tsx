@@ -2,9 +2,9 @@ import { type ReactNode } from "react"
 import { FormProvider, useForm, useFormContext } from "react-hook-form"
 
 import {
-  DEFAULT_PERSONALITY_SCORES,
+  DEFAULT_BFAS_SCORES,
   type ActivityField,
-  type PersonalityScores,
+  type BFASScores,
 } from "@touchgrass/types"
 
 export type EmploymentStatus = "Student" | "Employed" | "Unemployed" | "Retired"
@@ -26,7 +26,7 @@ export type OnboardingFormValues = {
   location: string
   employment: EmploymentStatus | null
   interests: ActivityField[]
-  personality: PersonalityScores
+  personality: BFASScores
   motivations: string[]
 }
 
@@ -39,7 +39,7 @@ export const ONBOARDING_DEFAULT_VALUES: OnboardingFormValues = {
   location: "",
   employment: null,
   interests: [],
-  personality: { ...DEFAULT_PERSONALITY_SCORES },
+  personality: { ...DEFAULT_BFAS_SCORES },
   motivations: [],
 }
 
