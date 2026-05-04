@@ -5,7 +5,7 @@ import {
   DEFAULT_PERSONALITY_SCORES,
   type ActivityField,
   type PersonalityScores,
-} from "@/lib/types"
+} from "@touchgrass/types"
 
 export type EmploymentStatus = "Student" | "Employed" | "Unemployed" | "Retired"
 

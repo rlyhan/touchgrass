@@ -11,7 +11,7 @@ import { useOnboardingForm } from "@/lib/onboarding-context"
 import {
   ACTIVITY_FIELDS,
   type ActivityField,
-} from "@/lib/types"
+} from "@touchgrass/types"
 
 export default function InterestsScreen() {
   const { control, setValue } = useOnboardingForm()

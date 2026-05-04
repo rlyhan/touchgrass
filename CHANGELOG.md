@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-05-04 — Move Shared Types Into `@touchgrass/types`
+
+- Moved `apps/mobile/lib/types.ts` into `packages/types/index.ts` so the activity, field, and Big Five personality types are now shared workspace exports rather than mobile-private. The previously empty `packages/types/` stub now has real contents.
+- Updated `packages/types/package.json` to expose `index.ts` directly via `main` and `types` (no build step — Metro and TypeScript resolve the source file).
+- Added `@touchgrass/types: "*"` as a dependency of `@touchgrass/mobile`; npm linked it as a workspace symlink under `node_modules/@touchgrass/types`.
+- Switched all five import sites in the mobile app from `@/lib/types` to `@touchgrass/types`: `app/onboarding/interests.tsx`, `app/onboarding/personality.tsx`, `lib/onboarding-context.tsx`, `lib/icons.ts`, `lib/recommendations.ts`. Lint and `tsc --noEmit` both pass.
+
 ## 2026-05-04 — Monorepo Restructure
 
 - Converted the repo to an npm-workspace monorepo with `apps/*` and `packages/*`. The Expo project now lives at `apps/mobile/` (renamed to `@touchgrass/mobile`); `apps/web/`, `packages/core/`, and `packages/types/` are stub workspaces (each contains only a minimal `package.json`) reserved for the future web app, microservice, and shared schemas.

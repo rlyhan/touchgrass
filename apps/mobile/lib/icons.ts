@@ -47,7 +47,7 @@ import {
 import type {
   ActivityField,
   ActivityType,
-} from "@/lib/types"
+} from "@touchgrass/types"
 
 export type { ActivityField, ActivityType }
 

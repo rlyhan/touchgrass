@@ -10,7 +10,7 @@ import { useOnboardingForm } from "@/lib/onboarding-context"
 import {
   DEFAULT_PERSONALITY_SCORES,
   PERSONALITY_TRAITS,
-} from "@/lib/types"
+} from "@touchgrass/types"
 
 export default function PersonalityScreen() {
   const { control, setValue } = useOnboardingForm()

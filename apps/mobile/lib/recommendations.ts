@@ -1,4 +1,4 @@
-import type { ActivityField, ActivityType } from "@/lib/types"
+import type { ActivityField, ActivityType } from "@touchgrass/types"
 
 export type Recommendation = {
   id: string
