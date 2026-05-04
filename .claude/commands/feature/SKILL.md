@@ -1,7 +1,7 @@
 ---
 name: feature
 description: Manage current feature workflow - start, review, explain or complete
-argument-hint: load|start|start-microfeature|review|explain|complete|complete-microfeature
+argument-hint: load|start|start-micro|review|explain|complete|complete-micro
 ---
 
 # Feature Workflow
