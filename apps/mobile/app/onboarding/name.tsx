@@ -4,7 +4,7 @@ import { Controller, useWatch } from "react-hook-form"
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { TextField } from "@/components/ui/text-field"
-import { useOnboardingForm } from "@/lib/onboarding-context"
+import { useOnboardingForm } from "@/lib/onboarding/context"
 
 const NEXT: Href = "/onboarding/basic-details" as Href
 

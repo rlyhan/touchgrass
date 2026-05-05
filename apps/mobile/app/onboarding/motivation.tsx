@@ -5,10 +5,8 @@ import { View } from "react-native"
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { OptionCard } from "@/components/ui/option-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
-import {
-  MOTIVATION_OPTIONS,
-  useOnboardingForm,
-} from "@/lib/onboarding-context"
+import { useOnboardingForm } from "@/lib/onboarding/context"
+import { MOTIVATION_OPTIONS } from "@/lib/onboarding/options"
 
 export default function MotivationScreen() {
   const { control, handleSubmit } = useOnboardingForm()

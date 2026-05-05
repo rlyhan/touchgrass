@@ -1,14 +1,4 @@
-import type { ActivityField, ActivityType } from "@touchgrass/types"
-
-export type Recommendation = {
-  id: string
-  title: string
-  imageUrl: string
-  type: ActivityType
-  field: ActivityField
-  estimated_time: string
-  related_types?: ActivityType[]
-}
+import type { Recommendation } from "@touchgrass/types"
 
 export const RECOMMENDATIONS: Recommendation[] = [
   {

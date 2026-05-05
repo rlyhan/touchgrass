@@ -7,11 +7,9 @@ import { SkipButton } from "@/components/onboarding/skip-button"
 import { Chip, ChipGroup } from "@/components/ui/chip"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { getFieldIcon } from "@/lib/icons"
-import { useOnboardingForm } from "@/lib/onboarding-context"
-import {
-  ACTIVITY_FIELDS,
-  type ActivityField,
-} from "@touchgrass/types"
+import { useOnboardingForm } from "@/lib/onboarding/context"
+import { ACTIVITY_FIELDS } from "@touchgrass/types/constants"
+import type { ActivityField } from "@touchgrass/types"
 
 export default function InterestsScreen() {
   const { control, setValue } = useOnboardingForm()

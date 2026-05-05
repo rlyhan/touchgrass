@@ -5,20 +5,16 @@ import { Text, View } from "react-native"
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { Slider } from "@/components/ui/slider"
-import { useOnboardingForm } from "@/lib/onboarding-context"
-import {
-  BFAS_PARENT_LABELS,
-  BFAS_TRAITS,
-  type BFASTraitDefinition,
-  type PersonalityType,
-} from "@touchgrass/types"
+import { useOnboardingForm } from "@/lib/onboarding/context"
+import { BFAS_PARENT_LABELS, BFAS_TRAITS } from "@touchgrass/types/constants"
+import type { BFASTraitDefinition, PersonalityTrait } from "@touchgrass/types"
 
-type TraitGroup = { parent: PersonalityType; traits: BFASTraitDefinition[] }
+type TraitGroup = { parent: PersonalityTrait; traits: BFASTraitDefinition[] }
 
 const BFAS_GROUPS: TraitGroup[] = BFAS_TRAITS.reduce<TraitGroup[]>(
   (acc, trait) => {
     const last = acc[acc.length - 1]
-    if (last && last.parent === trait.parent) {
+    if (last && last.parent.key === trait.parent.key) {
       last.traits.push(trait)
     } else {
       acc.push({ parent: trait.parent, traits: [trait] })
@@ -53,9 +49,9 @@ export default function PersonalityScreen() {
         render={({ field: { value, onChange } }) => (
           <View className="gap-8">
             {BFAS_GROUPS.map((group) => (
-              <View key={group.parent} className="gap-7">
+              <View key={group.parent.key} className="gap-7">
                 <Text className="text-xl font-bold text-gray-900">
-                  {BFAS_PARENT_LABELS[group.parent]}
+                  {BFAS_PARENT_LABELS[group.parent.key]}
                 </Text>
                 {group.traits.map((trait) => (
                   <Slider

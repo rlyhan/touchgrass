@@ -7,12 +7,12 @@ import { Chip, ChipGroup } from "@/components/ui/chip"
 import { FieldRow } from "@/components/ui/field-row"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { TextField } from "@/components/ui/text-field"
+import { useOnboardingForm } from "@/lib/onboarding/context"
 import {
   BUILD_OPTIONS,
   EMPLOYMENT_OPTIONS,
   GENDER_OPTIONS,
-  useOnboardingForm,
-} from "@/lib/onboarding-context"
+} from "@/lib/onboarding/options"
 
 const BIRTHDATE_PATTERN = /^\d{2}\/\d{2}\/\d{4}$/
 

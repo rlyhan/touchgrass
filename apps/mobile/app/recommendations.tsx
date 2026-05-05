@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
-import { RECOMMENDATIONS } from "@/lib/recommendations"
+import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
 export default function RecommendationsPage() {
   return (
