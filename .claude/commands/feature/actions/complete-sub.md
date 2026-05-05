@@ -1,4 +1,4 @@
-# Complete Microfeature Action
+# Complete Subfeature Action
 
 1. Run a final review to ensure everything is complete
 2. Stage all changes

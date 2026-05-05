@@ -1,7 +1,7 @@
 ---
 name: feature
 description: Manage current feature workflow - start, review, explain or complete
-argument-hint: load|start|start-micro|review|explain|complete|complete-micro
+argument-hint: load|load-sub|start|start-sub|review|explain|complete|complete-sub
 ---
 
 # Feature Workflow
@@ -27,13 +27,13 @@ Execute the requested action: $ARGUMENTS
 | Action | Description |
 |--------|-------------|
 | `load` | Define feature requirements and notes in current-feature.md |
-| `load-micro` | Define micro-feature requirements, log parent branch context |
+| `load-sub` | Define subfeature requirements, log parent branch context |
 | `start` | Create feature branch and begin implementation |
-| `start-micro` | Validate or create parent branch, create child branch, begin implementation |
+| `start-sub` | Validate or create parent branch, create child branch, begin implementation |
 | `review` | Check goals met, code quality |
 | `explain` | Document what changed and why |
 | `complete` | Commit, push, merge to main, reset current-feature.md |
-| `complete-micro` | Commit, push, merge to parent branch, restore parent feature context |
+| `complete-sub` | Commit, push, merge to parent branch, restore parent feature context |
 
 See [actions/](actions/) for detailed instructions.
 
