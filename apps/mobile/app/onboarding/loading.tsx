@@ -1,4 +1,4 @@
-import { router, type Href } from "expo-router"
+import { router } from "expo-router"
 import { useCallback, useEffect, useState } from "react"
 
 import {
@@ -15,8 +15,11 @@ export default function OnboardingLoadingScreen() {
   const submit = useCallback(async () => {
     setStatus("loading")
     try {
-      await createUser(getValues())
-      router.replace("/recommendations" as Href)
+      const { user } = await createUser(getValues())
+      router.replace({
+        pathname: "/recommendations",
+        params: { userId: user.id },
+      })
     } catch {
       setStatus("error")
     }
