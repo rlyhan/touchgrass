@@ -1,21 +1,20 @@
-# Call create user endpoint during loading screen
+# Update local env commands
 
 ## Summary
 
-On the form submission click, we are immediately taken to the loading screen, after which the POST endpoint is called, and we wait asynchronously for the endpoint to finish successfully, before we get redirect to the recommendations screen. This needs to replace the dummy setTimeout logic we have in the loading screen.
-
-If the POST endpoint fails, we need to display an error message within the loading screen and a button to reattempt the POST request with the label "Try again".
+We need to update our commands to the following:
+- npm start (root directory): Needs to run both its current command AND run the npm run dev command in packages/core
+- npm run storybook commands: Needs to run on a different server than 8081 which is what our mobile app runs on
 
 ## Parent Branch
 recommendation-engine-v1
 
 ## Requirements
 
-- On form submission, navigate immediately to the loading screen (do not await the POST before navigating).
-- From the loading screen, call the POST create user endpoint asynchronously.
-- Replace the existing dummy `setTimeout` logic in the loading screen with the real request lifecycle.
-- On a successful response, redirect the user to the recommendations screen.
-- On a failed response, render an error message within the loading screen.
-- When in the error state, render a "Try again" button that re-attempts the POST request.
+- Root `npm start` must run the existing mobile workspace start command AND `npm run dev` in `packages/core` concurrently.
+  - Both processes should stream output to the same terminal with clear labels.
+  - Stopping the root command (Ctrl+C) should cleanly terminate both child processes.
+- All `npm run storybook*` commands must use a port different from `8081` (the Expo/Metro port for the mobile app) so Storybook and the mobile app can run simultaneously without conflict.
+  - This applies to `storybook`, `storybook:ios`, `storybook:android`, and `storybook:web`.
 
 ## Notes

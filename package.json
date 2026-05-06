@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "npm run start --workspace=@touchgrass/mobile",
+    "start": "concurrently --names \"mobile,core\" --prefix-colors \"cyan,magenta\" --kill-others \"npm run start --workspace=@touchgrass/mobile\" \"npm run dev --workspace=@touchgrass/core\"",
     "ios": "npm run ios --workspace=@touchgrass/mobile",
     "android": "npm run android --workspace=@touchgrass/mobile",
     "web": "npm run web --workspace=@touchgrass/mobile",
@@ -16,5 +16,8 @@
     "storybook:ios": "npm run storybook:ios --workspace=@touchgrass/mobile",
     "storybook:android": "npm run storybook:android --workspace=@touchgrass/mobile",
     "storybook:web": "npm run storybook:web --workspace=@touchgrass/mobile"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
