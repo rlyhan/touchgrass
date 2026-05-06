@@ -3,10 +3,29 @@ import type {
   ActivityType,
   BFASScores,
   BFASTraitDefinition,
+  Build,
+  EmploymentStatus,
+  Gender,
   PersonalityScores,
   PersonalityTrait,
   PersonalityType,
-} from "./index"
+} from "./index.js"
+
+export const GENDERS: Gender[] = [
+  "Male",
+  "Female",
+  "Non-binary",
+  "Prefer not to say",
+]
+
+export const BUILDS: Build[] = ["Slim", "Athletic", "Average", "Heavy"]
+
+export const EMPLOYMENT_STATUSES: EmploymentStatus[] = [
+  "Student",
+  "Employed",
+  "Unemployed",
+  "Retired",
+]
 
 export const ACTIVITY_TYPES: ActivityType[] = [
   "Constructive",

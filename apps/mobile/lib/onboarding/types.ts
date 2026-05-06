@@ -1,14 +1,12 @@
-import type { ActivityField, BFASScores } from "@touchgrass/types"
+import type {
+  ActivityField,
+  BFASScores,
+  Build,
+  EmploymentStatus,
+  Gender,
+} from "@touchgrass/types"
 
-export type EmploymentStatus = "Student" | "Employed" | "Unemployed" | "Retired"
-
-export type Gender =
-  | "Male"
-  | "Female"
-  | "Non-binary"
-  | "Prefer not to say"
-
-export type Build = "Slim" | "Athletic" | "Average" | "Heavy"
+export type { Build, EmploymentStatus, Gender }
 
 export type OnboardingFormValues = {
   name: string

@@ -19,6 +19,13 @@ const BIRTHDATE_PATTERN = /^\d{2}\/\d{2}\/\d{4}$/
 const validateBirthdate = (value: string) =>
   BIRTHDATE_PATTERN.test(value.trim())
 
+const formatBirthdate = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
+
 const validateNonEmpty = (value: string) => value.trim().length > 0
 
 export default function BasicDetailsScreen() {
@@ -58,7 +65,7 @@ export default function BasicDetailsScreen() {
             <TextField
               label="Birthdate"
               value={value}
-              onChangeText={onChange}
+              onChangeText={(v) => onChange(formatBirthdate(v))}
               onBlur={onBlur}
               placeholder="DD/MM/YYYY"
               keyboardType="number-pad"
