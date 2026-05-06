@@ -1,11 +1,8 @@
-import express from "express"
+import { createApp } from "./app.js"
+import { insertUser } from "./db/users.js"
 
-const app = express()
+const app = createApp({ insertUser })
 const port = Number(process.env.PORT ?? 3000)
-
-app.get("/health", (_req, res) => {
-  res.json({ ok: true })
-})
 
 app.listen(port, () => {
   console.log(`@touchgrass/core: listening on http://localhost:${port}`)
