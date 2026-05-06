@@ -8,7 +8,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Music",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Skill-based", "Creative"],
   },
   {
     id: "rec_002",
@@ -17,7 +17,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Active",
     field: "Martial Arts",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Physical", "Skill-based"],
   },
   {
     id: "rec_003",
@@ -26,7 +26,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Artistic",
     field: "Literature",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Creative", "Expressive"],
   },
   {
     id: "rec_004",
@@ -35,7 +35,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Music",
     estimated_time: "30 minutes",
-    related_types: [],
+    related_types: ["Mindful", "Emotional"],
   },
   {
     id: "rec_005",
@@ -44,7 +44,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Music",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Educational", "Analytical"],
   },
   {
     id: "rec_006",
@@ -53,7 +53,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Music",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Artistic", "Expressive"],
   },
   {
     id: "rec_007",
@@ -62,7 +62,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Music",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Community-oriented", "Reflective"],
   },
   {
     id: "rec_008",
@@ -71,7 +71,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Martial Arts",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Skill-based"],
   },
   {
     id: "rec_009",
@@ -80,7 +80,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Martial Arts",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Mindful", "Physical"],
   },
   {
     id: "rec_010",
@@ -89,7 +89,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Martial Arts",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Educational", "Reflective"],
   },
   {
     id: "rec_011",
@@ -98,7 +98,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Martial Arts",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Exploratory", "Goal-oriented"],
   },
   {
     id: "rec_012",
@@ -107,7 +107,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Literature",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Disciplined", "Goal-oriented"],
   },
   {
     id: "rec_013",
@@ -116,7 +116,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Literature",
     estimated_time: "Ongoing",
-    related_types: [],
+    related_types: ["Community-oriented", "Intellectual"],
   },
   {
     id: "rec_014",
@@ -125,7 +125,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Literature",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Goal-oriented", "Creative"],
   },
   {
     id: "rec_015",
@@ -134,7 +134,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Literature",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Analytical", "Educational"],
   },
   {
     id: "rec_016",
@@ -143,7 +143,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Cooking",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Skill-based", "Disciplined"],
   },
   {
     id: "rec_017",
@@ -152,7 +152,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Cooking",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Community-oriented", "Creative"],
   },
   {
     id: "rec_018",
@@ -161,7 +161,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Cooking",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Constructive", "Reflective"],
   },
   {
     id: "rec_019",
@@ -170,7 +170,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Cooking",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Exploratory", "Experimental"],
   },
   {
     id: "rec_020",
@@ -179,7 +179,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Cooking",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Strategic", "Creative"],
   },
   {
     id: "rec_021",
@@ -188,7 +188,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Photography",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Mindful", "Artistic"],
   },
   {
     id: "rec_022",
@@ -197,7 +197,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Photography",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Experimental", "Skill-based"],
   },
   {
     id: "rec_023",
@@ -206,7 +206,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Artistic",
     field: "Photography",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Creative", "Expressive"],
   },
   {
     id: "rec_024",
@@ -215,7 +215,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Photography",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Leadership", "Outdoorsy"],
   },
   {
     id: "rec_025",
@@ -224,7 +224,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Outdoorsy",
     field: "Photography",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Adventurous", "Artistic"],
   },
   {
     id: "rec_026",
@@ -233,7 +233,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Gaming",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Leadership", "Collaborative"],
   },
   {
     id: "rec_027",
@@ -242,7 +242,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Gaming",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Skill-based", "Creative"],
   },
   {
     id: "rec_028",
@@ -251,7 +251,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Gaming",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Strategic", "Constructive"],
   },
   {
     id: "rec_029",
@@ -260,7 +260,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Gaming",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Performative", "Expressive"],
   },
   {
     id: "rec_030",
@@ -269,7 +269,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Gaming",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Goal-oriented", "Competitive"],
   },
   {
     id: "rec_031",
@@ -278,7 +278,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Active",
     field: "Fitness",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Physical", "Disciplined"],
   },
   {
     id: "rec_032",
@@ -287,7 +287,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Fitness",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Goal-oriented", "Strategic"],
   },
   {
     id: "rec_033",
@@ -296,7 +296,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Outdoorsy",
     field: "Fitness",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Active", "Strategic"],
   },
   {
     id: "rec_034",
@@ -305,7 +305,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Fitness",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Goal-oriented", "Physical"],
   },
   {
     id: "rec_035",
@@ -314,7 +314,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Fitness",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Educational", "Disciplined"],
   },
   {
     id: "rec_036",
@@ -323,7 +323,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Coding",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Creative", "Skill-based"],
   },
   {
     id: "rec_037",
@@ -332,7 +332,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Coding",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Educational", "Reflective"],
   },
   {
     id: "rec_038",
@@ -341,7 +341,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Coding",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Collaborative", "Community-oriented"],
   },
   {
     id: "rec_039",
@@ -350,7 +350,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Coding",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Artistic", "Experimental"],
   },
   {
     id: "rec_040",
@@ -359,7 +359,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Coding",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Collaborative", "Goal-oriented"],
   },
   {
     id: "rec_041",
@@ -368,7 +368,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Science",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Experimental", "Educational"],
   },
   {
     id: "rec_042",
@@ -377,7 +377,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Science",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Intellectual", "Educational"],
   },
   {
     id: "rec_043",
@@ -386,7 +386,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Science",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Analytical", "Community-oriented"],
   },
   {
     id: "rec_044",
@@ -395,7 +395,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Outdoorsy",
     field: "Science",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Adventurous", "Educational"],
   },
   {
     id: "rec_045",
@@ -404,7 +404,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Science",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Educational", "Community-oriented"],
   },
   {
     id: "rec_046",
@@ -413,7 +413,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Nature",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Mindful", "Therapeutic"],
   },
   {
     id: "rec_047",
@@ -422,7 +422,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Nature",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Mindful", "Therapeutic", "Outdoorsy"],
   },
   {
     id: "rec_048",
@@ -431,7 +431,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Nature",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Educational", "Outdoorsy"],
   },
   {
     id: "rec_049",
@@ -440,7 +440,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Nature",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Community-oriented", "Outdoorsy"],
   },
   {
     id: "rec_050",
@@ -449,7 +449,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Nature",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Outdoorsy", "Reflective"],
   },
   {
     id: "rec_051",
@@ -458,7 +458,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Film",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Artistic", "Expressive"],
   },
   {
     id: "rec_052",
@@ -467,7 +467,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Film",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Educational", "Analytical"],
   },
   {
     id: "rec_053",
@@ -476,7 +476,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Film",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Community-oriented", "Collaborative"],
   },
   {
     id: "rec_054",
@@ -485,7 +485,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Film",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Creative", "Strategic"],
   },
   {
     id: "rec_055",
@@ -494,7 +494,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Film",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Mindful", "Emotional"],
   },
   {
     id: "rec_056",
@@ -503,7 +503,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Active",
     field: "Theater",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Performative", "Expressive"],
   },
   {
     id: "rec_057",
@@ -512,7 +512,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Theater",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Collaborative", "Artistic"],
   },
   {
     id: "rec_058",
@@ -521,7 +521,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Artistic",
     field: "Theater",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Creative", "Expressive"],
   },
   {
     id: "rec_059",
@@ -530,7 +530,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Theater",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Performative", "Collaborative", "Expressive"],
   },
   {
     id: "rec_060",
@@ -539,7 +539,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Theater",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Leadership", "Collaborative"],
   },
   {
     id: "rec_061",
@@ -548,7 +548,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Artistic",
     field: "Visual Art",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Creative", "Reflective", "Expressive"],
   },
   {
     id: "rec_062",
@@ -557,7 +557,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Visual Art",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Artistic", "Skill-based"],
   },
   {
     id: "rec_063",
@@ -566,7 +566,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Outdoorsy",
     field: "Visual Art",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Artistic", "Mindful"],
   },
   {
     id: "rec_064",
@@ -575,7 +575,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Visual Art",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Artistic", "Expressive"],
   },
   {
     id: "rec_065",
@@ -584,7 +584,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Visual Art",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Goal-oriented", "Artistic"],
   },
   {
     id: "rec_066",
@@ -593,7 +593,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Writing",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Expressive", "Emotional"],
   },
   {
     id: "rec_067",
@@ -602,7 +602,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Writing",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Collaborative", "Creative"],
   },
   {
     id: "rec_068",
@@ -611,7 +611,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Writing",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Reflective", "Expressive", "Disciplined"],
   },
   {
     id: "rec_069",
@@ -620,7 +620,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Writing",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Goal-oriented", "Creative"],
   },
   {
     id: "rec_070",
@@ -629,7 +629,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Writing",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Exploratory", "Reflective"],
   },
   {
     id: "rec_071",
@@ -638,7 +638,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Active",
     field: "Dance",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Skill-based", "Physical"],
   },
   {
     id: "rec_072",
@@ -647,7 +647,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Dance",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Skill-based", "Performative"],
   },
   {
     id: "rec_073",
@@ -656,7 +656,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Dance",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Active", "Community-oriented"],
   },
   {
     id: "rec_074",
@@ -665,7 +665,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Artistic",
     field: "Dance",
     estimated_time: "A few hours",
-    related_types: [],
+    related_types: ["Creative", "Expressive"],
   },
   {
     id: "rec_075",
@@ -674,7 +674,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Dance",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Educational", "Analytical"],
   },
   {
     id: "rec_076",
@@ -683,7 +683,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Cycling",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Outdoorsy", "Physical"],
   },
   {
     id: "rec_077",
@@ -692,7 +692,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Cycling",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Skill-based"],
   },
   {
     id: "rec_078",
@@ -701,7 +701,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Cycling",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Outdoorsy", "Community-oriented"],
   },
   {
     id: "rec_079",
@@ -710,7 +710,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Active",
     field: "Cycling",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Competitive", "Physical"],
   },
   {
     id: "rec_080",
@@ -719,7 +719,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Outdoorsy",
     field: "Cycling",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Adventurous", "Physical"],
   },
   {
     id: "rec_081",
@@ -728,7 +728,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Hiking",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Outdoorsy", "Physical"],
   },
   {
     id: "rec_082",
@@ -737,7 +737,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Outdoorsy",
     field: "Hiking",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Adventurous", "Strategic"],
   },
   {
     id: "rec_083",
@@ -746,7 +746,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Hiking",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Leadership", "Outdoorsy"],
   },
   {
     id: "rec_084",
@@ -755,7 +755,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Artistic",
     field: "Hiking",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Outdoorsy", "Creative"],
   },
   {
     id: "rec_085",
@@ -764,7 +764,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Hiking",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Mindful", "Outdoorsy"],
   },
   {
     id: "rec_086",
@@ -773,7 +773,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Travel",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Exploratory", "Reflective"],
   },
   {
     id: "rec_087",
@@ -782,7 +782,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Creative",
     field: "Travel",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Reflective", "Artistic"],
   },
   {
     id: "rec_088",
@@ -791,7 +791,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Travel",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Educational", "Disciplined"],
   },
   {
     id: "rec_089",
@@ -800,7 +800,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Social",
     field: "Travel",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Community-oriented", "Exploratory"],
   },
   {
     id: "rec_090",
@@ -809,7 +809,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Travel",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Goal-oriented", "Creative"],
   },
   {
     id: "rec_091",
@@ -818,7 +818,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Wellness",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Mindful", "Disciplined"],
   },
   {
     id: "rec_092",
@@ -827,7 +827,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Wellness",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Disciplined", "Mindful"],
   },
   {
     id: "rec_093",
@@ -836,7 +836,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Active",
     field: "Wellness",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Mindful", "Therapeutic"],
   },
   {
     id: "rec_094",
@@ -845,7 +845,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Intellectual",
     field: "Wellness",
     estimated_time: "A week",
-    related_types: [],
+    related_types: ["Analytical", "Disciplined"],
   },
   {
     id: "rec_095",
@@ -854,7 +854,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Professional",
     field: "Wellness",
     estimated_time: "A month",
-    related_types: [],
+    related_types: ["Educational", "Goal-oriented"],
   },
   {
     id: "rec_096",
@@ -863,7 +863,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Outdoorsy",
     field: "Astronomy",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Reflective", "Mindful"],
   },
   {
     id: "rec_097",
@@ -872,7 +872,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Constructive",
     field: "Astronomy",
     estimated_time: "A weekend",
-    related_types: [],
+    related_types: ["Skill-based", "Experimental"],
   },
   {
     id: "rec_098",
@@ -881,7 +881,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Reflective",
     field: "Astronomy",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Mindful", "Outdoorsy"],
   },
   {
     id: "rec_099",
@@ -890,7 +890,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Adventurous",
     field: "Astronomy",
     estimated_time: "1 hour",
-    related_types: [],
+    related_types: ["Outdoorsy", "Mindful"],
   },
   {
     id: "rec_100",
@@ -899,6 +899,6 @@ export const RECOMMENDATIONS: Recommendation[] = [
     type: "Artistic",
     field: "Astronomy",
     estimated_time: "An afternoon",
-    related_types: [],
+    related_types: ["Outdoorsy", "Creative"],
   },
 ]
