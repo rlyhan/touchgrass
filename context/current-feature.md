@@ -1,18 +1,21 @@
-# POST endpoint creates user
+# Call create user endpoint during loading screen
 
 ## Summary
 
-Set up a new POST endpoint to receive the form submission sent from the Motivation screen and create a new user in the database.
+On the form submission click, we are immediately taken to the loading screen, after which the POST endpoint is called, and we wait asynchronously for the endpoint to finish successfully, before we get redirect to the recommendations screen. This needs to replace the dummy setTimeout logic we have in the loading screen.
+
+If the POST endpoint fails, we need to display an error message within the loading screen and a button to reattempt the POST request with the label "Try again".
 
 ## Parent Branch
 recommendation-engine-v1
 
 ## Requirements
 
-- Add a POST route on the microservice that accepts the onboarding form payload
-- Validate the request body using the existing onboarding zod schema; respond with 400 and validation errors if invalid
-- Insert a new user record into the database via Drizzle using the validated payload
-- Return a success response (e.g. 201) on successful creation
-- Return 500 with an error message if the database write fails
+- On form submission, navigate immediately to the loading screen (do not await the POST before navigating).
+- From the loading screen, call the POST create user endpoint asynchronously.
+- Replace the existing dummy `setTimeout` logic in the loading screen with the real request lifecycle.
+- On a successful response, redirect the user to the recommendations screen.
+- On a failed response, render an error message within the loading screen.
+- When in the error state, render a "Try again" button that re-attempts the POST request.
 
 ## Notes
