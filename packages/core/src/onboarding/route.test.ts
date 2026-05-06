@@ -48,12 +48,15 @@ const fakeCreatedUser: User = {
 const insertUser = mock.fn<(newUser: NewUser) => Promise<User>>(
   async () => fakeCreatedUser,
 )
+const getUserById = mock.fn<(id: string) => Promise<User | null>>(
+  async () => fakeCreatedUser,
+)
 
 let server: Server
 let baseUrl: string
 
 before(() => {
-  const app = createApp({ insertUser })
+  const app = createApp({ insertUser, getUserById })
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
   baseUrl = `http://127.0.0.1:${port}`

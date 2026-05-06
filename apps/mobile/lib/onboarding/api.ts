@@ -10,7 +10,13 @@ function birthdateToIso(formValue: string): string {
   return `${yyyy}-${mm}-${dd}`
 }
 
-export async function createUser(values: OnboardingFormValues): Promise<void> {
+export type CreateUserResponse = {
+  user: { id: string }
+}
+
+export async function createUser(
+  values: OnboardingFormValues,
+): Promise<CreateUserResponse> {
   const response = await fetch(`${API_BASE_URL}/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -23,4 +29,6 @@ export async function createUser(values: OnboardingFormValues): Promise<void> {
   if (!response.ok) {
     throw new Error(`Failed to create user (${response.status})`)
   }
+
+  return (await response.json()) as CreateUserResponse
 }
