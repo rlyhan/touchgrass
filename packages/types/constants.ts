@@ -28,16 +28,40 @@ export const EMPLOYMENT_STATUSES: EmploymentStatus[] = [
 ]
 
 export const ACTIVITY_TYPES: ActivityType[] = [
-  "Constructive",
-  "Active",
-  "Artistic",
-  "Intellectual",
-  "Outdoorsy",
-  "Social",
-  "Reflective",
   "Creative",
+  "Artistic",
+  "Constructive",
+  "Expressive",
+  "Performative",
+
+  "Intellectual",
+  "Analytical",
+  "Educational",
+  "Reflective",
+
+  "Active",
+  "Physical",
+  "Skill-based",
+  "Competitive",
+
   "Adventurous",
+  "Outdoorsy",
+  "Exploratory",
+  "Experimental",
+
+  "Social",
+  "Collaborative",
+  "Leadership",
+  "Community-oriented",
+
   "Professional",
+  "Goal-oriented",
+  "Disciplined",
+  "Strategic",
+
+  "Mindful",
+  "Therapeutic",
+  "Emotional",
 ]
 
 export const ACTIVITY_FIELDS: ActivityField[] = [
