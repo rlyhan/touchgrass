@@ -1,20 +1,59 @@
-# Update local env commands
+# Expand ActivityType definition
 
 ## Summary
 
-We need to update our commands to the following:
-- npm start (root directory): Needs to run both its current command AND run the npm run dev command in packages/core
-- npm run storybook commands: Needs to run on a different server than 8081 which is what our mobile app runs on
+The current activity type configuration is too narrow. Update the type to this:
+
+type ActivityType =
+  | "Creative"
+  | "Artistic"
+  | "Constructive"
+  | "Expressive"
+  | "Performative"
+
+  | "Intellectual"
+  | "Analytical"
+  | "Educational"
+  | "Reflective"
+
+  | "Active"
+  | "Physical"
+  | "Skill-based"
+  | "Competitive"
+
+  | "Adventurous"
+  | "Outdoorsy"
+  | "Exploratory"
+  | "Experimental"
+
+  | "Social"
+  | "Collaborative"
+  | "Leadership"
+  | "Community-oriented"
+
+  | "Professional"
+  | "Goal-oriented"
+  | "Disciplined"
+  | "Strategic"
+
+  | "Mindful"
+  | "Therapeutic"
+  | "Emotional"
+
+  And then make changes accordingly.
+
+  We also need to update the related_types in each of the mock recommendations in packages/mocks/recommendations.ts with zero to a few closely related types.
 
 ## Parent Branch
 recommendation-engine-v1
 
 ## Requirements
 
-- Root `npm start` must run the existing mobile workspace start command AND `npm run dev` in `packages/core` concurrently.
-  - Both processes should stream output to the same terminal with clear labels.
-  - Stopping the root command (Ctrl+C) should cleanly terminate both child processes.
-- All `npm run storybook*` commands must use a port different from `8081` (the Expo/Metro port for the mobile app) so Storybook and the mobile app can run simultaneously without conflict.
-  - This applies to `storybook`, `storybook:ios`, `storybook:android`, and `storybook:web`.
+- Replace the current `ActivityType` union in `packages/types/index.ts` with the expanded set of 27 types listed above (grouped into 7 thematic clusters).
+- Preserve the existing grouping/order so future readers can see the thematic clusters at a glance.
+- Propagate the change everywhere `ActivityType` is referenced in TypeScript source so the project type-checks cleanly.
+- Update any constants that enumerate activity types (e.g. `packages/types/constants.ts`) to match the new set.
+- Do **not** modify `related_types` values in `packages/mocks/recommendations.ts` in this subfeature — that is the next subfeature. However, if existing `type` values on mocks become invalid under the new union, map them to the closest new type so the file still compiles.
+- Run `npm run lint` and any typecheck to confirm nothing is broken before considering the subfeature complete.
 
 ## Notes
