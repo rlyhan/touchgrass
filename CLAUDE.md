@@ -8,9 +8,9 @@ A mobile application to help users discover new hobbies, activities, and experie
 
 Read the following to get full project context before making changes:
 
-* .claude/context/project-overview.md
-* .claude/context/workflow.md
-* .claude/context/current-feature.md
+* context/project-overview.md
+* context/workflow.md
+* context/current-feature.md
 
 Always read context files before implementing features.
 
