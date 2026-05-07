@@ -39,7 +39,7 @@ export default function SignInScreen() {
         setError(signInError.message ?? "Could not sign in")
         return
       }
-      router.replace("/" as Href)
+      router.replace("/recommendations" as Href)
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.")
     } finally {
