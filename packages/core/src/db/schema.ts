@@ -11,8 +11,16 @@ import {
 
 import type { BFASScores } from "@touchgrass/types"
 
-export const users = pgTable("users", {
+import { user } from "./auth-schema.js"
+
+export * from "./auth-schema.js"
+
+export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
+  authUserId: text("auth_user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   birthdate: date("birthdate").notNull(),
   heightCm: integer("height_cm").notNull(),
@@ -34,5 +42,5 @@ export const users = pgTable("users", {
     .defaultNow(),
 })
 
-export type User = typeof users.$inferSelect
-export type NewUser = typeof users.$inferInsert
+export type Profile = typeof profiles.$inferSelect
+export type NewProfile = typeof profiles.$inferInsert

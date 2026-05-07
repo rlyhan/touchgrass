@@ -1,7 +1,12 @@
 import { createApp } from "./app.js"
-import { getUserById, insertUser } from "./db/users.js"
+import { getSessionUserId } from "./auth-session.js"
+import { getProfileByAuthUserId, insertProfile } from "./db/profiles.js"
 
-const app = createApp({ insertUser, getUserById })
+const app = createApp({
+  insertProfile,
+  getProfileByAuthUserId,
+  getSessionUserId,
+})
 const port = Number(process.env.PORT ?? 3000)
 
 app.listen(port, () => {

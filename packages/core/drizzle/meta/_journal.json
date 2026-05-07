@@ -8,6 +8,13 @@
       "when": 1777964265553,
       "tag": "0000_rare_bromley",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778143016176,
+      "tag": "0001_better_auth_and_profiles",
+      "breakpoints": true
     }
   ]
 }

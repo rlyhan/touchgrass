@@ -10,6 +10,9 @@ export type { Build, EmploymentStatus, Gender }
 
 export type OnboardingFormValues = {
   name: string
+  email: string
+  password: string
+  confirmPassword: string
   birthdate: string
   heightCm: string
   gender: Gender | null

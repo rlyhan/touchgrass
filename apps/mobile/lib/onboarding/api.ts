@@ -1,3 +1,5 @@
+import { authedFetch } from "@/lib/auth/fetch"
+
 import type { OnboardingFormValues } from "./types"
 
 const API_BASE_URL =
@@ -10,14 +12,14 @@ function birthdateToIso(formValue: string): string {
   return `${yyyy}-${mm}-${dd}`
 }
 
-export type CreateUserResponse = {
-  user: { id: string }
+export type CreateProfileResponse = {
+  profile: { id: string }
 }
 
-export async function createUser(
+export async function createProfile(
   values: OnboardingFormValues,
-): Promise<CreateUserResponse> {
-  const response = await fetch(`${API_BASE_URL}/users`, {
+): Promise<CreateProfileResponse> {
+  const response = await authedFetch(`${API_BASE_URL}/profiles`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -27,8 +29,11 @@ export async function createUser(
   })
 
   if (!response.ok) {
-    throw new Error(`Failed to create user (${response.status})`)
+    const body = await response.text().catch(() => "")
+    throw new Error(
+      `Failed to create profile (${response.status}): ${body || "<empty body>"}`,
+    )
   }
 
-  return (await response.json()) as CreateUserResponse
+  return (await response.json()) as CreateProfileResponse
 }

@@ -1,28 +1,31 @@
 import type { Request, Response } from "express"
 
-import type { User } from "../db/schema.js"
+import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendation-algorithm.js"
 
 export type GetRecommendationsDeps = {
-  getUserById: (id: string) => Promise<User | null>
+  getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
+  getSessionUserId: (req: Request) => Promise<string | null>
 }
 
 export function getRecommendationsHandler({
-  getUserById,
+  getProfileByAuthUserId,
+  getSessionUserId,
 }: GetRecommendationsDeps) {
-  return async function handler(
-    req: Request<{ userId: string }>,
-    res: Response,
-  ) {
-    const { userId } = req.params
+  return async function handler(req: Request, res: Response) {
+    const authUserId = await getSessionUserId(req)
+    if (!authUserId) {
+      res.status(401).json({ error: "Not authenticated" })
+      return
+    }
 
     try {
-      const user = await getUserById(userId)
-      if (!user) {
-        res.status(404).json({ error: "User not found" })
+      const profile = await getProfileByAuthUserId(authUserId)
+      if (!profile) {
+        res.status(404).json({ error: "Profile not found" })
         return
       }
-      const recommendations = getRecommendations(user.personality).map(
+      const recommendations = getRecommendations(profile.personality).map(
         (s) => s.rec,
       )
       res.status(200).json({ recommendations })

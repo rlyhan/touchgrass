@@ -3,8 +3,12 @@ import type { Server } from "node:http"
 import type { AddressInfo } from "node:net"
 import { after, before, beforeEach, mock, test } from "node:test"
 
+import type { Request } from "express"
+
 import { createApp } from "../app.js"
-import type { NewUser, User } from "../db/schema.js"
+import type { NewProfile, Profile } from "../db/schema.js"
+
+const AUTH_USER_ID = "auth_user_abc"
 
 const validPayload = {
   name: "Ada Lovelace",
@@ -30,8 +34,9 @@ const validPayload = {
   motivations: ["Curiosity", "Mastery"],
 }
 
-const fakeCreatedUser: User = {
+const fakeCreatedProfile: Profile = {
   id: "00000000-0000-0000-0000-000000000001",
+  authUserId: AUTH_USER_ID,
   name: validPayload.name,
   birthdate: validPayload.birthdate,
   heightCm: 172,
@@ -45,18 +50,25 @@ const fakeCreatedUser: User = {
   createdAt: new Date("2026-01-01T00:00:00Z"),
 }
 
-const insertUser = mock.fn<(newUser: NewUser) => Promise<User>>(
-  async () => fakeCreatedUser,
+const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
+  async () => fakeCreatedProfile,
 )
-const getUserById = mock.fn<(id: string) => Promise<User | null>>(
-  async () => fakeCreatedUser,
+const getProfileByAuthUserId = mock.fn<
+  (authUserId: string) => Promise<Profile | null>
+>(async () => fakeCreatedProfile)
+const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
+  async () => AUTH_USER_ID,
 )
 
 let server: Server
 let baseUrl: string
 
 before(() => {
-  const app = createApp({ insertUser, getUserById })
+  const app = createApp({
+    insertProfile,
+    getProfileByAuthUserId,
+    getSessionUserId,
+  })
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
   baseUrl = `http://127.0.0.1:${port}`
@@ -67,30 +79,47 @@ after(() => {
 })
 
 beforeEach(() => {
-  insertUser.mock.resetCalls()
-  insertUser.mock.mockImplementation(async () => fakeCreatedUser)
+  insertProfile.mock.resetCalls()
+  insertProfile.mock.mockImplementation(async () => fakeCreatedProfile)
+  getSessionUserId.mock.resetCalls()
+  getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
 })
 
-test("POST /users returns 201 with the created user on a valid payload", async () => {
-  const res = await fetch(`${baseUrl}/users`, {
+test("POST /profiles returns 201 with the created profile on a valid payload", async () => {
+  const res = await fetch(`${baseUrl}/profiles`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
   })
 
   assert.equal(res.status, 201)
-  const body = (await res.json()) as { user: User }
-  assert.equal(body.user.id, fakeCreatedUser.id)
-  assert.equal(body.user.name, validPayload.name)
+  const body = (await res.json()) as { profile: Profile }
+  assert.equal(body.profile.id, fakeCreatedProfile.id)
+  assert.equal(body.profile.authUserId, AUTH_USER_ID)
+  assert.equal(body.profile.name, validPayload.name)
 
-  assert.equal(insertUser.mock.callCount(), 1)
-  const calledWith = insertUser.mock.calls[0]?.arguments[0]
+  assert.equal(insertProfile.mock.callCount(), 1)
+  const calledWith = insertProfile.mock.calls[0]?.arguments[0]
   assert.equal(calledWith?.heightCm, 172)
   assert.equal(calledWith?.name, validPayload.name)
+  assert.equal(calledWith?.authUserId, AUTH_USER_ID)
 })
 
-test("POST /users returns 400 with validation errors on an invalid payload", async () => {
-  const res = await fetch(`${baseUrl}/users`, {
+test("POST /profiles returns 401 when there is no session", async () => {
+  getSessionUserId.mock.mockImplementation(async () => null)
+
+  const res = await fetch(`${baseUrl}/profiles`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(validPayload),
+  })
+
+  assert.equal(res.status, 401)
+  assert.equal(insertProfile.mock.callCount(), 0)
+})
+
+test("POST /profiles returns 400 with validation errors on an invalid payload", async () => {
+  const res = await fetch(`${baseUrl}/profiles`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...validPayload, name: "" }),
@@ -100,15 +129,15 @@ test("POST /users returns 400 with validation errors on an invalid payload", asy
   const body = (await res.json()) as { errors: unknown[] }
   assert.ok(Array.isArray(body.errors))
   assert.ok(body.errors.length > 0)
-  assert.equal(insertUser.mock.callCount(), 0)
+  assert.equal(insertProfile.mock.callCount(), 0)
 })
 
-test("POST /users returns 500 when the database insert fails", async () => {
-  insertUser.mock.mockImplementation(async () => {
+test("POST /profiles returns 500 when the database insert fails", async () => {
+  insertProfile.mock.mockImplementation(async () => {
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/users`, {
+  const res = await fetch(`${baseUrl}/profiles`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -116,5 +145,5 @@ test("POST /users returns 500 when the database insert fails", async () => {
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to create user")
+  assert.equal(body.error, "Failed to create profile")
 })

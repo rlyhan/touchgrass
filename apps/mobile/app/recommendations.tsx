@@ -1,39 +1,40 @@
-import { useLocalSearchParams } from "expo-router"
+import { router, type Href } from "expo-router"
 import { useCallback, useEffect, useState } from "react"
-import { ActivityIndicator, ScrollView, Text, View } from "react-native"
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
+import { signOut } from "@/lib/auth/client"
 import { fetchRecommendations } from "@/lib/recommendations/api"
 import type { Recommendation } from "@touchgrass/types"
 
 type Status = "loading" | "ready" | "error"
 
 export default function RecommendationsPage() {
-  const { userId } = useLocalSearchParams<{ userId?: string }>()
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
   const [status, setStatus] = useState<Status>("loading")
 
   const load = useCallback(async () => {
-    if (typeof userId !== "string") {
-      setStatus("error")
-      return
-    }
     setStatus("loading")
     try {
-      const recs = await fetchRecommendations(userId)
+      const recs = await fetchRecommendations()
       setRecommendations(recs)
       setStatus("ready")
     } catch {
       setStatus("error")
     }
-  }, [userId])
+  }, [])
 
   useEffect(() => {
     load()
   }, [load])
+
+  const handleSignOut = useCallback(async () => {
+    await signOut()
+    router.replace("/" as Href)
+  }, [])
 
   if (status !== "ready") {
     return (
@@ -54,6 +55,11 @@ export default function RecommendationsPage() {
               <View className="mt-8 w-full">
                 <PrimaryButton label="Try again" onPress={load} />
               </View>
+              <Pressable onPress={handleSignOut} className="mt-6">
+                <Text className="text-sm font-medium text-gray-500">
+                  Sign out
+                </Text>
+              </Pressable>
             </>
           )}
         </View>
@@ -83,6 +89,12 @@ export default function RecommendationsPage() {
               estimatedTime={rec.estimated_time}
             />
           ))}
+        </View>
+
+        <View className="mt-10 items-center">
+          <Pressable onPress={handleSignOut}>
+            <Text className="text-sm font-medium text-gray-500">Sign out</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>

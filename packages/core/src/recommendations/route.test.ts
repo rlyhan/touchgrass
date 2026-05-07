@@ -3,13 +3,18 @@ import type { Server } from "node:http"
 import type { AddressInfo } from "node:net"
 import { after, before, beforeEach, mock, test } from "node:test"
 
+import type { Request } from "express"
+
 import type { Recommendation } from "@touchgrass/types"
 
 import { createApp } from "../app.js"
-import type { NewUser, User } from "../db/schema.js"
+import type { NewProfile, Profile } from "../db/schema.js"
 
-const fakeUser: User = {
+const AUTH_USER_ID = "auth_user_abc"
+
+const fakeProfile: Profile = {
   id: "00000000-0000-0000-0000-000000000001",
+  authUserId: AUTH_USER_ID,
   name: "Ada Lovelace",
   birthdate: "1990-04-12",
   heightCm: 172,
@@ -34,18 +39,25 @@ const fakeUser: User = {
   createdAt: new Date("2026-01-01T00:00:00Z"),
 }
 
-const insertUser = mock.fn<(newUser: NewUser) => Promise<User>>(
-  async () => fakeUser,
+const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
+  async () => fakeProfile,
 )
-const getUserById = mock.fn<(id: string) => Promise<User | null>>(
-  async () => fakeUser,
+const getProfileByAuthUserId = mock.fn<
+  (authUserId: string) => Promise<Profile | null>
+>(async () => fakeProfile)
+const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
+  async () => AUTH_USER_ID,
 )
 
 let server: Server
 let baseUrl: string
 
 before(() => {
-  const app = createApp({ insertUser, getUserById })
+  const app = createApp({
+    insertProfile,
+    getProfileByAuthUserId,
+    getSessionUserId,
+  })
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
   baseUrl = `http://127.0.0.1:${port}`
@@ -56,12 +68,14 @@ after(() => {
 })
 
 beforeEach(() => {
-  getUserById.mock.resetCalls()
-  getUserById.mock.mockImplementation(async () => fakeUser)
+  getProfileByAuthUserId.mock.resetCalls()
+  getProfileByAuthUserId.mock.mockImplementation(async () => fakeProfile)
+  getSessionUserId.mock.resetCalls()
+  getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
 })
 
-test("GET /users/:userId/recommendations returns 200 with recommendations for a known user", async () => {
-  const res = await fetch(`${baseUrl}/users/${fakeUser.id}/recommendations`)
+test("GET /recommendations returns 200 with recommendations for the signed-in user", async () => {
+  const res = await fetch(`${baseUrl}/recommendations`)
 
   assert.equal(res.status, 200)
   const body = (await res.json()) as { recommendations: Recommendation[] }
@@ -72,28 +86,35 @@ test("GET /users/:userId/recommendations returns 200 with recommendations for a 
     assert.ok(typeof rec.title === "string")
   }
 
-  assert.equal(getUserById.mock.callCount(), 1)
-  assert.equal(getUserById.mock.calls[0]?.arguments[0], fakeUser.id)
+  assert.equal(getProfileByAuthUserId.mock.callCount(), 1)
+  assert.equal(getProfileByAuthUserId.mock.calls[0]?.arguments[0], AUTH_USER_ID)
 })
 
-test("GET /users/:userId/recommendations returns 404 when the user does not exist", async () => {
-  getUserById.mock.mockImplementation(async () => null)
+test("GET /recommendations returns 401 when there is no session", async () => {
+  getSessionUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(
-    `${baseUrl}/users/00000000-0000-0000-0000-000000000999/recommendations`,
-  )
+  const res = await fetch(`${baseUrl}/recommendations`)
+
+  assert.equal(res.status, 401)
+  assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("GET /recommendations returns 404 when the user has no profile yet", async () => {
+  getProfileByAuthUserId.mock.mockImplementation(async () => null)
+
+  const res = await fetch(`${baseUrl}/recommendations`)
 
   assert.equal(res.status, 404)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "User not found")
+  assert.equal(body.error, "Profile not found")
 })
 
-test("GET /users/:userId/recommendations returns 500 when the lookup fails", async () => {
-  getUserById.mock.mockImplementation(async () => {
+test("GET /recommendations returns 500 when the lookup fails", async () => {
+  getProfileByAuthUserId.mock.mockImplementation(async () => {
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/users/${fakeUser.id}/recommendations`)
+  const res = await fetch(`${baseUrl}/recommendations`)
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }

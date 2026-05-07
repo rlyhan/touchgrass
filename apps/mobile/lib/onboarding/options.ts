@@ -9,6 +9,9 @@ import type { OnboardingFormValues } from "./types"
 
 export const ONBOARDING_DEFAULT_VALUES: OnboardingFormValues = {
   name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
   birthdate: "",
   heightCm: "",
   gender: null,

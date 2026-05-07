@@ -5,7 +5,7 @@ import {
   OnboardingLoadingView,
   type OnboardingLoadingStatus,
 } from "@/components/onboarding/loading-screen"
-import { createUser } from "@/lib/onboarding/api"
+import { createProfile } from "@/lib/onboarding/api"
 import { useOnboardingForm } from "@/lib/onboarding/context"
 
 export default function OnboardingLoadingScreen() {
@@ -15,12 +15,10 @@ export default function OnboardingLoadingScreen() {
   const submit = useCallback(async () => {
     setStatus("loading")
     try {
-      const { user } = await createUser(getValues())
-      router.replace({
-        pathname: "/recommendations",
-        params: { userId: user.id },
-      })
-    } catch {
+      await createProfile(getValues())
+      router.replace("/recommendations")
+    } catch (err) {
+      console.error("createProfile failed", err)
       setStatus("error")
     }
   }, [getValues])

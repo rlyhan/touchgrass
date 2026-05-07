@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-05-08 — Better Auth (Email + Password)
+
+Added Better Auth as the auth layer. Sign-up / sign-in / sign-out, persisted sessions, and a session-driven API.
+
+**Server (`packages/core`)**
+
+- `better-auth` configured with the Drizzle adapter against the existing Neon DB; email/password enabled (8-char minimum). Handler mounted at `/api/auth/{*splat}` on the Express app, before `express.json()`. CORS now permits credentials.
+- New `getSessionUserId(req)` helper reads the Better Auth session via `auth.api.getSession`. Injected as a dep into route handlers so tests can mock it.
+- `users` table replaced by `profiles`, with a new `auth_user_id` (text, NOT NULL, UNIQUE, FK to `user(id)` ON DELETE CASCADE) one-to-one with the auth user.
+- Session-driven endpoints: `POST /profiles` requires a session and stamps `authUserId` from it; `GET /recommendations` requires a session and looks up the profile by `authUserId`. 401 unauthenticated, 404 if signed in but no profile yet.
+- Single `0001_better_auth_and_profiles.sql` migration creates the four Better Auth tables (`user`, `session`, `account`, `verification`), renames `users` → `profiles`, and adds the `auth_user_id` column with its FK and unique constraint.
+- `npm test` now loads `--env-file=../../.env.local` because `app.ts` transitively imports `db/client.ts` (via auth) at module load.
+
+**Mobile (`apps/mobile`)**
+
+- Installed `better-auth`, `@better-auth/expo`, `expo-secure-store`, and `expo-network`.
+- `lib/auth/client.ts` — Better Auth client. On native, uses `expoClient` plugin with `expo-secure-store` for token persistence. On web, skips the plugin and relies on `credentials: "include"` so the browser handles cookies natively.
+- `lib/auth/fetch.ts` — `authedFetch` helper that attaches the session cookie via `authClient.getCookie()` on native and uses `credentials: "include"` on web. Used by both API helpers.
+- Onboarding name screen extended with email, password, and confirm-password fields. Email-format / password-length / passwords-match validation. `signUp.email()` wrapped in try/catch — server errors surfaced inline ("User already exists. Use another email."), transport errors caught with a generic "Couldn't reach the server" message. Added a "Sign in" link for returning users.
+- New `app/sign-in.tsx` for returning users — same try/catch pattern around `signIn.email()`, links back to account creation.
+- `app/index.tsx` reads `useSession()` and routes signed-in users to `/recommendations`, everyone else to `/onboarding/name`, with a spinner during the initial session check.
+- "Sign out" button on `/recommendations` (both ready and error states) routes back through `/`.
+
 ## 2026-05-04 — Move Shared Types Into `@touchgrass/types`
 
 - Moved `apps/mobile/lib/types.ts` into `packages/types/index.ts` so the activity, field, and Big Five personality types are now shared workspace exports rather than mobile-private. The previously empty `packages/types/` stub now has real contents.
