@@ -33,7 +33,7 @@ export default function RecommendationsPage() {
 
   const handleSignOut = useCallback(async () => {
     await signOut()
-    router.replace("/" as Href)
+    router.replace("/sign-in" as Href)
   }, [])
 
   if (status !== "ready") {

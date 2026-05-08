@@ -12,11 +12,12 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { TextField } from "@/components/ui/text-field"
-import { signIn } from "@/lib/auth/client"
+import { signIn, useSession } from "@/lib/auth/client"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function SignInScreen() {
+  const { refetch } = useSession()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -39,6 +40,7 @@ export default function SignInScreen() {
         setError(signInError.message ?? "Could not sign in")
         return
       }
+      await refetch()
       router.replace("/recommendations" as Href)
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.")

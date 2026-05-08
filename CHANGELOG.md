@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-05-08 — Authed Route Group & Sign-In Race Fix
+
+Locks down `/recommendations` so signed-out users can only ever see the onboarding flow, and fixes a race that bounced freshly-signed-in users back to onboarding instead of into the app.
+
+**Mobile (`apps/mobile`)**
+
+- New `app/(authed)/` route group with a `_layout.tsx` that reads `useSession()` and `<Redirect>`s to `/onboarding/name` when there is no session, renders an `ActivityIndicator` while pending, and otherwise renders a `Stack`. Moved `app/recommendations.tsx` into the group (URL is unchanged because parens-prefixed groups don't appear in the path). Future authed routes drop into the group to inherit the gate.
+- `app/sign-in.tsx` now awaits `useSession().refetch()` after a successful `signIn.email()` before navigating. Without this, `router.replace("/recommendations")` could fire before Better Auth's `$sessionSignal`-triggered refetch had updated the session atom, so the new `(authed)` gate read a stale `{data: null}` on first render and bounced the user back to `/onboarding/name`.
+- Added Jest setup (`jest-expo` preset, `@testing-library/react-native`, `react-test-renderer`, `@types/jest`) plus a `test` script and Jest config in `apps/mobile/package.json`. First integration test (`__tests__/authed-layout.test.tsx`) covers the gate's three states: pending, signed-out → redirect, signed-in → render `Stack`.
+
 ## 2026-05-08 — Better Auth (Email + Password)
 
 Added Better Auth as the auth layer. Sign-up / sign-in / sign-out, persisted sessions, and a session-driven API.

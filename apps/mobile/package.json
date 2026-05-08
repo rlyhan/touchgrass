@@ -10,10 +10,20 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "test": "jest",
     "storybook": "EXPO_PUBLIC_STORYBOOK=true expo start --port 7007",
     "storybook:ios": "EXPO_PUBLIC_STORYBOOK=true expo start --ios --port 7007",
     "storybook:android": "EXPO_PUBLIC_STORYBOOK=true expo start --android --port 7007",
     "storybook:web": "EXPO_PUBLIC_STORYBOOK=true expo start --web --port 7007"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|nativewind))"
+    ]
   },
   "dependencies": {
     "@better-auth/expo": "^1.6.9",
@@ -62,9 +72,13 @@
     "@storybook/addon-ondevice-controls": "^10.3.2",
     "@storybook/addon-ondevice-notes": "^10.3.2",
     "@storybook/react-native": "^10.3.2",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "jest-expo": "~54.0.0",
+    "react-test-renderer": "^19.1.0",
     "storybook": "^10.3.6",
     "typescript": "~5.9.2"
   }
