@@ -7,7 +7,10 @@ import { GrassLogo } from "@/components/icons/grass-logo"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { signOut } from "@/lib/auth/client"
-import { fetchRecommendations } from "@/lib/recommendations/api"
+import {
+  fetchRecommendations,
+  ProfileNotFoundError,
+} from "@/lib/recommendations/api"
 import type { Recommendation } from "@touchgrass/types"
 
 type Status = "loading" | "ready" | "error"
@@ -25,7 +28,14 @@ export default function RecommendationsPage() {
       const recs = await fetchRecommendations()
       setRecommendations(recs)
       setStatus("ready")
-    } catch {
+    } catch (err) {
+      // The user is authenticated but has no profile — most likely because
+      // onboarding was interrupted before profile creation completed. Send
+      // them back to finish it rather than leaving them on a dead-end error.
+      if (err instanceof ProfileNotFoundError) {
+        router.replace("/onboarding/basic-details" as Href)
+        return
+      }
       setStatus("error")
     }
   }, [])
