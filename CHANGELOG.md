@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-05-08 — Frontend Code Audit Fixes
+
+Issues surfaced by a frontend audit: null-safety, broken image fallback, missing accessibility, ScrollView on dynamic list, silent profile-creation errors, localhost env-var leak, sign-out race, and image layout shift.
+
+**Mobile (`apps/mobile`)**
+
+- `lib/recommendations/api.ts` — `body.recommendations ?? []` guards against a malformed API response where the key is absent, preventing a runtime crash on `.map()`.
+- `components/recommendations/recommendation-card.tsx` — Added `onError` handler to `expo-image`; broken or missing image URLs now render an emerald placeholder `View` instead of a broken slot. Image `height` changed from `"100%"` to the explicit `160` to prevent layout shift on load.
+- `components/ui/primary-button.tsx` — `Pressable` now carries `accessibilityRole="button"` and `accessibilityLabel={label}`.
+- `components/ui/chip.tsx` — `Pressable` now carries `accessibilityRole="togglebutton"`, `accessibilityLabel`, and `accessibilityState={{ selected }}`.
+- `components/ui/option-card.tsx` — `Pressable` now carries `accessibilityRole="radio"`, `accessibilityLabel`, and `accessibilityState={{ checked: selected }}`.
+- `app/(authed)/recommendations.tsx` — Replaced `ScrollView` + `.map()` with `FlatList` (`keyExtractor`, stable `renderItem` via `useCallback`, `ItemSeparatorComponent`, `ListHeaderComponent`, `ListFooterComponent`, `initialNumToRender={5}`). Added `signingOut` state — both sign-out buttons disable and show "Signing out..." while the request is in flight; both carry `accessibilityRole="button"` and `accessibilityLabel="Sign out"`.
+- `components/onboarding/loading-screen.tsx` / `app/onboarding/loading.tsx` — Profile creation errors are now classified (network `TypeError` vs server error) and a specific message is passed down to `OnboardingLoadingView` instead of the generic fallback.
+- `lib/auth/client.ts`, `lib/onboarding/api.ts`, `lib/recommendations/api.ts` — `EXPO_PUBLIC_API_BASE_URL` fallback to `localhost:3000` is now gated on `__DEV__`; production builds throw immediately if the variable is unset.
+
 ## 2026-05-08 — Backend Security & Validation Fixes
 
 Five issues surfaced by a backend audit: CORS wildcard, missing env guard, unvalidated jsonb, duplicate-profile 500, and raw Zod errors in responses.

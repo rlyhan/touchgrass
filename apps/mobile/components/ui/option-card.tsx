@@ -11,6 +11,9 @@ export function OptionCard({ label, selected, onPress }: Props) {
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="radio"
+      accessibilityLabel={label}
+      accessibilityState={{ checked: selected }}
       className={`flex-row items-center gap-3 rounded-2xl border px-4 py-4 ${
         selected
           ? "border-emerald-500 bg-emerald-50"

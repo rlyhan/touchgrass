@@ -9,9 +9,10 @@ export type OnboardingLoadingStatus = "loading" | "error"
 type Props = {
   status: OnboardingLoadingStatus
   onRetry: () => void
+  errorMessage?: string
 }
 
-export function OnboardingLoadingView({ status, onRetry }: Props) {
+export function OnboardingLoadingView({ status, onRetry, errorMessage }: Props) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <View className="flex-1 items-center justify-center px-8">
@@ -33,7 +34,7 @@ export function OnboardingLoadingView({ status, onRetry }: Props) {
               Something went wrong.
             </Text>
             <Text className="mt-2 text-center text-base text-gray-600">
-              We couldn&apos;t set up your profile. Please try again.
+              {errorMessage ?? "We couldn’t set up your profile. Please try again."}
             </Text>
             <View className="mt-8 w-full">
               <PrimaryButton label="Try again" onPress={onRetry} />

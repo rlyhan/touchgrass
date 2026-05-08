@@ -12,6 +12,9 @@ export function Chip({ label, selected, onPress, icon: Icon }: Props) {
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="togglebutton"
+      accessibilityLabel={label}
+      accessibilityState={{ selected }}
       className={`flex-row items-center gap-2 rounded-full border px-4 py-2.5 ${
         selected
           ? "border-emerald-500 bg-emerald-50"

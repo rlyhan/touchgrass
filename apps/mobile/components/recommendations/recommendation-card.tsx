@@ -1,5 +1,6 @@
 import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
+import { useState } from "react"
 import { Text, View } from "react-native"
 
 import {
@@ -25,15 +26,21 @@ export function RecommendationCard({
 }: RecommendationCardProps) {
   const TypeIcon = getActivityTypeIcon(type)
   const FieldIcon = getFieldIcon(field)
+  const [imageError, setImageError] = useState(false)
 
   return (
     <View className="overflow-hidden rounded-2xl bg-white shadow-sm">
       <View className="relative h-40 w-full">
-        <Image
-          source={{ uri: imageUrl }}
-          contentFit="cover"
-          style={{ width: "100%", height: "100%" }}
-        />
+        {imageError ? (
+          <View style={{ width: "100%", height: "100%", backgroundColor: "#d1fae5" }} />
+        ) : (
+          <Image
+            source={{ uri: imageUrl }}
+            contentFit="cover"
+            style={{ width: "100%", height: 160 }}
+            onError={() => setImageError(true)}
+          />
+        )}
         <LinearGradient
           colors={["transparent", "rgba(0,0,0,0.2)", "rgba(0,0,0,0.7)"]}
           locations={[0, 0.5, 1]}
