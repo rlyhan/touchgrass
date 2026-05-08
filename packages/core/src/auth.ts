@@ -8,6 +8,10 @@ if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set")
 }
 
+if (!process.env.BETTER_AUTH_URL) {
+  throw new Error("BETTER_AUTH_URL is not set")
+}
+
 const extraTrustedOrigins =
   process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",")
     .map((s) => s.trim())
@@ -23,15 +27,17 @@ const devTrustedOrigins = isProd
       "http://localhost:19000",
     ]
 
+export const trustedOrigins = [
+  "touchgrass://",
+  ...devTrustedOrigins,
+  ...extraTrustedOrigins,
+]
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
-  trustedOrigins: [
-    "touchgrass://",
-    ...devTrustedOrigins,
-    ...extraTrustedOrigins,
-  ],
+  trustedOrigins,
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,

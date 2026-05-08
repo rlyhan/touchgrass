@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-05-08 — Backend Security & Validation Fixes
+
+Five issues surfaced by a backend audit: CORS wildcard, missing env guard, unvalidated jsonb, duplicate-profile 500, and raw Zod errors in responses.
+
+**Server (`packages/core`)**
+
+- CORS `origin: true` replaced with an explicit `trustedOrigins` allowlist. The same array is now shared between `cors` middleware and `betterAuth` via a named export from `auth.ts`, so the two can't diverge.
+- Added a startup guard for `BETTER_AUTH_URL` — the server now throws on boot if the variable is unset, matching the existing guard for `BETTER_AUTH_SECRET`.
+- `personality` jsonb is now parsed with `bfasScoresSchema` at runtime after the DB fetch, before being passed to the recommendation algorithm. Previously the ORM's compile-time `.$type<T>()` cast provided no runtime protection; malformed rows silently produced wrong scores.
+- `POST /profiles` now pre-checks for an existing profile and returns 409 instead of letting the DB unique constraint surface as a 500. A second 409 path in the catch block handles the `23505` race condition for simultaneous requests.
+- Zod validation errors on `POST /profiles` are now mapped to `{ path, message }` pairs before being sent — internal fields (`code`, `expected`, `origin`) are stripped from the response.
+- Added `app.test.ts` with four CORS tests (trusted/untrusted origin, simple and preflight). Added tests for malformed `personality` (500), duplicate profile (409), race-condition `23505` (409), and sanitized 400 error shape.
+
 ## 2026-05-08 — Authed Route Group & Sign-In Race Fix
 
 Locks down `/recommendations` so signed-out users can only ever see the onboarding flow, and fixes a race that bounced freshly-signed-in users back to onboarding instead of into the app.

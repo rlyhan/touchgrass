@@ -20,7 +20,7 @@ const heightCm = z
 
 const bfasScore = z.number().min(0).max(100)
 
-const bfasScoresSchema = z.object(
+export const bfasScoresSchema = z.object(
   Object.fromEntries(
     BFAS_TRAITS.map((trait) => [trait.key, bfasScore]),
   ) as Record<BFASTrait, typeof bfasScore>,

@@ -1,7 +1,7 @@
 import cors from "cors"
 import express, { type Express } from "express"
 
-import { auth } from "./auth.js"
+import { auth, trustedOrigins } from "./auth.js"
 import { toNodeHandler } from "better-auth/node"
 import {
   type CreateProfileDeps,
@@ -18,7 +18,7 @@ export function createApp(deps: AppDeps): Express {
   const app = express()
   app.use(
     cors({
-      origin: true,
+      origin: trustedOrigins,
       credentials: true,
     }),
   )

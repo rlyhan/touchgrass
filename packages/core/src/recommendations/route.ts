@@ -1,6 +1,7 @@
 import type { Request, Response } from "express"
 
 import type { Profile } from "../db/schema.js"
+import { bfasScoresSchema } from "../onboarding/schema.js"
 import { getRecommendations } from "../lib/recommendation-algorithm.js"
 
 export type GetRecommendationsDeps = {
@@ -25,7 +26,8 @@ export function getRecommendationsHandler({
         res.status(404).json({ error: "Profile not found" })
         return
       }
-      const recommendations = getRecommendations(profile.personality).map(
+      const personality = bfasScoresSchema.parse(profile.personality)
+      const recommendations = getRecommendations(personality).map(
         (s) => s.rec,
       )
       res.status(200).json({ recommendations })

@@ -5,11 +5,13 @@ import { onboardingFormSchema } from "./schema.js"
 
 export type CreateProfileDeps = {
   insertProfile: (newProfile: NewProfile) => Promise<Profile>
+  getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
   getSessionUserId: (req: Request) => Promise<string | null>
 }
 
 export function createProfileHandler({
   insertProfile,
+  getProfileByAuthUserId,
   getSessionUserId,
 }: CreateProfileDeps) {
   return async function handler(req: Request, res: Response) {
@@ -21,7 +23,15 @@ export function createProfileHandler({
 
     const parsed = onboardingFormSchema.safeParse(req.body)
     if (!parsed.success) {
-      res.status(400).json({ errors: parsed.error.issues })
+      res.status(400).json({
+        errors: parsed.error.issues.map(({ path, message }) => ({ path, message })),
+      })
+      return
+    }
+
+    const existing = await getProfileByAuthUserId(authUserId)
+    if (existing) {
+      res.status(409).json({ error: "Profile already exists" })
       return
     }
 
@@ -44,6 +54,10 @@ export function createProfileHandler({
       const created = await insertProfile(newProfile)
       res.status(201).json({ profile: created })
     } catch (error) {
+      if ((error as { code?: string }).code === "23505") {
+        res.status(409).json({ error: "Profile already exists" })
+        return
+      }
       console.error("Failed to create profile", error)
       res.status(500).json({ error: "Failed to create profile" })
     }

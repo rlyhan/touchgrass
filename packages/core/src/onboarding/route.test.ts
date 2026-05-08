@@ -55,7 +55,7 @@ const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
 )
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
->(async () => fakeCreatedProfile)
+>(async () => null)
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
@@ -81,6 +81,8 @@ after(() => {
 beforeEach(() => {
   insertProfile.mock.resetCalls()
   insertProfile.mock.mockImplementation(async () => fakeCreatedProfile)
+  getProfileByAuthUserId.mock.resetCalls()
+  getProfileByAuthUserId.mock.mockImplementation(async () => null)
   getSessionUserId.mock.resetCalls()
   getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
 })
@@ -118,7 +120,7 @@ test("POST /profiles returns 401 when there is no session", async () => {
   assert.equal(insertProfile.mock.callCount(), 0)
 })
 
-test("POST /profiles returns 400 with validation errors on an invalid payload", async () => {
+test("POST /profiles returns 400 with sanitized validation errors on an invalid payload", async () => {
   const res = await fetch(`${baseUrl}/profiles`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -126,10 +128,44 @@ test("POST /profiles returns 400 with validation errors on an invalid payload", 
   })
 
   assert.equal(res.status, 400)
-  const body = (await res.json()) as { errors: unknown[] }
+  const body = (await res.json()) as { errors: { path: unknown[]; message: string }[] }
   assert.ok(Array.isArray(body.errors))
   assert.ok(body.errors.length > 0)
+  // Only path and message — no internal Zod fields (code, expected, origin, etc.)
+  for (const err of body.errors) {
+    assert.deepEqual(Object.keys(err).sort(), ["message", "path"])
+  }
   assert.equal(insertProfile.mock.callCount(), 0)
+})
+
+test("POST /profiles returns 409 when a profile already exists", async () => {
+  getProfileByAuthUserId.mock.mockImplementation(async () => fakeCreatedProfile)
+
+  const res = await fetch(`${baseUrl}/profiles`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(validPayload),
+  })
+
+  assert.equal(res.status, 409)
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Profile already exists")
+  assert.equal(insertProfile.mock.callCount(), 0)
+})
+
+test("POST /profiles returns 409 on DB unique constraint violation (race condition)", async () => {
+  const constraintError = Object.assign(new Error("unique violation"), { code: "23505" })
+  insertProfile.mock.mockImplementation(async () => { throw constraintError })
+
+  const res = await fetch(`${baseUrl}/profiles`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(validPayload),
+  })
+
+  assert.equal(res.status, 409)
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Profile already exists")
 })
 
 test("POST /profiles returns 500 when the database insert fails", async () => {
