@@ -50,25 +50,61 @@ export type ActivityType =
 
 export type ActivityField =
   | "Music"
-  | "Martial Arts"
-  | "Literature"
-  | "Cooking"
+  | "Art"
+  | "Writing"
   | "Photography"
-  | "Gaming"
-  | "Fitness"
-  | "Coding"
-  | "Science"
-  | "Nature"
   | "Film"
   | "Theater"
-  | "Visual Art"
-  | "Writing"
   | "Dance"
-  | "Cycling"
-  | "Hiking"
-  | "Travel"
-  | "Wellness"
+
+  | "Coding"
+  | "Technology"
+  | "Science"
   | "Astronomy"
+  | "Engineering"
+
+  | "Cars"
+  | "Motorcycles"
+  | "Aviation"
+
+  | "Fitness"
+  | "Sports"
+  | "Martial Arts"
+  | "Cycling"
+  | "Running"
+  | "Climbing"
+  | "Hiking"
+
+  | "Gaming"
+  | "Board Games"
+
+  | "Cooking"
+  | "Coffee"
+  | "Fashion"
+
+  | "Travel"
+  | "Nature"
+  | "Camping"
+
+  | "Psychology"
+  | "Philosophy"
+  | "History"
+  | "Language"
+
+  | "Business"
+  | "Finance"
+  | "Leadership"
+
+  | "Meditation"
+  | "Wellness"
+
+  | "Education"
+  | "Community"
+  | "Volunteering"
+
+  | "DIY"
+  | "Home Design"
+  | "Collecting"
 
 // Big Five personality model (OCEAN). Each trait is a 0-100 score.
 export type PersonalityType =

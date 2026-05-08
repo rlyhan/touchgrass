@@ -1,33 +1,87 @@
-# Implement Better Auth
+# Update activity fields
 
 ## Summary
 
-Set up Better Auth so that users can persist their sessions instead of going through the onboarding session all over again.
+The activity fields are currently too leaned towards creative, hobbyist culture, which biases recommendations towards high Openness users.
 
-In the same screen where they enter their name they should also enter their email address, password, and confirm password.
+We need a more diverse set of activity fields and mock activity data.
 
-Better Auth was chosen over Neon Auth and Clerk because it runs as a TypeScript library inside the existing `packages/core` Express server and stores users directly in the existing Neon DB via the Drizzle adapter — no third-party service or webhook sync layer.
+We need to update the ActivityField type to handle these:
+
+export const ACTIVITY_FIELDS: ActivityField[] = [
+  "Music",
+  "Art",
+  "Writing",
+  "Photography",
+  "Film",
+  "Theater",
+  "Dance",
+
+  "Coding",
+  "Technology",
+  "Science",
+  "Astronomy",
+  "Engineering",
+
+  "Cars",
+  "Motorcycles",
+  "Aviation",
+
+  "Fitness",
+  "Sports",
+  "Martial Arts",
+  "Cycling",
+  "Running",
+  "Climbing",
+  "Hiking",
+
+  "Gaming",
+  "Board Games",
+
+  "Cooking",
+  "Coffee",
+  "Fashion",
+
+  "Travel",
+  "Nature",
+  "Camping",
+
+  "Psychology",
+  "Philosophy",
+  "History",
+  "Language",
+
+  "Business",
+  "Finance",
+  "Leadership",
+
+  "Meditation",
+  "Wellness",
+
+  "Education",
+  "Community",
+  "Volunteering",
+
+  "DIY",
+  "Home Design",
+  "Collecting",
+]
+
+And then update the mock data and any logic, types, etc accordingly.
 
 ## Parent Branch
 
 ## Requirements
 
-- Integrate Neon Auth into the app to enable user account creation and session persistence
-- Extend the existing onboarding name screen to also collect:
-  - Email address
-  - Password
-  - Confirm password
-- Validate email format and that password matches confirm password before submission
-- On submission, create a Neon Auth account (sign-up) tied to the user's onboarding data
-- Persist the authenticated session locally so returning users skip the full onboarding flow
-- On app launch, check for an existing session and route the user accordingly (onboarding vs. main app)
-- Provide a sign-in path for returning users on a different device (or after sign-out)
-- Provide a sign-out action somewhere in the app
-- Handle and surface auth errors (invalid email, weak password, email already in use, network errors)
+- Replace the existing `ACTIVITY_FIELDS` constant and `ActivityField` type with the new expanded list (42 fields across 11 thematic groups)
+- Update all mock activity/recommendation data so categories use only values from the new field list
+- Update any UI components that render or filter by `ActivityField` (e.g. interest pickers, tags, filter chips) to handle the new count and groupings
+- Ensure TypeScript types stay consistent — no string literals hardcoded outside the canonical `ACTIVITY_FIELDS` list
+- Run `npm run build` (or lint) to confirm zero type errors after changes
 
 ## Notes
 
-- Server-side auth: `better-auth` mounted in the existing `packages/core` Express app, Drizzle adapter against Neon
-- Mobile: `@better-auth/expo` client; tokens in `expo-secure-store` on native, browser cookie jar on web
-- `BETTER_AUTH_SECRET` in server `.env.local`; `EXPO_PUBLIC_API_BASE_URL` for the mobile client
-- Link auth user → profile via an `auth_user_id` column on `profiles` so API endpoints can derive identity from the session instead of taking IDs in URLs
+- The new list is intentionally broader: it adds STEM, vehicles, fitness sub-disciplines, food/lifestyle, academic/intellectual, business, and community categories to counterbalance the current creative-arts bias
+- Fields are grouped thematically (Creative, STEM, Vehicles, Active/Sports, Games, Lifestyle, Outdoors, Academic, Business, Wellness, Community/DIY) — keep this grouping in mind if the UI needs section headers or ordering logic
+- Mock data only needs representative coverage across the new fields; it does not need to be exhaustive
+- Do not rename or alias old fields — replace them cleanly; any saved user preferences referencing old field names will need a migration or reset if persistence is involved

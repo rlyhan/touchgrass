@@ -45,7 +45,7 @@ export const Creative: Story = {
     imageUrl:
       "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&q=80",
     type: "Artistic",
-    field: "Visual Art",
+    field: "Art",
     estimatedTime: "30 min",
   },
 }

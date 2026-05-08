@@ -66,25 +66,61 @@ export const ACTIVITY_TYPES: ActivityType[] = [
 
 export const ACTIVITY_FIELDS: ActivityField[] = [
   "Music",
-  "Martial Arts",
-  "Literature",
-  "Cooking",
+  "Art",
+  "Writing",
   "Photography",
-  "Gaming",
-  "Fitness",
-  "Coding",
-  "Science",
-  "Nature",
   "Film",
   "Theater",
-  "Visual Art",
-  "Writing",
   "Dance",
-  "Cycling",
-  "Hiking",
-  "Travel",
-  "Wellness",
+
+  "Coding",
+  "Technology",
+  "Science",
   "Astronomy",
+  "Engineering",
+
+  "Cars",
+  "Motorcycles",
+  "Aviation",
+
+  "Fitness",
+  "Sports",
+  "Martial Arts",
+  "Cycling",
+  "Running",
+  "Climbing",
+  "Hiking",
+
+  "Gaming",
+  "Board Games",
+
+  "Cooking",
+  "Coffee",
+  "Fashion",
+
+  "Travel",
+  "Nature",
+  "Camping",
+
+  "Psychology",
+  "Philosophy",
+  "History",
+  "Language",
+
+  "Business",
+  "Finance",
+  "Leadership",
+
+  "Meditation",
+  "Wellness",
+
+  "Education",
+  "Community",
+  "Volunteering",
+
+  "DIY",
+  "Home Design",
+  "Collecting",
 ]
 
 export const PERSONALITY_TRAITS: PersonalityTrait[] = [
