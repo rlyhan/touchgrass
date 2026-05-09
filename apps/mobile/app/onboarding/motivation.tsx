@@ -35,10 +35,10 @@ export default function MotivationScreen() {
         name="motivations"
         rules={{ validate: (v) => v.length >= 1 }}
         render={({ field: { value, onChange } }) => {
-          const toggle = (option: string) => {
-            const next = value.includes(option)
-              ? value.filter((m) => m !== option)
-              : [...value, option]
+          const toggle = (optionValue: string) => {
+            const next = value.includes(optionValue)
+              ? value.filter((m) => m !== optionValue)
+              : [...value, optionValue]
             onChange(next)
           }
 
@@ -46,10 +46,10 @@ export default function MotivationScreen() {
             <View className="gap-3">
               {MOTIVATION_OPTIONS.map((option) => (
                 <OptionCard
-                  key={option}
-                  label={option}
-                  selected={value.includes(option)}
-                  onPress={() => toggle(option)}
+                  key={option.value}
+                  label={option.label}
+                  selected={value.includes(option.value)}
+                  onPress={() => toggle(option.value)}
                 />
               ))}
             </View>

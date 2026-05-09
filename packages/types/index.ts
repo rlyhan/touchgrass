@@ -148,6 +148,12 @@ export type BFASTraitDefinition = {
   parent: PersonalityTrait
 }
 
+export type Motivation = {
+  value: string
+  label: string
+  associated_activity_types: ActivityType[]
+}
+
 export type Recommendation = {
   id: string
   title: string

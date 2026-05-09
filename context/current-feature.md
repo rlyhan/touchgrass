@@ -1,87 +1,28 @@
-# Update activity fields
+# Update Motivation type and onboarding selection
 
 ## Summary
 
-The activity fields are currently too leaned towards creative, hobbyist culture, which biases recommendations towards high Openness users.
+The MOTIVATION_OPTIONS data structure has now been updated, and the code now needs to reflect these changes.
 
-We need a more diverse set of activity fields and mock activity data.
-
-We need to update the ActivityField type to handle these:
-
-export const ACTIVITY_FIELDS: ActivityField[] = [
-  "Music",
-  "Art",
-  "Writing",
-  "Photography",
-  "Film",
-  "Theater",
-  "Dance",
-
-  "Coding",
-  "Technology",
-  "Science",
-  "Astronomy",
-  "Engineering",
-
-  "Cars",
-  "Motorcycles",
-  "Aviation",
-
-  "Fitness",
-  "Sports",
-  "Martial Arts",
-  "Cycling",
-  "Running",
-  "Climbing",
-  "Hiking",
-
-  "Gaming",
-  "Board Games",
-
-  "Cooking",
-  "Coffee",
-  "Fashion",
-
-  "Travel",
-  "Nature",
-  "Camping",
-
-  "Psychology",
-  "Philosophy",
-  "History",
-  "Language",
-
-  "Business",
-  "Finance",
-  "Leadership",
-
-  "Meditation",
-  "Wellness",
-
-  "Education",
-  "Community",
-  "Volunteering",
-
-  "DIY",
-  "Home Design",
-  "Collecting",
-]
-
-And then update the mock data and any logic, types, etc accordingly.
+-Creation of a Motivation type
+-The onboarding screen for motivation selection should display the label field and submit the value field
+-Any test updates
 
 ## Parent Branch
+recommendation-engine-v1
 
 ## Requirements
 
-- Replace the existing `ACTIVITY_FIELDS` constant and `ActivityField` type with the new expanded list (42 fields across 11 thematic groups)
-- Update all mock activity/recommendation data so categories use only values from the new field list
-- Update any UI components that render or filter by `ActivityField` (e.g. interest pickers, tags, filter chips) to handle the new count and groupings
-- Ensure TypeScript types stay consistent — no string literals hardcoded outside the canonical `ACTIVITY_FIELDS` list
-- Run `npm run build` (or lint) to confirm zero type errors after changes
+- Define a `Motivation` type that matches the shape of entries in `MOTIVATION_OPTIONS` (`value`, `label`, `associated_activity_types`).
+  - Place it alongside related onboarding types (e.g. in `apps/mobile/lib/onboarding/types.ts` or the shared `@touchgrass/types` package, matching existing conventions).
+  - Annotate `MOTIVATION_OPTIONS` with `Motivation[]` (or `readonly Motivation[]`) so the structure is type-checked.
+- Fix `apps/mobile/app/onboarding/motivation.tsx` so the option list works with the new object shape:
+  - Render `option.label` as the visible card text.
+  - Toggle/store `option.value` (a string) in the form's `motivations` array — not the whole object.
+  - Update the `selected` check to compare against `option.value`.
+- Verify the form value type for `motivations` is `string[]` (the persisted/submitted shape) and update `OnboardingFormValues` if needed.
+- Confirm no other consumer of `MOTIVATION_OPTIONS` breaks under the new shape.
+- Update or add tests covering the motivation selection behavior, if test coverage exists for onboarding.
+- Run `npm run lint` and typecheck after changes.
 
 ## Notes
-
-- The new list is intentionally broader: it adds STEM, vehicles, fitness sub-disciplines, food/lifestyle, academic/intellectual, business, and community categories to counterbalance the current creative-arts bias
-- Fields are grouped thematically (Creative, STEM, Vehicles, Active/Sports, Games, Lifestyle, Outdoors, Academic, Business, Wellness, Community/DIY) — keep this grouping in mind if the UI needs section headers or ordering logic
-- Mock data only needs representative coverage across the new fields; it does not need to be exhaustive
-- Do not rename or alias old fields — replace them cleanly; any saved user preferences referencing old field names will need a migration or reset if persistence is involved
