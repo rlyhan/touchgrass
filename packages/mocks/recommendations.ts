@@ -1,4 +1,4 @@
-import type { Recommendation } from "@touchgrass/types"
+import { Recommendation } from "@touchgrass/types";
 
 export const RECOMMENDATIONS: Recommendation[] = [
   {
@@ -644,10 +644,10 @@ export const RECOMMENDATIONS: Recommendation[] = [
     id: "rec_072",
     title: "Learn a TikTok Choreography",
     imageUrl: "https://picsum.photos/seed/rec_072/800/600",
-    type: "Creative",
+    type: "Performative",
     field: "Dance",
     estimated_time: "1 hour",
-    related_types: ["Skill-based", "Performative"],
+    related_types: ["Skill-based", "Community-oriented"],
   },
   {
     id: "rec_073",

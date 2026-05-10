@@ -124,6 +124,8 @@ export type PersonalityTrait = {
   highLabel: string
 }
 
+export type OCEANScores = Record<PersonalityType, number>
+
 // Big Five Aspects Scale (BFAS) — 10 aspects, two per Big Five domain.
 export type BFASTrait =
   | "Openness"
@@ -154,6 +156,42 @@ export type Motivation = {
   associated_activity_types: ActivityType[]
 }
 
+export type TraitLevel = 'H' | 'L';
+
+export type PatternTypeId =
+  | '1-HH' | '1-HL' | '1-LH' | '1-LL'
+  | '2-HH' | '2-HL' | '2-LH' | '2-LL'
+  | '3-HH' | '3-HL' | '3-LH' | '3-LL'
+  | '4-HH' | '4-HL' | '4-LH' | '4-LL'
+  | '5-HH' | '5-HL' | '5-LH' | '5-LL'
+  | '6-HH' | '6-HL' | '6-LH' | '6-LL'
+  | '7-HH' | '7-HL' | '7-LH' | '7-LL'
+  | '8-HH' | '8-HL' | '8-LH' | '8-LL'
+  | '9-HH' | '9-HL' | '9-LH' | '9-LL'
+  | '10-HH' | '10-HL' | '10-LH' | '10-LL';
+
+export interface PatternGroup {
+  id: number;
+  label: string;
+  traitA: PersonalityType;
+  traitB: PersonalityType;
+}
+
+export interface PatternType {
+  id: string;
+  groupId: number;
+  name: string;
+  shortDescription: string;
+  traitA: {
+    trait: PersonalityType;
+    level: TraitLevel;
+  };
+  traitB: {
+    trait: PersonalityType;
+    level: TraitLevel;
+  };
+}
+
 export type Recommendation = {
   id: string
   title: string
@@ -162,4 +200,6 @@ export type Recommendation = {
   field: ActivityField
   estimated_time: string
   related_types?: ActivityType[]
+  // Human-curated matches
+  patternTypes?: PatternTypeId[];
 }

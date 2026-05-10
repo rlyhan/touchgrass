@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-05-10 — NEO Pattern Recommendation Scoring
+
+Replaced the per-trait OCEAN alignment scoring in the recommendation engine with a NEO pattern-strength model that scores each activity against the user's fit across the 40 IPIP-NEO pattern types (10 OCEAN trait pairs × HH/HL/LH/LL combinations).
+
+**Types (`packages/types`)**
+
+- `index.ts` — Added `OCEANScores`, `TraitLevel`, `PatternTypeId` (40-id union), `PatternGroup`, `PatternType`. Added optional `patternTypes?: PatternTypeId[]` field on `Recommendation` for human-curated overrides (declared, not yet read by the algorithm).
+- `constants.ts` — Removed the old `ACTIVITY_TYPE_BFAS_MAPPING`. Added `patternGroups` (10 trait-pair groups), `patternTypes` (40 named patterns with H/L definitions), and `ActivityTypePatterns` (each `ActivityType` → 3 pattern IDs that best express it).
+
+**Server (`packages/core`)**
+
+- `lib/helpers.ts` (new) — `getOCEANScores` collapses BFAS aspects into their parent OCEAN traits by averaging. `calculatePatternStrength` scores how well a user's OCEAN scores fit a pattern's H/L spec (each trait → `score/100` for H or `1 - score/100` for L, then averaged). `getUserPatternStrengths` runs that across all 40 patterns. `calculateActivityPatternAffinity` averages the user's strengths across a list of pattern IDs (returns 0 for empty input).
+- `lib/recommendation-algorithm.ts` — Rewrote `getRecommendations`. Now: BFAS → OCEAN → pattern strengths; for each recommendation, primary affinity (over `ActivityTypePatterns[type]`) and secondary affinity (over the union of patterns from `related_types`). Final score is `0.7 * primary + 0.3 * secondary`, falling back to primary alone when `related_types` is absent (so an empty secondary list doesn't drag the score toward zero). Sorts highest → lowest, returns top 3.
+- `lib/helpers.test.ts` (new) — 8 unit tests covering `getOCEANScores` averaging, `calculatePatternStrength` H/L matching including 0/100 boundaries, and `calculateActivityPatternAffinity` (empty list, multi-pattern average, missing-key handling).
+
+**Mocks (`packages/mocks`)**
+
+- `recommendations.ts` — `rec_072` (TikTok choreography) retyped from `Creative` to `Performative` and its `related_types` updated to remove the duplicate that previously had its own `type` listed as a related type.
+
+**Docs (`context`)**
+
+- `recommendation-engine.md` — Added BFAS aspect breakdown, full IPIP-NEO pattern group catalog, and a four-stage Algorithm Flow section (BFAS→OCEAN, pattern strengths, primary/secondary scoring with the 0.7/0.3 split, sort & return top 3) with notes on inputs not yet wired in (motivation, interests, curated `patternTypes`).
+
 ## 2026-05-08 — Frontend Code Audit Fixes
 
 Issues surfaced by a frontend audit: null-safety, broken image fallback, missing accessibility, ScrollView on dynamic list, silent profile-creation errors, localhost env-var leak, sign-out race, and image layout shift.

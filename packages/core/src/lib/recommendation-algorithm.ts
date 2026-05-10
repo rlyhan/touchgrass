@@ -1,78 +1,42 @@
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
-import { ActivityType, BFASScores, Recommendation } from "@touchgrass/types";
-import { ACTIVITY_TYPES, ACTIVITY_TYPE_BFAS_MAPPING } from "@touchgrass/types/constants";
+import { BFASScores, Recommendation } from "@touchgrass/types";
+import { ActivityTypePatterns } from "@touchgrass/types/constants";
+import { calculateActivityPatternAffinity, getOCEANScores, getUserPatternStrengths } from "./helpers.js";
 
-/* Recommendation Algorithm */
-
-function calculateAlignment(
-    activityType: ActivityType,
-    userTraits: BFASScores
-): number {
-    const activityTraits = ACTIVITY_TYPE_BFAS_MAPPING[activityType]
-
-    let totalDiff = 0
-    let maxDiff = 0
-
-    for (const key in userTraits) {
-        const userValue = userTraits[key as keyof BFASScores] ?? 0
-        const activityValue = activityTraits[key as keyof BFASScores] ?? 0
-
-        const diff = Math.abs(userValue - activityValue)
-
-        totalDiff += diff
-        maxDiff += 100 // max possible per trait
-    }
-
-    const score = 1 - totalDiff / maxDiff
-
-    return score
+export type ScoredRecommendation = {
+    rec: Recommendation
+    score: number
 }
 
-function getUserAlignments(userTraits: BFASScores): Record<ActivityType, number> {
-    const alignments: Record<ActivityType, number> = {} as Record<ActivityType, number>
-    ACTIVITY_TYPES.forEach(activityType => {
-        alignments[activityType] = calculateAlignment(activityType, userTraits)
-    })
-    return alignments
-}
-
-const PRIMARY_ALIGNMENT_MIN = 0.8
-const SECONDARY_ALIGNMENT_MIN = 0.6
-
-export type ScoredRecommendation = { rec: Recommendation; score: number }
+const PRIMARY_WEIGHT = 0.7
+const SECONDARY_WEIGHT = 0.3
+const MAX_RECOMMENDATIONS = 3
 
 export function getRecommendations(userTraits: BFASScores): ScoredRecommendation[] {
+    // Patterns are defined against OCEAN, so collapse the user's BFAS aspects first.
+    const bfasToOCEAN = getOCEANScores(userTraits)
+    const userPatternStrengths = getUserPatternStrengths(bfasToOCEAN)
+
     const scored: ScoredRecommendation[] = []
 
-    const userAlignments = getUserAlignments(userTraits)
-
     for (const recommendation of RECOMMENDATIONS) {
-        const baseScore = calculateAlignment(recommendation.type, userTraits)
+        const primaryPatterns = ActivityTypePatterns[recommendation.type] ?? []
+        const primaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, primaryPatterns)
 
-        const primaryAlignment = userAlignments[recommendation.type]
+        const secondaryPatterns = (recommendation.related_types ?? []).flatMap(
+            (t) => ActivityTypePatterns[t] ?? []
+        )
+        const secondaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, secondaryPatterns)
 
-        let primaryBoost = 0
-        if (primaryAlignment >= PRIMARY_ALIGNMENT_MIN) {
-            primaryBoost = 0.15
-        }
-
-        let secondaryBoost = 0
-        for (const type of recommendation.related_types ?? []) {
-            const alignment = userAlignments[type]
-
-            if (alignment >= SECONDARY_ALIGNMENT_MIN) {
-                secondaryBoost += 0.05 * alignment
-            }
-        }
-
-        const finalScore = baseScore + primaryBoost + secondaryBoost
+        const finalScore = secondaryPatterns.length === 0
+            ? primaryAffinity
+            : primaryAffinity * PRIMARY_WEIGHT + secondaryAffinity * SECONDARY_WEIGHT
 
         scored.push({ rec: recommendation, score: finalScore })
     }
 
-    // Sort highest → lowest
+    // Sort highest → lowest, then take the top N
     scored.sort((a, b) => b.score - a.score)
 
-    // Return top 3
-    return scored.slice(0, 3)
+    return scored.slice(0, MAX_RECOMMENDATIONS)
 }
