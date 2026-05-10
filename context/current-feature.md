@@ -1,30 +1,34 @@
-# Use the NEO Pattern Types
+# Rank user's top 6 activity types by pattern affinity
 
 ## Summary
 
-Change the algorithm to calculate user's alignment to activities through the NEO pattern types.
+Currently, the top recommendations are often omitting the same type, eg. "Reflective" for someone top scoring in "Intellectual Explorer".
+
+To get a variety of recommendations, we should make sure that in a set of 3 recommendations:
+- Each has a different primary type (eg. Reflective, Creative, Active)
+- Each has a different #1 pattern type alignment (eg. no more than 1 can be best-aligned with 1-LH)
+
+We should get the top 6 activity types for the user based on their pattern types to narrow down our options.
+
+We should then randomise the results that come through.
 
 ## Parent Branch
 recommendation-engine-v1
 
 ## Requirements
 
-- [x] Score recommendations against the user's NEO pattern strengths rather than against raw OCEAN traits.
-- [x] Use each recommendation's primary `type` as the dominant signal, and its `related_types` as a secondary signal with a smaller weight.
-- [x] Return recommendations sorted highest → lowest by score so the API route can take the top N.
+This subfeature is the foundation for the diversity work: produce a ranked list of the user's top 6 activity types based on their pattern strengths, which downstream steps will use to constrain and diversify recommendations.
+
+- Score every activity type (e.g. Reflective, Creative, Active, ...) against the user's pattern strengths using the same `calculateActivityPatternAffinity` mechanism currently applied per-recommendation.
+- Return the top 6 activity types ordered by descending affinity score.
+- Expose this as a reusable helper in `packages/core/src/lib/recommendation-algorithm.ts` (or a sibling module) so subsequent subfeatures (diversification, randomisation) can consume it.
+- Do not yet change the `/recommendations` API response shape or the per-recommendation scoring path — that's left to follow-up subfeatures.
+
+Out of scope for this subfeature:
+- Enforcing distinct primary types or distinct #1 pattern alignments across the final 3 recs.
+- Randomising the returned recommendations.
+- Changing how individual recommendations are scored or sliced.
 
 ## Implementation
 
-- [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts) — filled in `getRecommendations`:
-  1. Convert BFAS → OCEAN via `getOCEANScores`.
-  2. Compute user pattern strengths across all 40 NEO pattern types via `getUserPatternStrengths`.
-  3. For each recommendation, look up `ActivityTypePatterns[type]` for the primary set and the union of `ActivityTypePatterns[t]` for each `related_types` entry as the secondary set.
-  4. Average the user's strength across each set via `calculateActivityPatternAffinity`.
-  5. Combine: `primary * 0.7 + secondary * 0.3`, falling back to primary alone when the recommendation has no `related_types` (so an empty secondary list doesn't drag the score toward zero).
-  6. Sort highest → lowest.
-- [`context/recommendation-engine.md`](./recommendation-engine.md) — added an **Algorithm Flow** section documenting the four stages above, plus a note on inputs the engine doesn't yet consume (motivation, interests, human-curated `patternTypes`).
-
 ## Notes
-
-- The primary/secondary split is the only weighting in this pass — motivation and interests are still unwired.
-- Each recommendation also has a human-curated `patternTypes` field on the `Recommendation` type, but the algorithm currently only reads from `ActivityTypePatterns` keyed by `type` / `related_types`. Wiring curated patterns in (and deciding how they should override or blend with the inferred ones) is a follow-up.

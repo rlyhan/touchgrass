@@ -1,6 +1,6 @@
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
-import { BFASScores, Recommendation } from "@touchgrass/types";
-import { ActivityTypePatterns } from "@touchgrass/types/constants";
+import { ActivityType, BFASScores, Recommendation } from "@touchgrass/types";
+import { ACTIVITY_TYPES, ActivityTypePatterns } from "@touchgrass/types/constants";
 import { calculateActivityPatternAffinity, getOCEANScores, getUserPatternStrengths } from "./helpers.js";
 
 export type ScoredRecommendation = {
@@ -8,9 +8,15 @@ export type ScoredRecommendation = {
     score: number
 }
 
+export type ScoredActivityType = {
+    type: ActivityType
+    score: number
+}
+
 const PRIMARY_WEIGHT = 0.7
 const SECONDARY_WEIGHT = 0.3
 const MAX_RECOMMENDATIONS = 3
+const TOP_ACTIVITY_TYPES_COUNT = 6
 
 export function getRecommendations(userTraits: BFASScores): ScoredRecommendation[] {
     // Patterns are defined against OCEAN, so collapse the user's BFAS aspects first.
@@ -39,4 +45,24 @@ export function getRecommendations(userTraits: BFASScores): ScoredRecommendation
     scored.sort((a, b) => b.score - a.score)
 
     return scored.slice(0, MAX_RECOMMENDATIONS)
+}
+
+export function getTopActivityTypes(
+    userTraits: BFASScores,
+    count: number = TOP_ACTIVITY_TYPES_COUNT,
+): ScoredActivityType[] {
+    const bfasToOCEAN = getOCEANScores(userTraits)
+    const userPatternStrengths = getUserPatternStrengths(bfasToOCEAN)
+
+    const scored: ScoredActivityType[] = ACTIVITY_TYPES.map((type) => ({
+        type,
+        score: calculateActivityPatternAffinity(
+            userPatternStrengths,
+            ActivityTypePatterns[type] ?? [],
+        ),
+    }))
+
+    scored.sort((a, b) => b.score - a.score)
+
+    return scored.slice(0, count)
 }
