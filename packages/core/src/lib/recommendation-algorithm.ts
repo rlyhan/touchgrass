@@ -15,6 +15,7 @@ export type ScoredActivityType = {
 
 const PRIMARY_WEIGHT = 0.7
 const SECONDARY_WEIGHT = 0.3
+const MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH = 0.65
 const MAX_RECOMMENDATIONS = 3
 const TOP_ACTIVITY_TYPES_COUNT = 6
 
@@ -34,15 +35,40 @@ function scoreRecommendation(userPatternStrengths: Record<string, number>, recom
     return { rec: recommendation, score: finalScore }
 }
 
+function getDiverseRecommendations(recommendations: ScoredRecommendation[]): ScoredRecommendation[] {
+    // Get recommendations with match score >= MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH
+    const strongMatches = recommendations.filter((recommendation) => recommendation.score >= MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH)
+
+    // Identify the strongest scoring recommendation for each activity type
+    const bestByType: Partial<Record<ActivityType, ScoredRecommendation>> = {}
+    for (const recommendation of strongMatches) {
+        const type = recommendation.rec.type
+        if (!bestByType[type] || recommendation.score > (bestByType[type] as ScoredRecommendation).score) {
+            bestByType[type] = recommendation
+        }
+    }
+
+    // Collect defined best values (filter out any undefined entries)
+    const bestValues = Object.values(bestByType).filter(Boolean) as ScoredRecommendation[]
+
+    // If there are at least MAX_RECOMMENDATIONS, return them all
+    if (bestValues.length >= MAX_RECOMMENDATIONS) {
+        return bestValues.slice(0, MAX_RECOMMENDATIONS)
+    }
+
+    // Otherwise, add the next highest-scoring matches
+    return [...bestValues, ...strongMatches.filter((rec) => !bestByType[rec.rec.type])].slice(0, MAX_RECOMMENDATIONS)
+}
+
 export function getRecommendations(userTraits: BFASScores): ScoredRecommendation[] {
     // Patterns are defined against OCEAN, so collapse the user's BFAS aspects first.
     const bfasToOCEAN = getOCEANScores(userTraits)
     const userPatternStrengths = getUserPatternStrengths(bfasToOCEAN)
 
     // Use mock RECOMMENDATIONS data for now
-    const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternStrengths, rec)).sort((a, b) => b.score - a.score)
+    const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternStrengths, rec))
 
-    return scoredRecommendations.slice(0, MAX_RECOMMENDATIONS)
+    return getDiverseRecommendations(scoredRecommendations).sort((a, b) => b.score - a.score).slice(0, MAX_RECOMMENDATIONS)
 }
 
 export function getTopActivityTypes(
