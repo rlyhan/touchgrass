@@ -1,12 +1,11 @@
-import { router, type Href } from "expo-router"
-import { Controller, useWatch } from "react-hook-form"
-import { View } from "react-native"
-
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { OptionCard } from "@/components/ui/option-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { useOnboardingForm } from "@/lib/onboarding/context"
-import { MOTIVATION_OPTIONS } from "@/lib/onboarding/options"
+import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
+import { router, type Href } from "expo-router"
+import { Controller, useWatch } from "react-hook-form"
+import { View } from "react-native"
 
 export default function MotivationScreen() {
   const { control, handleSubmit } = useOnboardingForm()
