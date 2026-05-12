@@ -1,6 +1,6 @@
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
 import { ActivityType, BFASScores, Recommendation } from "@touchgrass/types";
-import { ACTIVITY_TYPES, ActivityTypePatterns } from "@touchgrass/types/constants";
+import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants";
 import { calculateActivityPatternAffinity, getOCEANScores, getUserPatternStrengths } from "./helpers.js";
 
 export type ScoredRecommendation = {
@@ -20,11 +20,11 @@ const MAX_RECOMMENDATIONS = 3
 const TOP_ACTIVITY_TYPES_COUNT = 6
 
 function scoreRecommendation(userPatternStrengths: Record<string, number>, recommendation: Recommendation): ScoredRecommendation {
-    const primaryPatterns = ActivityTypePatterns[recommendation.type] ?? []
+    const primaryPatterns = ACTIVITY_TYPE_PATTERNS[recommendation.type] ?? []
     const primaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, primaryPatterns)
 
     const secondaryPatterns = (recommendation.related_types ?? []).flatMap(
-        (t) => ActivityTypePatterns[t] ?? []
+        (t) => ACTIVITY_TYPE_PATTERNS[t] ?? []
     )
     const secondaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, secondaryPatterns)
 
@@ -82,7 +82,7 @@ export function getTopActivityTypes(
         type,
         score: calculateActivityPatternAffinity(
             userPatternStrengths,
-            ActivityTypePatterns[type] ?? [],
+            ACTIVITY_TYPE_PATTERNS[type] ?? [],
         ),
     }))
 

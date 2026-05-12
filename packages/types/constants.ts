@@ -349,7 +349,7 @@ export const patternGroups: PatternGroup[] = [
   },
 ];
 
-export const patternTypes: PatternType[] = [
+export const PATTERN_TYPES: PatternType[] = [
   // Group 1 — Extraversion × Agreeableness
   {
     id: '1-HH',
@@ -691,7 +691,7 @@ export const patternTypes: PatternType[] = [
   },
 ];
 
-export const ActivityTypePatterns: Record<ActivityType, PatternTypeId[]> = {
+export const ACTIVITY_TYPE_PATTERNS: Record<ActivityType, PatternTypeId[]> = {
   Active: ['2-HH', '3-HL', '1-HL'],
   Adventurous: ['4-HH', '3-HL', '10-LH'],
   Analytical: ['9-HH', '2-LH', '8-HL'],

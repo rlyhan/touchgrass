@@ -1,5 +1,5 @@
 import { BFASScores, OCEANScores, PatternType } from '@touchgrass/types';
-import { patternTypes } from '@touchgrass/types/constants';
+import { PATTERN_TYPES } from '@touchgrass/types/constants';
 
 export const getOCEANScores = (bfas: BFASScores): OCEANScores => {
     return {
@@ -44,7 +44,7 @@ export function calculatePatternStrength(
 
 export const getUserPatternStrengths = (userOcean: OCEANScores): Record<PatternType['id'], number> => {
     const strengths: Record<PatternType['id'], number> = {} as Record<PatternType['id'], number>
-    patternTypes.forEach(pattern => {
+    PATTERN_TYPES.forEach(pattern => {
         strengths[pattern.id] = calculatePatternStrength(userOcean, pattern)
     })
     return strengths
