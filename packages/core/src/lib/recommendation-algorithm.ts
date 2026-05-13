@@ -1,7 +1,7 @@
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
-import { ActivityType, BFASScores, Recommendation } from "@touchgrass/types";
+import { ActivityType, BFASScores, Motivation, Recommendation } from "@touchgrass/types";
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants";
-import { calculateActivityPatternAffinity, getOCEANScores, getUserPatternStrengths } from "./helpers.js";
+import { calculateActivityPatternAffinity, calculateMotivationBoost, getMotivationRelevantTraits, getOCEANScores, getUserPatternStrengths } from "./helpers/index.js";
 
 export type ScoredRecommendation = {
     rec: Recommendation
@@ -19,7 +19,16 @@ const MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH = 0.65
 const MAX_RECOMMENDATIONS = 3
 const TOP_ACTIVITY_TYPES_COUNT = 6
 
-function scoreRecommendation(userPatternStrengths: Record<string, number>, recommendation: Recommendation): ScoredRecommendation {
+/*
+ * Calculates the base score for a recommendation based on pattern affinity.
+ * eg. "Spend a Month Visiting Antique Markets" -> type: Exploratory, related_types: Social, Reflective
+ * User's match with primary patterns = 0.55, secondary patterns = 0.61
+ * Base score = 0.55 * 0.7 + 0.61 * 0.3 = 0.568
+ */
+function calculateRecommendationBaseScore(
+    userPatternStrengths: Record<string, number>,
+    recommendation: Recommendation,
+): number {
     const primaryPatterns = ACTIVITY_TYPE_PATTERNS[recommendation.type] ?? []
     const primaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, primaryPatterns)
 
@@ -28,18 +37,32 @@ function scoreRecommendation(userPatternStrengths: Record<string, number>, recom
     )
     const secondaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, secondaryPatterns)
 
-    const finalScore = secondaryPatterns.length === 0
+    return secondaryPatterns.length === 0
         ? primaryAffinity
         : primaryAffinity * PRIMARY_WEIGHT + secondaryAffinity * SECONDARY_WEIGHT
-
-    return { rec: recommendation, score: finalScore }
 }
 
+/* Combines base pattern affinity with motivation boost to produce a final score. */
+function scoreRecommendation(userPatternStrengths: Record<string, number>, recommendation: Recommendation, motivations: Motivation[]): ScoredRecommendation {
+    const baseScore = calculateRecommendationBaseScore(userPatternStrengths, recommendation)
+
+    const motivationRelevantTraits = getMotivationRelevantTraits({ activity: recommendation, motivations })
+    const motivationBoost = motivationRelevantTraits.length > 0
+        ? calculateMotivationBoost(userPatternStrengths, motivationRelevantTraits)
+        : 0
+
+    return { rec: recommendation, score: baseScore + motivationBoost }
+}
+
+/*
+ * Selects a diverse set of recommendations, prioritising strong matches across different activity types.
+ * - Filters to recommendations above the strong-match affinity threshold
+ * - Picks the highest-scoring recommendation per activity type
+ * - If needed, fills remaining slots with the next-best matches regardless of type
+ */
 function getDiverseRecommendations(recommendations: ScoredRecommendation[]): ScoredRecommendation[] {
-    // Get recommendations with match score >= MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH
     const strongMatches = recommendations.filter((recommendation) => recommendation.score >= MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH)
 
-    // Identify the strongest scoring recommendation for each activity type
     const bestByType: Partial<Record<ActivityType, ScoredRecommendation>> = {}
     for (const recommendation of strongMatches) {
         const type = recommendation.rec.type
@@ -48,29 +71,31 @@ function getDiverseRecommendations(recommendations: ScoredRecommendation[]): Sco
         }
     }
 
-    // Collect defined best values (filter out any undefined entries)
     const bestValues = Object.values(bestByType).filter(Boolean) as ScoredRecommendation[]
 
-    // If there are at least MAX_RECOMMENDATIONS, return them all
     if (bestValues.length >= MAX_RECOMMENDATIONS) {
         return bestValues.slice(0, MAX_RECOMMENDATIONS)
     }
 
-    // Otherwise, add the next highest-scoring matches
     return [...bestValues, ...strongMatches.filter((rec) => !bestByType[rec.rec.type])].slice(0, MAX_RECOMMENDATIONS)
 }
 
-export function getRecommendations(userTraits: BFASScores): ScoredRecommendation[] {
-    // Patterns are defined against OCEAN, so collapse the user's BFAS aspects first.
+/*
+ * Returns scored, diverse recommendations for a user.
+ * Converts BFAS traits → OCEAN → NEO pattern strengths, scores each recommendation,
+ * then diversifies across activity types.
+ */
+export function getRecommendations(userTraits: BFASScores, motivations: Motivation[]): ScoredRecommendation[] {
     const bfasToOCEAN = getOCEANScores(userTraits)
     const userPatternStrengths = getUserPatternStrengths(bfasToOCEAN)
 
     // Use mock RECOMMENDATIONS data for now
-    const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternStrengths, rec))
+    const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternStrengths, rec, motivations))
 
     return getDiverseRecommendations(scoredRecommendations).sort((a, b) => b.score - a.score).slice(0, MAX_RECOMMENDATIONS)
 }
 
+/* Returns the top-scoring activity types for a user based on their BFAS traits. */
 export function getTopActivityTypes(
     userTraits: BFASScores,
     count: number = TOP_ACTIVITY_TYPES_COUNT,

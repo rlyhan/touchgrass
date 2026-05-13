@@ -1,8 +1,10 @@
 import type { Request, Response } from "express"
 
+import type { Motivation } from "@touchgrass/types"
+import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 import type { Profile } from "../db/schema.js"
-import { bfasScoresSchema } from "../onboarding/schema.js"
 import { getRecommendations } from "../lib/recommendation-algorithm.js"
+import { bfasScoresSchema } from "../onboarding/schema.js"
 
 export type GetRecommendationsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
@@ -27,7 +29,10 @@ export function getRecommendationsHandler({
         return
       }
       const personality = bfasScoresSchema.parse(profile.personality)
-      const recommendations = getRecommendations(personality).map(
+      const motivations = profile.motivations
+        .map((v) => MOTIVATION_OPTIONS.find((m) => m.value === v))
+        .filter((m): m is Motivation => m !== undefined)
+      const recommendations = getRecommendations(personality, motivations).map(
         (s) => s.rec,
       )
       res.status(200).json({ recommendations })

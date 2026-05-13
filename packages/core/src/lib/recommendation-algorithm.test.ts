@@ -24,13 +24,13 @@ const mockUserBfas: BFASScores = {
 }
 
 test("getRecommendations returns up to 3 recommendations", () => {
-  const scored = getRecommendations(mockUserBfas)
+  const scored = getRecommendations(mockUserBfas, [])
   assert.ok(scored.length <= 3)
   assert.ok(scored.length > 0)
 })
 
 test("getRecommendations only returns items from the available recommendation pool", () => {
-  const scored = getRecommendations(mockUserBfas)
+  const scored = getRecommendations(mockUserBfas, [])
   const ids = new Set(RECOMMENDATIONS.map((r) => r.id))
   for (const { rec } of scored) {
     assert.ok(ids.has(rec.id), `unknown recommendation id: ${rec.id}`)
@@ -38,7 +38,7 @@ test("getRecommendations only returns items from the available recommendation po
 })
 
 test("getRecommendations returns recommendations in score-sorted order", () => {
-  const scored = getRecommendations(mockUserBfas)
+  const scored = getRecommendations(mockUserBfas, [])
   for (let i = 1; i < scored.length; i++) {
     const prev = scored[i - 1]
     const curr = scored[i]

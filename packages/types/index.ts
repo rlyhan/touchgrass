@@ -178,7 +178,7 @@ export interface PatternGroup {
 }
 
 export interface PatternType {
-  id: string;
+  id: PatternTypeId;
   groupId: number;
   name: string;
   shortDescription: string;

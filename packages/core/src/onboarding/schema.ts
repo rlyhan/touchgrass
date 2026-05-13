@@ -7,6 +7,7 @@ import {
   BUILDS,
   EMPLOYMENT_STATUSES,
   GENDERS,
+  MOTIVATION_OPTIONS,
 } from "@touchgrass/types/constants"
 
 const isoDate = z
@@ -36,7 +37,7 @@ export const onboardingFormSchema = z.object({
   employment: z.enum(EMPLOYMENT_STATUSES).nullable(),
   interests: z.array(z.enum(ACTIVITY_FIELDS)),
   personality: bfasScoresSchema,
-  motivations: z.array(z.string()),
+  motivations: z.enum(MOTIVATION_OPTIONS.map((m) => m.value)).array(),
 })
 
 export type OnboardingFormPayload = z.infer<typeof onboardingFormSchema>

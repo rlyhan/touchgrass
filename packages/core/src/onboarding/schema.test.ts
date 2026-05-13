@@ -24,7 +24,7 @@ const validPayload = {
     Volatility: 30,
     Withdrawal: 25,
   },
-  motivations: ["Curiosity", "Mastery"],
+  motivations: ["explore_creative", "learn_think_grow"],
 }
 
 test("accepts a fully populated valid payload", () => {
