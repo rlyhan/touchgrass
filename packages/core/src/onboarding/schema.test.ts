@@ -79,6 +79,14 @@ test("rejects out-of-range BFAS score", () => {
   assert.equal(result.success, false)
 })
 
+test("rejects empty motivations array", () => {
+  const result = onboardingFormSchema.safeParse({
+    ...validPayload,
+    motivations: [],
+  })
+  assert.equal(result.success, false)
+})
+
 test("rejects missing BFAS trait", () => {
   const { Withdrawal: _omitted, ...incomplete } = validPayload.personality
   const result = onboardingFormSchema.safeParse({
