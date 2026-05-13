@@ -37,7 +37,7 @@ export const onboardingFormSchema = z.object({
   employment: z.enum(EMPLOYMENT_STATUSES).nullable(),
   interests: z.array(z.enum(ACTIVITY_FIELDS)),
   personality: bfasScoresSchema,
-  motivations: z.enum(MOTIVATION_OPTIONS.map((m) => m.value)).array(),
+  motivations: z.enum(MOTIVATION_OPTIONS.map((m) => m.value)).array().min(1),
 })
 
 export type OnboardingFormPayload = z.infer<typeof onboardingFormSchema>
