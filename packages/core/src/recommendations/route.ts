@@ -1,7 +1,7 @@
 import type { Request, Response } from "express"
 
-import type { Motivation } from "@touchgrass/types"
-import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
+import type { ActivityField, Motivation } from "@touchgrass/types"
+import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendation-algorithm.js"
 import { bfasScoresSchema } from "../onboarding/schema.js"
@@ -32,9 +32,14 @@ export function getRecommendationsHandler({
       const motivations = profile.motivations
         .map((v) => MOTIVATION_OPTIONS.find((m) => m.value === v))
         .filter((m): m is Motivation => m !== undefined)
-      const recommendations = getRecommendations(personality, motivations).map(
-        (s) => s.rec,
+      const interests = profile.interests.filter((i): i is ActivityField =>
+        (ACTIVITY_FIELDS as readonly string[]).includes(i),
       )
+      const recommendations = getRecommendations(
+        personality,
+        motivations,
+        interests,
+      ).map((s) => s.rec)
       res.status(200).json({ recommendations })
     } catch (error) {
       console.error("Failed to get recommendations", error)
