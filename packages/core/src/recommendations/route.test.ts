@@ -35,7 +35,7 @@ const fakeProfile: Profile = {
     Volatility: 30,
     Withdrawal: 25,
   },
-  motivations: ["Curiosity", "Mastery"],
+  motivations: ["explore_creative", "learn_think_grow"],
   createdAt: new Date("2026-01-01T00:00:00Z"),
 }
 
