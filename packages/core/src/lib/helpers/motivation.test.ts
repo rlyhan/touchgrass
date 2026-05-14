@@ -6,7 +6,7 @@ import type { Motivation, Recommendation } from "@touchgrass/types"
 import {
   calculateMotivationBoost,
   getMotivationRelevantTraits,
-} from "./helpers/index.js"
+} from "./motivation.js"
 
 // Minimal Recommendation factory — only the fields the functions under test care about
 const makeRec = (
