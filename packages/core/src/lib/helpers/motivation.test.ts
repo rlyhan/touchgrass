@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import type { Motivation, Recommendation } from "@touchgrass/types"
+import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import {
   calculateMotivationBoost,
@@ -22,11 +23,7 @@ const makeRec = (
   related_types,
 })
 
-const creativeMotivation: Motivation = {
-  value: "explore_creative",
-  label: "Explore my creative side",
-  associated_activity_types: ["Creative", "Artistic"],
-}
+const creativeMotivation: Motivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
 
 // ─── calculateMotivationBoost ────────────────────────────────────────────────
 
@@ -76,7 +73,7 @@ test("getMotivationRelevantTraits returns empty when primary type is not in any 
   assert.deepEqual(result, [])
 })
 
-test("getMotivationRelevantTraits returns patterns when primary type matches a motivation", () => {
+test("getMotivationRelevantTraits returns patterns when primary type matches a motivation (e.g. Creative → composing music)", () => {
   const result = getMotivationRelevantTraits({
     activity: makeRec("Creative"),
     motivations: [creativeMotivation],

@@ -2,6 +2,10 @@ import { ActivityType, Motivation, PatternTypeId, Recommendation } from '@touchg
 import { ACTIVITY_TYPE_PATTERNS } from '@touchgrass/types/constants'
 import { getAdjacentTraits, MATCH_WEIGHTS } from './patterns.js'
 
+/*
+ * Calculate a boosting factor for a recommendation
+ * Finds both exact and adjacent matches between the user's traits and the target traits, applies weights, and normalises the result.
+ */
 export function calculateMotivationBoost(
     userTraits: Record<string, number>,
     targetTraits: PatternTypeId[],
@@ -31,6 +35,10 @@ export function getMotivationActivityTypes(motivations: Motivation[]): ActivityT
     return [...new Set(motivations.flatMap((m) => m.associated_activity_types))]
 }
 
+/* 
+ * Gets patterns from the activity's types + related types.
+ * Compares with patterns from associated types of motivations.
+ */
 export function getMotivationRelevantTraits({
     activity,
     motivations,
