@@ -7,7 +7,7 @@ import {
   calculateActivityPatternAffinity,
   calculatePatternDistance,
   calculatePatternStrength,
-  getAdjacentTraits,
+  getAdjacentPatterns,
   MATCH_WEIGHTS,
 } from "./patterns.js"
 
@@ -138,36 +138,36 @@ test("calculatePatternDistance returns 2 when both trait polarities differ", () 
   )
 })
 
-// ─── getAdjacentTraits ───────────────────────────────────────────────────────
+// ─── getAdjacentPatterns ───────────────────────────────────────────────────────
 
-test("getAdjacentTraits returns exactly 3 adjacent patterns for a 4-variant group", () => {
+test("getAdjacentPatterns returns exactly 3 adjacent patterns for a 4-variant group", () => {
   // Each group has 4 variants (HH, HL, LH, LL); the target is excluded, leaving 3
-  assert.equal(getAdjacentTraits("1-HH").length, 3)
+  assert.equal(getAdjacentPatterns("1-HH").length, 3)
 })
 
-test("getAdjacentTraits excludes the target pattern itself", () => {
-  const adjacent = getAdjacentTraits("1-HH")
-  assert.ok(adjacent.every((t) => t.traitId !== "1-HH"))
+test("getAdjacentPatterns excludes the target pattern itself", () => {
+  const adjacent = getAdjacentPatterns("1-HH")
+  assert.ok(adjacent.every((t) => t.patternId !== "1-HH"))
 })
 
-test("getAdjacentTraits only returns patterns from the same group", () => {
+test("getAdjacentPatterns only returns patterns from the same group", () => {
   // Group 1 contains: 1-HH, 1-HL, 1-LH, 1-LL
-  const adjacent = getAdjacentTraits("1-HH")
-  assert.ok(adjacent.every((t) => t.traitId.startsWith("1-")))
+  const adjacent = getAdjacentPatterns("1-HH")
+  assert.ok(adjacent.every((t) => t.patternId.startsWith("1-")))
 })
 
-test("getAdjacentTraits assigns STRONG_ADJACENT weight to distance-1 patterns", () => {
+test("getAdjacentPatterns assigns STRONG_ADJACENT weight to distance-1 patterns", () => {
   // 1-HH → 1-HL (traitB differs) and 1-LH (traitA differs) are both distance 1
-  const adjacent = getAdjacentTraits("1-HH")
-  const strongNeighbours = adjacent.filter((t) => t.traitId === "1-HL" || t.traitId === "1-LH")
+  const adjacent = getAdjacentPatterns("1-HH")
+  const strongNeighbours = adjacent.filter((t) => t.patternId === "1-HL" || t.patternId === "1-LH")
   assert.equal(strongNeighbours.length, 2)
   assert.ok(strongNeighbours.every((t) => t.weight === MATCH_WEIGHTS.STRONG_ADJACENT))
 })
 
-test("getAdjacentTraits assigns WEAK_ADJACENT weight to the distance-2 pattern", () => {
+test("getAdjacentPatterns assigns WEAK_ADJACENT weight to the distance-2 pattern", () => {
   // 1-HH → 1-LL (both traits differ) is distance 2
-  const adjacent = getAdjacentTraits("1-HH")
-  const weak = adjacent.find((t) => t.traitId === "1-LL")
+  const adjacent = getAdjacentPatterns("1-HH")
+  const weak = adjacent.find((t) => t.patternId === "1-LL")
   assert.ok(weak !== undefined)
   assert.equal(weak.weight, MATCH_WEIGHTS.WEAK_ADJACENT)
 })

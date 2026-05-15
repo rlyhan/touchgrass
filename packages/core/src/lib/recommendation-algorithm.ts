@@ -1,7 +1,7 @@
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
-import { ActivityField, ActivityType, BFASScores, Motivation, Recommendation } from "@touchgrass/types";
+import { ActivityField, ActivityType, BFASScores, Motivation, PatternTypeId, Recommendation } from "@touchgrass/types";
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants";
-import { calculateActivityPatternAffinity, calculateMotivationBoost, getMotivationRelevantTraits, getOCEANScores, getUserPatternStrengths } from "./helpers/index.js";
+import { calculateActivityPatternAffinity, calculateMotivationBoost, getOCEANScores, getUserPatternWeights } from "./helpers/index.js";
 
 export type ScoredRecommendation = {
     rec: Recommendation
@@ -26,16 +26,16 @@ const TOP_ACTIVITY_TYPES_COUNT = 6
  * Base score = (0.63 * 0.7) + (0.59 * 0.3) = 0.62
  */
 function calculateRecommendationBaseScore(
-    userPatternStrengths: Record<string, number>,
+    userPatternWeights: Record<PatternTypeId, number>,
     recommendation: Recommendation,
 ): number {
     const primaryPatterns = ACTIVITY_TYPE_PATTERNS[recommendation.type] ?? []
-    const primaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, primaryPatterns)
+    const primaryAffinity = calculateActivityPatternAffinity(userPatternWeights, primaryPatterns)
 
     const secondaryPatterns = (recommendation.related_types ?? []).flatMap(
         (t) => ACTIVITY_TYPE_PATTERNS[t] ?? []
     )
-    const secondaryAffinity = calculateActivityPatternAffinity(userPatternStrengths, secondaryPatterns)
+    const secondaryAffinity = calculateActivityPatternAffinity(userPatternWeights, secondaryPatterns)
 
     return secondaryPatterns.length === 0
         ? primaryAffinity
@@ -43,14 +43,9 @@ function calculateRecommendationBaseScore(
 }
 
 /* Combines base pattern affinity with motivation boost to produce a final score. */
-function scoreRecommendation(userPatternStrengths: Record<string, number>, recommendation: Recommendation, motivations: Motivation[]): ScoredRecommendation {
-    const baseScore = calculateRecommendationBaseScore(userPatternStrengths, recommendation)
-
-    const motivationRelevantTraits = getMotivationRelevantTraits({ activity: recommendation, motivations })
-    const motivationBoost = motivationRelevantTraits.length > 0
-        ? calculateMotivationBoost(userPatternStrengths, motivationRelevantTraits)
-        : 0
-
+function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, recommendation: Recommendation, motivations: Motivation[]): ScoredRecommendation {
+    const baseScore = calculateRecommendationBaseScore(userPatternWeights, recommendation)
+    const motivationBoost = calculateMotivationBoost(userPatternWeights, recommendation, motivations)
     return { rec: recommendation, score: baseScore + motivationBoost }
 }
 
@@ -101,7 +96,7 @@ function applyInterestBoost(
 
 /*
  * Returns scored, diverse recommendations for a user.
- * Converts BFAS traits → OCEAN → NEO pattern strengths, scores each recommendation,
+ * Converts BFAS traits → OCEAN → NEO pattern weights, scores each recommendation,
  * diversifies across activity types, then boosts recommendations matching the user's interests.
  */
 export function getRecommendations(
@@ -110,10 +105,10 @@ export function getRecommendations(
     interests: ActivityField[],
 ): ScoredRecommendation[] {
     const bfasToOCEAN = getOCEANScores(userTraits)
-    const userPatternStrengths = getUserPatternStrengths(bfasToOCEAN)
+    const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
 
     // Use mock RECOMMENDATIONS data for now
-    const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternStrengths, rec, motivations))
+    const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
 
     const diverse = getDiverseRecommendations(scoredRecommendations)
     return applyInterestBoost(diverse, interests).slice(0, MAX_RECOMMENDATIONS)
@@ -125,12 +120,12 @@ export function getTopActivityTypes(
     count: number = TOP_ACTIVITY_TYPES_COUNT,
 ): ScoredActivityType[] {
     const bfasToOCEAN = getOCEANScores(userTraits)
-    const userPatternStrengths = getUserPatternStrengths(bfasToOCEAN)
+    const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
 
     const scored: ScoredActivityType[] = ACTIVITY_TYPES.map((type) => ({
         type,
         score: calculateActivityPatternAffinity(
-            userPatternStrengths,
+            userPatternWeights,
             ACTIVITY_TYPE_PATTERNS[type] ?? [],
         ),
     }))

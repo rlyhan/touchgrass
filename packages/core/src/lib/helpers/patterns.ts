@@ -24,7 +24,7 @@ export function calculatePatternDistance(a: PatternType, b: PatternType) {
 }
 
 /* Returns patterns in the same group as the target, with their adjacency weights. eg. 4-HL → 4-HH (0.65), 4-LL (0.5) */
-export function getAdjacentTraits(targetPatternTypeId: PatternTypeId) {
+export function getAdjacentPatterns(targetPatternTypeId: PatternTypeId) {
     const target = getPatternById(targetPatternTypeId)
 
     if (!target) return []
@@ -41,7 +41,7 @@ export function getAdjacentTraits(targetPatternTypeId: PatternTypeId) {
             if (distance === 1) weight = MATCH_WEIGHTS.STRONG_ADJACENT
             else if (distance === 2) weight = MATCH_WEIGHTS.WEAK_ADJACENT
 
-            return { traitId: candidate.id, weight }
+            return { patternId: candidate.id, weight }
         })
         .filter((t) => t.weight > 0)
 }
@@ -63,28 +63,28 @@ export function calculatePatternStrength(
     return (traitAFit + traitBFit) / 2
 }
 
-/* Calculates pattern strengths for all 40 NEO patterns based on user's OCEAN scores */
-export const getUserPatternStrengths = (userOcean: OCEANScores): Record<PatternType['id'], number> => {
-    const strengths: Record<PatternType['id'], number> = {} as Record<PatternType['id'], number>
+/* Calculates pattern weights for all 40 NEO patterns based on user's OCEAN scores */
+export const getUserPatternWeights = (userOcean: OCEANScores): Record<PatternType['id'], number> => {
+    const weights: Record<PatternType['id'], number> = {} as Record<PatternType['id'], number>
     PATTERN_TYPES.forEach((pattern) => {
-        strengths[pattern.id] = calculatePatternStrength(userOcean, pattern)
+        weights[pattern.id] = calculatePatternStrength(userOcean, pattern)
     })
-    return strengths
+    return weights
 }
 
 /*
- * Averages a user's pattern strengths across a set of activity patterns.
- * eg. Exploratory patterns ['4-HH', '9-HH', '7-LH'] → user strengths 0.48, 0.70, 0.46 → affinity 0.5475
+ * Averages a user's pattern weights across a set of activity patterns.
+ * eg. Exploratory patterns ['4-HH', '9-HH', '7-LH'] → user weights 0.48, 0.70, 0.46 → affinity 0.5475
  */
 export function calculateActivityPatternAffinity(
-    userPatternStrengths: Record<string, number>,
+    userPatternWeights: Record<PatternTypeId, number>,
     activityPatterns: PatternType['id'][]
 ): number {
     if (!activityPatterns.length) return 0
 
     let total = 0
     for (const patternId of activityPatterns) {
-        total += userPatternStrengths[patternId] ?? 0
+        total += userPatternWeights[patternId] ?? 0
     }
 
     return total / activityPatterns.length

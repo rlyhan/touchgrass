@@ -134,7 +134,7 @@ For each pattern, we compute how strongly the user fits it:
   - level `L` → `1 - score / 100`
 - Average the two fits.
 
-Result: `Record<PatternTypeId, number>` where each value is in `[0, 1]`. Done by `calculatePatternStrength` and `getUserPatternStrengths`.
+Result: `Record<PatternTypeId, number>` where each value is in `[0, 1]`. Done by `calculatePatternStrength` and `getUserPatternWeights`.
 
 ### 3. Score each recommendation
 

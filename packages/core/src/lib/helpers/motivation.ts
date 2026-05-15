@@ -1,28 +1,33 @@
 import { ActivityType, Motivation, PatternTypeId, Recommendation } from '@touchgrass/types'
 import { ACTIVITY_TYPE_PATTERNS } from '@touchgrass/types/constants'
-import { getAdjacentTraits, MATCH_WEIGHTS } from './patterns.js'
+import { getAdjacentPatterns, MATCH_WEIGHTS } from './patterns.js'
 
 /*
- * Calculate a boosting factor for a recommendation
- * Finds both exact and adjacent matches between the user's traits and the target traits, applies weights, and normalises the result.
+ * Calculate a boosting factor for a recommendation based on the user's motivations.
+ * Resolves motivation-relevant patterns for the activity, then finds exact and adjacent
+ * matches against the user's pattern weights, applies weights, and normalises the result.
  */
 export function calculateMotivationBoost(
-    userTraits: Record<string, number>,
-    targetTraits: PatternTypeId[],
+    userPatternWeights: Record<PatternTypeId, number>,
+    activity: Recommendation,
+    motivations: Motivation[],
     normalizationFactor = 5,
 ) {
+    const patterns = getMotivationPatterns({ activity, motivations })
+    if (patterns.length === 0) return 0
+
     let exactBoost = 0
     let adjacentBoost = 0
 
-    targetTraits.forEach((targetTraitId) => {
-        if (userTraits[targetTraitId] !== undefined) {
-            exactBoost += userTraits[targetTraitId] * MATCH_WEIGHTS.EXACT
+    patterns.forEach((targetPatternId) => {
+        if (userPatternWeights[targetPatternId] !== undefined) {
+            exactBoost += userPatternWeights[targetPatternId] * MATCH_WEIGHTS.EXACT
             return
         }
 
-        const adjacentTraits = getAdjacentTraits(targetTraitId)
-        adjacentTraits.forEach((adjacent) => {
-            const userScore = userTraits[adjacent.traitId]
+        const adjacentPatterns = getAdjacentPatterns(targetPatternId)
+        adjacentPatterns.forEach((adjacent) => {
+            const userScore = userPatternWeights[adjacent.patternId]
             if (!userScore) return
             adjacentBoost += userScore * adjacent.weight
         })
@@ -39,7 +44,7 @@ export function getMotivationActivityTypes(motivations: Motivation[]): ActivityT
  * Gets patterns from the activity's types + related types.
  * Compares with patterns from associated types of motivations.
  */
-export function getMotivationRelevantTraits({
+export function getMotivationPatterns({
     activity,
     motivations,
 }: {
@@ -53,9 +58,9 @@ export function getMotivationRelevantTraits({
         ...(activity.related_types || []),
     ].filter((type) => motivationTypes.includes(type))
 
-    const targetTraits = matchingTypes.flatMap(
+    const motivationPatterns = matchingTypes.flatMap(
         (type) => ACTIVITY_TYPE_PATTERNS[type] || []
     )
 
-    return [...new Set(targetTraits)]
+    return [...new Set(motivationPatterns)]
 }
