@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
-import type { Motivation, PatternTypeId, Recommendation } from "@touchgrass/types"
+import type { Motivation, PatternTypeId, Activity } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import {
@@ -9,11 +9,11 @@ import {
   getMotivationPatterns,
 } from "./motivation.js"
 
-// Minimal Recommendation factory — only the fields the functions under test care about
+// Minimal Activity factory — only the fields the functions under test care about
 const makeRec = (
-  type: Recommendation["type"],
-  related_types?: Recommendation["related_types"],
-): Recommendation => ({
+  type: Activity["type"],
+  related_types?: Activity["related_types"],
+): Activity => ({
   id: "test",
   title: "Test",
   imageUrl: "",

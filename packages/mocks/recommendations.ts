@@ -1,6 +1,6 @@
-import { Recommendation } from "@touchgrass/types";
+import { Activity } from "@touchgrass/types";
 
-export const RECOMMENDATIONS: Recommendation[] = [
+export const RECOMMENDATIONS: Activity[] = [
   {
     id: "rec_001",
     title: "Build a Guitar Pedalboard",

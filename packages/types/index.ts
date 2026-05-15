@@ -192,7 +192,7 @@ export interface PatternType {
   };
 }
 
-export type Recommendation = {
+export type Activity = {
   id: string
   title: string
   imageUrl: string

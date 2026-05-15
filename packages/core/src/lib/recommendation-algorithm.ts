@@ -1,10 +1,10 @@
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
-import { ActivityField, ActivityType, BFASScores, Motivation, PatternTypeId, Recommendation } from "@touchgrass/types";
+import { Activity, ActivityField, ActivityType, BFASScores, Motivation, PatternTypeId } from "@touchgrass/types";
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants";
 import { calculateActivityPatternAffinity, calculateMotivationBoost, getOCEANScores, getUserPatternWeights } from "./helpers/index.js";
 
 export type ScoredRecommendation = {
-    rec: Recommendation
+    rec: Activity
     score: number
 }
 
@@ -27,7 +27,7 @@ const TOP_ACTIVITY_TYPES_COUNT = 6
  */
 function calculateRecommendationBaseScore(
     userPatternWeights: Record<PatternTypeId, number>,
-    recommendation: Recommendation,
+    recommendation: Activity,
 ): number {
     const primaryPatterns = ACTIVITY_TYPE_PATTERNS[recommendation.type] ?? []
     const primaryAffinity = calculateActivityPatternAffinity(userPatternWeights, primaryPatterns)
@@ -43,7 +43,7 @@ function calculateRecommendationBaseScore(
 }
 
 /* Combines base pattern affinity with motivation boost to produce a final score. */
-function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, recommendation: Recommendation, motivations: Motivation[]): ScoredRecommendation {
+function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, recommendation: Activity, motivations: Motivation[]): ScoredRecommendation {
     const baseScore = calculateRecommendationBaseScore(userPatternWeights, recommendation)
     const motivationBoost = calculateMotivationBoost(userPatternWeights, recommendation, motivations)
     return { rec: recommendation, score: baseScore + motivationBoost }

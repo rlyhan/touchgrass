@@ -1,4 +1,4 @@
-import { ActivityType, Motivation, PatternTypeId, Recommendation } from '@touchgrass/types'
+import { Activity, ActivityType, Motivation, PatternTypeId } from '@touchgrass/types'
 import { ACTIVITY_TYPE_PATTERNS } from '@touchgrass/types/constants'
 import { getAdjacentPatterns, MATCH_WEIGHTS } from './patterns.js'
 
@@ -9,7 +9,7 @@ import { getAdjacentPatterns, MATCH_WEIGHTS } from './patterns.js'
  */
 export function calculateMotivationBoost(
     userPatternWeights: Record<PatternTypeId, number>,
-    activity: Recommendation,
+    activity: Activity,
     motivations: Motivation[],
     normalizationFactor = 5,
 ) {
@@ -48,7 +48,7 @@ export function getMotivationPatterns({
     activity,
     motivations,
 }: {
-    activity: Recommendation
+    activity: Activity
     motivations: Motivation[]
 }): PatternTypeId[] {
     const motivationTypes = getMotivationActivityTypes(motivations)

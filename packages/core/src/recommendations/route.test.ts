@@ -5,7 +5,7 @@ import { after, before, beforeEach, mock, test } from "node:test"
 
 import type { Request } from "express"
 
-import type { Recommendation } from "@touchgrass/types"
+import type { Activity } from "@touchgrass/types"
 
 import { createApp } from "../app.js"
 import type { NewProfile, Profile } from "../db/schema.js"
@@ -78,7 +78,7 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
   const res = await fetch(`${baseUrl}/recommendations`)
 
   assert.equal(res.status, 200)
-  const body = (await res.json()) as { recommendations: Recommendation[] }
+  const body = (await res.json()) as { recommendations: Activity[] }
   assert.ok(Array.isArray(body.recommendations))
   assert.ok(body.recommendations.length > 0)
   for (const rec of body.recommendations) {

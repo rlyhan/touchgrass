@@ -1,4 +1,4 @@
-import type { Recommendation } from "@touchgrass/types"
+import type { Activity } from "@touchgrass/types"
 
 import { authedFetch } from "@/lib/auth/fetch"
 
@@ -14,7 +14,7 @@ export class ProfileNotFoundError extends Error {
   }
 }
 
-export async function fetchRecommendations(): Promise<Recommendation[]> {
+export async function fetchRecommendations(): Promise<Activity[]> {
   const response = await authedFetch(`${API_BASE_URL}/recommendations`)
 
   if (response.status === 404) {
@@ -25,6 +25,6 @@ export async function fetchRecommendations(): Promise<Recommendation[]> {
     throw new Error(`Failed to fetch recommendations (${response.status})`)
   }
 
-  const body = (await response.json()) as { recommendations: Recommendation[] }
+  const body = (await response.json()) as { recommendations: Activity[] }
   return body.recommendations ?? []
 }

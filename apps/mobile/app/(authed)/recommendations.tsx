@@ -11,14 +11,14 @@ import {
   fetchRecommendations,
   ProfileNotFoundError,
 } from "@/lib/recommendations/api"
-import type { Recommendation } from "@touchgrass/types"
+import type { Activity } from "@touchgrass/types"
 
 type Status = "loading" | "ready" | "error"
 
 const ItemSeparator = () => <View style={{ height: 16 }} />
 
 export default function RecommendationsPage() {
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [recommendations, setRecommendations] = useState<Activity[]>([])
   const [status, setStatus] = useState<Status>("loading")
   const [signingOut, setSigningOut] = useState(false)
 
@@ -51,7 +51,7 @@ export default function RecommendationsPage() {
   }, [])
 
   const renderItem = useCallback(
-    ({ item: rec }: { item: Recommendation }) => (
+    ({ item: rec }: { item: Activity }) => (
       <RecommendationCard
         title={rec.title}
         imageUrl={rec.imageUrl}
