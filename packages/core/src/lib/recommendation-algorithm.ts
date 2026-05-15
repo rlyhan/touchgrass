@@ -22,8 +22,8 @@ const TOP_ACTIVITY_TYPES_COUNT = 6
 /*
  * Calculates the base score for a recommendation based on pattern affinity.
  * eg. "Spend a Month Visiting Antique Markets" -> type: Exploratory, related_types: Social, Reflective
- * User's match with primary patterns = 0.55, secondary patterns = 0.61
- * Base score = 0.55 * 0.7 + 0.61 * 0.3 = 0.568
+ * User's match with primary patterns = 0.63, secondary patterns = 0.59
+ * Base score = (0.63 * 0.7) + (0.59 * 0.3) = 0.62
  */
 function calculateRecommendationBaseScore(
     userPatternStrengths: Record<string, number>,
