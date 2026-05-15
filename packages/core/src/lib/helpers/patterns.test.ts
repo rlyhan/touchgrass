@@ -42,12 +42,12 @@ const patternHL: PatternType = {
   traitB: { trait: "Agreeableness", level: "L" },
 }
 
-test("calculatePatternStrength rewards matching H levels with high trait scores", () => {
+test("calculatePatternStrength scores H-level traits as score/100 and averages both traits", () => {
   // Extraversion=70 → 0.7 ; Agreeableness=30 → 0.3 ; avg = 0.5
   assert.equal(calculatePatternStrength(userOcean, patternHH), 0.5)
 })
 
-test("calculatePatternStrength rewards matching L levels with low trait scores", () => {
+test("calculatePatternStrength scores L-level traits as (1 - score/100) and averages both traits", () => {
   // Extraversion=70 → 0.3 ; Agreeableness=30 → 0.7 ; avg = 0.5
   assert.equal(calculatePatternStrength(userOcean, patternLL), 0.5)
 })
