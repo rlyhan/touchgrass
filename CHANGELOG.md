@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-05-16 — Motivation Boost: Fix Dead Adjacent Branch
+
+Reworked `calculateMotivationBoost`. The previous implementation early-returned on an exact pattern lookup; because `getUserPatternWeights` returns a complete `Record<PatternTypeId, number>`, that branch was always taken in production and the adjacent-pattern contribution was dead code. The new logic computes both contributions for every shared target.
+
+**Algorithm (`packages/core`)**
+
+- `helpers/motivation.ts` — For each shared target pattern `calculateMotivationBoost` now sums `userWeight × EXACT` plus each adjacent neighbour's `userWeight × {STRONG_ADJACENT | WEAK_ADJACENT}` — so below-threshold weights still contribute proportionally without an explicit dampening factor. Renamed `getMotivationPatterns` → `getMotivationAndActivitySharedPatterns` and expanded the surrounding doc comments.
+
+**Tests (`packages/core`)**
+
+- `helpers/motivation.test.ts` — Added coverage for the exact + adjacent summation case for a single target; renamed import to match the renamed helper.
+
+---
+
+## 2026-05-15 — Recommendation Engine: Motivation Boost, Interest Boost & Diversification
+
+Three new scoring stages added to the recommendation pipeline, along with a fix to OCEAN score derivation.
+
+**Algorithm (`packages/core`)**
+
+- `recommendation-algorithm.ts` — Diversification step (`getDiverseRecommendations`) ensures no two results share the same primary `ActivityType` (added 2026-05-11). Motivation boost applied before diversification: each recommendation's pattern-affinity score is multiplied by a boost factor derived from the user's selected motivations — EXACT match (1.0), STRONG_ADJACENT (0.65), or WEAK_ADJACENT (0.5) based on NEO pattern adjacency (shared `groupId` + polarity distance). Interest boost applied after diversification: candidates whose `ActivityType` matches any of the user's interest fields are sorted to the front before the final `MAX_RECOMMENDATIONS` slice.
+- `helpers/` — Split the single `helpers.ts` into `ocean.ts`, `patterns.ts`, and `motivation.ts` (re-exported from `helpers/index.ts`). `getOCEANScores` fixed to derive each OCEAN trait from its true BFAS parent aspects. `motivation.ts` exposes `calculateMotivationBoost`, which computes per-recommendation boost weights.
+- `recommendations/route.ts` — Passes `motivations` and `interests` from the user profile through to `getRecommendations`; `interests` is narrowed against `ACTIVITY_FIELDS` before passing.
+
+**Validation (`packages/core`)**
+
+- `onboarding/schema.ts` — Motivations array now requires `.min(1)`; the backend rejects submissions with no motivation selected.
+
+**Types (`packages/types`)**
+
+- `Motivation` type moved from `packages/core` into `packages/types` for shared access.
+
+---
+
 ## 2026-05-10 — NEO Pattern Recommendation Scoring
 
 Replaced the per-trait OCEAN alignment scoring in the recommendation engine with a NEO pattern-strength model that scores each activity against the user's fit across the 40 IPIP-NEO pattern types (10 OCEAN trait pairs × HH/HL/LH/LL combinations).
