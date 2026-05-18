@@ -203,3 +203,13 @@ export type Activity = {
   // Human-curated matches
   patternTypes?: PatternTypeId[];
 }
+
+export type ScoredRecommendation = {
+  rec: Activity
+  score: number
+}
+
+export type ScoredActivityType = {
+  type: ActivityType
+  score: number
+}

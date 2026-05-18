@@ -1,21 +1,16 @@
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
-import { Activity, ActivityField, ActivityType, BFASScores, Motivation, PatternTypeId } from "@touchgrass/types";
+import { Activity, ActivityField, BFASScores, Motivation, PatternTypeId, ScoredActivityType, ScoredRecommendation } from "@touchgrass/types";
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants";
-import { calculateActivityPatternAffinity, calculateMotivationBoost, getOCEANScores, getUserPatternWeights } from "./helpers/index.js";
-
-export type ScoredRecommendation = {
-    rec: Activity
-    score: number
-}
-
-export type ScoredActivityType = {
-    type: ActivityType
-    score: number
-}
+import {
+    calculateActivityPatternAffinity,
+    calculateMotivationBoost,
+    diversifyAndOrder,
+    getOCEANScores,
+    getUserPatternWeights,
+} from "./helpers/index.js";
 
 const PRIMARY_WEIGHT = 0.7
 const SECONDARY_WEIGHT = 0.3
-const MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH = 0.65
 const MAX_RECOMMENDATIONS = 3
 const TOP_ACTIVITY_TYPES_COUNT = 6
 
@@ -50,54 +45,10 @@ function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, 
 }
 
 /*
- * Selects a diverse set of recommendations, prioritising strong matches across different activity types.
- * - Filters to recommendations above the strong-match affinity threshold
- * - Picks the highest-scoring recommendation per activity type
- * Returns the full type-representative set without truncating, so downstream stages
- * (e.g. interest boosting) can choose from a wider pool before the final cap is applied.
- */
-function getDiverseRecommendations(recommendations: ScoredRecommendation[]): ScoredRecommendation[] {
-    const strongMatches = recommendations.filter((recommendation) => recommendation.score >= MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH)
-
-    const bestByType: Partial<Record<ActivityType, ScoredRecommendation>> = {}
-    for (const recommendation of strongMatches) {
-        const type = recommendation.rec.type
-        if (!bestByType[type] || recommendation.score > (bestByType[type] as ScoredRecommendation).score) {
-            bestByType[type] = recommendation
-        }
-    }
-
-    return Object.values(bestByType).filter(Boolean) as ScoredRecommendation[]
-}
-
-/*
- * Boosts recommendations whose `field` matches one of the user's selected interests by
- * partitioning into matches + others, sorting each group by descending score, and
- * concatenating matches first.
- */
-function applyInterestBoost(
-    recommendations: ScoredRecommendation[],
-    interests: ActivityField[],
-): ScoredRecommendation[] {
-    const interestSet = new Set<ActivityField>(interests)
-    const matches: ScoredRecommendation[] = []
-    const others: ScoredRecommendation[] = []
-    for (const scored of recommendations) {
-        if (interestSet.has(scored.rec.field)) {
-            matches.push(scored)
-        } else {
-            others.push(scored)
-        }
-    }
-    matches.sort((a, b) => b.score - a.score)
-    others.sort((a, b) => b.score - a.score)
-    return [...matches, ...others]
-}
-
-/*
- * Returns scored, diverse recommendations for a user.
- * Converts BFAS traits → OCEAN → NEO pattern weights, scores each recommendation,
- * diversifies across activity types, then boosts recommendations matching the user's interests.
+ * Returns scored, diversified recommendations for a user.
+ * Converts BFAS traits → OCEAN → NEO pattern weights, scores each recommendation
+ * (including motivation boost), then applies interest-aware diversification and bucket
+ * ordering before capping the result.
  */
 export function getRecommendations(
     userTraits: BFASScores,
@@ -107,11 +58,9 @@ export function getRecommendations(
     const bfasToOCEAN = getOCEANScores(userTraits)
     const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
 
-    // Use mock RECOMMENDATIONS data for now
     const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
 
-    const diverse = getDiverseRecommendations(scoredRecommendations)
-    return applyInterestBoost(diverse, interests).slice(0, MAX_RECOMMENDATIONS)
+    return diversifyAndOrder(scoredRecommendations, interests).slice(0, MAX_RECOMMENDATIONS)
 }
 
 /* Returns the top-scoring activity types for a user based on their BFAS traits. */
