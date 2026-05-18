@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-05-19 — Recommendation Engine: Interest-Aware Bucket Diversification
+
+Replaced the post-diversification interest boost with a bucket-based, interest-first diversification pipeline. The top recommendation slots now aim for one rec per user interest before activity-type diversity kicks in.
+
+**Algorithm (`packages/core`)**
+
+- `helpers/diversify.ts` (new) — `classifyBucket` assigns each scored rec to Top (`score >= 0.6` + field in interests), Middle (`score >= 0.6` + off-interest, OR `0.4 <= score < 0.6` + in-interest with a sort-only `+0.1` boost), or Bottom. `diversifyAndOrder` runs two layered passes: Pass 1 picks the highest-`sortScore` Top-bucket rec for each user interest (no type uniqueness inside the pass, so two interest fields may share an activity type — Pass 2 still avoids duplicating those types). Pass 2 walks the remaining `sortScore >= 0.6` pool (leftover Top ∪ Middle high-score) and picks one rec per previously-unseen activity type. Pass 1 is a no-op with 0 interests. After picks, remaining recs are appended in Top → Middle → Bottom order, each bucket sorted by `sortScore` desc. The `+0.1` boost is sort-only; the persisted `score` is never mutated.
+- `recommendation-algorithm.ts` — `getRecommendations` now calls `diversifyAndOrder(scored, interests).slice(0, MAX_RECOMMENDATIONS)` directly after scoring + motivation boost. Removed the old `getDiverseRecommendations` and `applyInterestBoost` helpers and the unused `MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH` (0.65) threshold — the new logic uses `TOP_BUCKET_MIN_SCORE = 0.6`.
+
+**Types (`packages/types`)**
+
+- `index.ts` — Moved `ScoredRecommendation` and `ScoredActivityType` out of `packages/core` into the shared types package.
+
+**Tests (`packages/core`)**
+
+- `helpers/diversify.test.ts` (new) — 14 synthetic-data unit tests around `diversifyAndOrder` covering bucket placement, Top/Middle/Bottom ordering, Middle weighting competition (boost wins / boost insufficient), score preservation, one-per-interest behavior with type collision (2 interests), interest-pass-plus-type-fill (1 interest), and the 0-interest activity-type-only path.
+- `recommendation-algorithm.test.ts` — Trimmed to `getRecommendations` shape/integration tests plus the existing `getTopActivityTypes` tests; the diversification tests now live alongside `helpers/diversify.ts`.
+
+---
+
 ## 2026-05-16 — Motivation Boost: Fix Dead Adjacent Branch
 
 Reworked `calculateMotivationBoost`. The previous implementation early-returned on an exact pattern lookup; because `getUserPatternWeights` returns a complete `Record<PatternTypeId, number>`, that branch was always taken in production and the adjacent-pattern contribution was dead code. The new logic computes both contributions for every shared target.
