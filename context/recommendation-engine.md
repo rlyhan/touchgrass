@@ -109,7 +109,7 @@ Each pattern type belongs to a group that intersects two OCEAN traits, with a hi
 
 ## Algorithm Flow
 
-Implemented in [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts), with helpers in [`packages/core/src/lib/helpers.ts`](../packages/core/src/lib/helpers.ts).
+Implemented in [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts), with helpers split across [`packages/core/src/lib/helpers/`](../packages/core/src/lib/helpers/) (`ocean.ts`, `patterns.ts`, `motivation.ts`, `diversify.ts`).
 
 ### 1. Convert BFAS → OCEAN
 
@@ -144,22 +144,52 @@ For each recommendation:
 
 1. **Primary affinity** — look up `ActivityTypePatterns[recommendation.type]` and average the user's pattern strengths across those pattern IDs.
 2. **Secondary affinity** — flatten the pattern IDs from every entry in `related_types` and average the user's strengths across that combined list.
-3. **Final score** —
-   - if there are no secondary patterns: `final = primary`
-   - otherwise: `final = primary * 0.7 + secondary * 0.3`
+3. **Base score** —
+   - if there are no secondary patterns: `base = primary`
+   - otherwise: `base = primary + secondary * 0.2`
 
-The primary type is weighted more heavily (0.7) because it's the dominant lens the activity is framed through; related types are influence, not equal voice. The empty-list fallback prevents an absent `related_types` field from dragging the score toward zero.
+Primary affinity is the anchor — a strong primary match shouldn't be dragged down just because a recommendation has related types. Secondary affinity adds a modest bonus on top (capped at +0.2), so it can only reinforce, not punish. This means base scores can exceed 1.0 in theory (ceiling 1.2), but that's fine — all scores are relative for ranking.
 
-Done by `calculateActivityPatternAffinity` and the main loop in `getRecommendations`.
+Done by `calculateRecommendationBaseScore` in `recommendation-algorithm.ts`.
 
-### 4. Sort and return
+### 4. Apply motivation boost
 
-Recommendations are sorted highest → lowest by `score` and the top 3 (`MAX_RECOMMENDATIONS`) are returned as `ScoredRecommendation[]`. The API route unwraps these to `Recommendation[]` for the response.
+Each motivation has a set of `associated_activity_types`. The boost rewards activities whose type/related_types overlap with the user's selected motivations.
+
+1. Find the **shared patterns** — the union of pattern IDs from any activity type that appears in both the recommendation's type/related_types and the motivation's associated types.
+2. For each shared target pattern, accumulate:
+   - `userWeight[target] × 1.0` (exact match)
+   - `userWeight[adjacent] × 0.65` for each distance-1 neighbour in the same pattern group (strong adjacent)
+   - `userWeight[adjacent] × 0.5` for each distance-2 neighbour (weak adjacent)
+3. **Motivation boost** = sum / `normalizationFactor` (default 5), keeping it modest relative to the base score.
+4. **Final score** = `base + motivationBoost`
+
+The adjacent-pattern step means a user who fits a neighbouring pattern still benefits even if they don't perfectly match the target, weighted proportionally by their actual pattern weight. Done by `calculateMotivationBoost` and helpers `getMotivationAndActivitySharedPatterns` / `getAdjacentPatterns` in `helpers/motivation.ts` and `helpers/patterns.ts`.
+
+### 5. Diversify and order
+
+After scoring, `diversifyAndOrder` (in `helpers/diversify.ts`) produces the final ordered list before the top 3 (`MAX_RECOMMENDATIONS`) are taken.
+
+**Bucket classification** — each recommendation is placed into one of three buckets based on score and whether its `field` is one of the user's interests:
+
+| Condition | Bucket | sortScore |
+|-----------|--------|-----------|
+| score ≥ 0.6 AND field in interests | top | score |
+| score ≥ 0.6 AND field not in interests | middle | score |
+| score in [0.4, 0.6) AND field in interests | middle | score + 0.1 |
+| everything else | bottom | score |
+
+The +0.1 boost is applied only to `sortScore` (used for ordering) — the original `score` is preserved.
+
+**Two-pass slot filling:**
+
+- **Pass 1 — Interest diversification** (runs when the user has ≥ 1 interest): for each user interest (in input order), pick the highest-`sortScore` Top-bucket recommendation whose `field` matches. Records each chosen activity type for Pass 2.
+- **Pass 2 — Activity-type diversification** (always runs): walk the remaining high-sortScore pool (Top ∪ Middle with `sortScore ≥ 0.6`) and pick the first recommendation for each previously-unseen activity type.
+
+Remaining recommendations are appended in bucket order (Top → Middle → Bottom), sorted by `sortScore` descending within each bucket. The final list is stripped back to `ScoredRecommendation[]` (bucket metadata discarded).
 
 ### Inputs not yet wired in
 
-- **Motivation** — declared in the user profile but not yet factored into scoring.
-- **Interests** — same.
 - **Human-curated `patternTypes`** on each recommendation — the field exists but the algorithm currently only reads from `ActivityTypePatterns` via `type` / `related_types`.
 
 ---

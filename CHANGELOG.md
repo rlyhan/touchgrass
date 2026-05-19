@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-05-19 — Fix: Preserve Primary Affinity When Secondary Affinities Exist
+
+Reworked the base-score formula so a strong primary pattern match is no longer diluted by the presence of `related_types`.
+
+**Algorithm (`packages/core`)**
+
+- `recommendation-algorithm.ts` — `calculateRecommendationBaseScore` now returns `primaryAffinity + secondaryAffinity * 0.2` when secondary patterns exist (previously `primary * 0.7 + secondary * 0.3`). Primary affinity is treated as the anchor; secondary affinity contributes a bonus (capped at +0.2) rather than displacing 30% of the primary signal. The no-secondary-patterns path still returns `primaryAffinity` unchanged. Removed `PRIMARY_WEIGHT`; renamed `SECONDARY_WEIGHT` from `0.3` to `0.2`. Base scores now have an arithmetic ceiling of 1.2, which is fine because scores are only used relative to each other for ranking.
+
+**Tests (`packages/core`)**
+
+- `recommendation-algorithm.test.ts` — Updated five `calculateRecommendationBaseScore` test expectations to match the new formula: primary-only ceiling (1.0), weighted blend (0.96), arithmetic ceiling (1.2), pooled secondary (1.1), and the all-zero floor (0.0).
+
+**Docs (`context`)**
+
+- `recommendation-engine.md` — Updated the Step 3 base-score description to the new formula and rationale, and refreshed surrounding sections (helpers path, motivation boost, diversify-and-order) to reflect the current pipeline.
+
+---
+
 ## 2026-05-19 — Test: getRecommendations Integration Coverage + Activity Pool Injection
 
 Expanded `getRecommendations` integration tests and decoupled the algorithm from its hardcoded activity source.
