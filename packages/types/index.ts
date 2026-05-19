@@ -204,6 +204,11 @@ export type Activity = {
   patternTypes?: PatternTypeId[];
 }
 
+export type ActivityDetail = Activity & {
+  aiSummary: string
+  description: string
+}
+
 export type ScoredRecommendation = {
   rec: Activity
   score: number

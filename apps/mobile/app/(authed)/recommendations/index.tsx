@@ -52,13 +52,21 @@ export default function RecommendationsPage() {
 
   const renderItem = useCallback(
     ({ item: rec }: { item: Activity }) => (
-      <RecommendationCard
-        title={rec.title}
-        imageUrl={rec.imageUrl}
-        type={rec.type}
-        field={rec.field}
-        estimatedTime={rec.estimated_time}
-      />
+      <Pressable
+        onPress={() =>
+          router.push(`/recommendations/detail?id=${rec.id}` as Href)
+        }
+        accessibilityRole="button"
+        accessibilityLabel={`View details for ${rec.title}`}
+      >
+        <RecommendationCard
+          title={rec.title}
+          imageUrl={rec.imageUrl}
+          type={rec.type}
+          field={rec.field}
+          estimatedTime={rec.estimated_time}
+        />
+      </Pressable>
     ),
     [],
   )
