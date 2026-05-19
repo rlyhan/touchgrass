@@ -15,6 +15,7 @@ interface RecommendationCardProps {
   type: string
   field: string
   estimatedTime?: string
+  size?: "default" | "large"
 }
 
 export function RecommendationCard({
@@ -23,21 +24,26 @@ export function RecommendationCard({
   type,
   field,
   estimatedTime,
+  size = "default",
 }: RecommendationCardProps) {
   const TypeIcon = getActivityTypeIcon(type)
   const FieldIcon = getFieldIcon(field)
   const [imageError, setImageError] = useState(false)
+  const isLarge = size === "large"
 
   return (
     <View className="overflow-hidden rounded-2xl bg-white shadow-sm">
-      <View className="relative h-40 w-full">
+      <View
+        className="relative w-full"
+        style={isLarge ? { aspectRatio: 4 / 3 } : { height: 160 }}
+      >
         {imageError ? (
           <View style={{ width: "100%", height: "100%", backgroundColor: "#d1fae5" }} />
         ) : (
           <Image
             source={{ uri: imageUrl }}
             contentFit="cover"
-            style={{ width: "100%", height: 160 }}
+            style={{ width: "100%", height: "100%" }}
             onError={() => setImageError(true)}
           />
         )}
@@ -46,9 +52,17 @@ export function RecommendationCard({
           locations={[0, 0.5, 1]}
           style={{ position: "absolute", inset: 0 }}
         />
-        <Text className="absolute bottom-4 left-4 right-4 text-xl font-semibold text-white">
-          {title}
-        </Text>
+        {isLarge ? (
+          <View className="absolute bottom-0 left-0 right-0 p-5">
+            <Text className="text-2xl font-bold leading-tight text-white">
+              {title}
+            </Text>
+          </View>
+        ) : (
+          <Text className="absolute bottom-4 left-4 right-4 text-xl font-semibold text-white">
+            {title}
+          </Text>
+        )}
       </View>
 
       <View className="flex-row flex-wrap gap-x-6 gap-y-2 px-4 py-3">

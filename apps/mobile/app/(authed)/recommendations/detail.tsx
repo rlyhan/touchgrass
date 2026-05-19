@@ -1,7 +1,5 @@
-import { Image } from "expo-image"
-import { LinearGradient } from "expo-linear-gradient"
 import { router, useLocalSearchParams } from "expo-router"
-import { ArrowLeft, Clock, Sparkle } from "lucide-react-native"
+import { ArrowLeft, Sparkle } from "lucide-react-native"
 import { useEffect, useState } from "react"
 import {
   ActivityIndicator,
@@ -12,7 +10,8 @@ import {
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-import { getActivityTypeIcon, getFieldIcon } from "@/lib/icons"
+import { RecommendationCard } from "@/components/recommendations/recommendation-card"
+import { PrimaryButton } from "@/components/ui/primary-button"
 import {
   type ActivityDetailExtended,
   fetchRecommendationDetail,
@@ -46,9 +45,6 @@ export default function RecommendationDetailPage() {
     )
   }
 
-  const TypeIcon = getActivityTypeIcon(activity.type)
-  const FieldIcon = getFieldIcon(activity.field)
-
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       {/* Header with back button */}
@@ -67,46 +63,14 @@ export default function RecommendationDetailPage() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero image with gradient + title overlay — renders instantly from cache */}
-        <View className="overflow-hidden rounded-t-2xl">
-          <View style={{ aspectRatio: 4 / 3 }}>
-            <Image
-              source={{ uri: activity.imageUrl }}
-              contentFit="cover"
-              style={{ width: "100%", height: "100%" }}
-            />
-            <LinearGradient
-              colors={["transparent", "rgba(0,0,0,0.2)", "rgba(0,0,0,0.7)"]}
-              locations={[0, 0.5, 1]}
-              style={{ position: "absolute", inset: 0 }}
-            />
-            <View className="absolute bottom-0 left-0 right-0 p-5">
-              <Text className="text-2xl font-bold leading-tight text-white">
-                {activity.title}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Metadata card — renders instantly from cache */}
-        <View className="rounded-b-2xl border border-t-0 border-gray-200 bg-white">
-          <View className="flex-row items-center gap-6 px-5 py-4">
-            <View className="flex-row items-center gap-2">
-              <TypeIcon size={16} color="#6b7280" />
-              <Text className="text-sm text-gray-500">{activity.type}</Text>
-            </View>
-            <View className="flex-row items-center gap-2">
-              <FieldIcon size={16} color="#6b7280" />
-              <Text className="text-sm text-gray-500">{activity.field}</Text>
-            </View>
-            <View className="flex-row items-center gap-2">
-              <Clock size={16} color="#6b7280" />
-              <Text className="text-sm text-gray-500">
-                {activity.estimated_time}
-              </Text>
-            </View>
-          </View>
-        </View>
+        <RecommendationCard
+          title={activity.title}
+          imageUrl={activity.imageUrl}
+          type={activity.type}
+          field={activity.field}
+          estimatedTime={activity.estimated_time}
+          size="large"
+        />
 
         {/* AI summary + description — loaded async from /recommendations/:id/detail */}
         {extendedError ? null : !extended ? (
@@ -148,11 +112,9 @@ export default function RecommendationDetailPage() {
         )}
 
         {/* CTA */}
-        <Pressable className="mt-8 w-full rounded-2xl bg-emerald-500 py-4">
-          <Text className="text-center text-base font-semibold text-white">
-            Start this activity
-          </Text>
-        </Pressable>
+        <View className="mt-8">
+          <PrimaryButton label="Start this activity" onPress={() => {}} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   )
