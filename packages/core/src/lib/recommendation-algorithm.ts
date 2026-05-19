@@ -1,4 +1,3 @@
-import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations";
 import { Activity, ActivityField, BFASScores, Motivation, PatternTypeId, ScoredActivityType, ScoredRecommendation } from "@touchgrass/types";
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants";
 import {
@@ -54,11 +53,12 @@ export function getRecommendations(
     userTraits: BFASScores,
     motivations: Motivation[],
     interests: ActivityField[],
+    activities: Activity[],
 ): ScoredRecommendation[] {
     const bfasToOCEAN = getOCEANScores(userTraits)
     const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
 
-    const scoredRecommendations = RECOMMENDATIONS.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
+    const scoredRecommendations = activities.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
 
     return diversifyAndOrder(scoredRecommendations, interests).slice(0, MAX_RECOMMENDATIONS)
 }

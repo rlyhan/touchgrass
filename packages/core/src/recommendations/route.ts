@@ -2,6 +2,7 @@ import type { Request, Response } from "express"
 
 import type { ActivityField, Motivation } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
+import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendation-algorithm.js"
 import { bfasScoresSchema } from "../onboarding/schema.js"
@@ -39,6 +40,7 @@ export function getRecommendationsHandler({
         personality,
         motivations,
         interests,
+        RECOMMENDATIONS,
       ).map((s) => s.rec)
       res.status(200).json({ recommendations })
     } catch (error) {

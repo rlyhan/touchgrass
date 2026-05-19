@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-05-19 — Test: getRecommendations Integration Coverage + Activity Pool Injection
+
+Expanded `getRecommendations` integration tests and decoupled the algorithm from its hardcoded activity source.
+
+**Tests (`packages/core`)**
+
+- `recommendation-algorithm.test.ts` — Four new `getRecommendations` integration tests: output has no duplicate activity types (diversification wired through); Art interest surfaces at least one Art-field rec (concrete positive assertion replacing the weaker count-monotonicity check); high-Openness/Extraversion user with `explore_creative` motivation and no interests surfaces creative-type recs (first test to exercise the motivation parameter end-to-end through `getRecommendations`); Art interest + `explore_creative` motivation together surface an Art-field creative-type rec. `creativeMotivation` hoisted to module level so it is shared by the `scoreRecommendation` and `getRecommendations` test sections.
+
+**Algorithm (`packages/core`)**
+
+- `recommendation-algorithm.ts` — `getRecommendations` now accepts an explicit `activities: Activity[]` parameter instead of importing `RECOMMENDATIONS` directly. Removes the module-level dependency on `@touchgrass/mocks/recommendations`, making the algorithm a pure function of its inputs and allowing the call site to swap in a DB-fetched catalog when the real endpoint arrives.
+- `recommendations/route.ts` — Imports `RECOMMENDATIONS` from `@touchgrass/mocks/recommendations` and passes it as the `activities` argument to `getRecommendations`.
+
+---
+
 ## 2026-05-19 — Unit Tests: calculateRecommendationBaseScore & scoreRecommendation
 
 Added unit tests for the two private scoring functions, now exported.
