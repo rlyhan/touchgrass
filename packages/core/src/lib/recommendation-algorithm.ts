@@ -8,16 +8,18 @@ import {
     getUserPatternWeights,
 } from "./helpers/index.js";
 
-const PRIMARY_WEIGHT = 0.7
-const SECONDARY_WEIGHT = 0.3
+const SECONDARY_WEIGHT = 0.2
 const MAX_RECOMMENDATIONS = 3
 const TOP_ACTIVITY_TYPES_COUNT = 6
 
 /*
  * Calculates the base score for a recommendation based on pattern affinity.
+ * Primary affinity is the anchor; secondary affinity adds a small bonus on top
+ * so a strong primary match isn't dragged down by a weaker secondary match.
+ *
  * eg. "Spend a Month Visiting Antique Markets" -> type: Exploratory, related_types: Social, Reflective
  * User's match with primary patterns = 0.63, secondary patterns = 0.59
- * Base score = (0.63 * 0.7) + (0.59 * 0.3) = 0.62
+ * Base score = 0.63 + (0.59 * 0.2) = 0.748
  */
 export function calculateRecommendationBaseScore(
     userPatternWeights: Record<PatternTypeId, number>,
@@ -29,11 +31,10 @@ export function calculateRecommendationBaseScore(
     const secondaryPatterns = (recommendation.related_types ?? []).flatMap(
         (t) => ACTIVITY_TYPE_PATTERNS[t] ?? []
     )
-    const secondaryAffinity = calculateActivityPatternAffinity(userPatternWeights, secondaryPatterns)
+    if (secondaryPatterns.length === 0) return primaryAffinity
 
-    return secondaryPatterns.length === 0
-        ? primaryAffinity
-        : primaryAffinity * PRIMARY_WEIGHT + secondaryAffinity * SECONDARY_WEIGHT
+    const secondaryAffinity = calculateActivityPatternAffinity(userPatternWeights, secondaryPatterns)
+    return primaryAffinity + secondaryAffinity * SECONDARY_WEIGHT
 }
 
 /* Combines base pattern affinity with motivation boost to produce a final score. */

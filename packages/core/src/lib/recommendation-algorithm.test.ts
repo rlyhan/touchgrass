@@ -133,27 +133,27 @@ test("calculateRecommendationBaseScore returns 0 when userPatternWeights is empt
   )
 })
 
-test("calculateRecommendationBaseScore gives 0.7 when primary is perfect and secondary weights are all missing", () => {
+test("calculateRecommendationBaseScore returns only primaryAffinity score if no secondary affinities", () => {
   // primaryAffinity = 1.0; secondaryAffinity = 0 (no Social weights)
-  // expected = 1.0*0.7 + 0*0.3 = 0.7
+  // expected = 1.0 + 0*0.2 = 1.0
   const weights = { "4-HH": 1, "9-HH": 1, "7-LH": 1 } as Record<PatternTypeId, number>
   const score = calculateRecommendationBaseScore(weights, makeRec("Creative", ["Social"]))
-  assert.ok(Math.abs(score - 0.7) < 1e-9, `expected 0.7, got ${score}`)
+  assert.ok(Math.abs(score - 1.0) < 1e-9, `expected 1.0, got ${score}`)
 })
 
-test("calculateRecommendationBaseScore blends primary (0.7) and secondary (0.3) when related types are present", () => {
+test("calculateRecommendationBaseScore adds secondary boost (× 0.2) on top of primary when related types are present", () => {
   // primaryAffinity = (0.9+0.9+0.9)/3 = 0.9
   // secondaryAffinity (Social) = (0.3+0.3+0.3)/3 = 0.3
-  // expected = 0.9*0.7 + 0.3*0.3 = 0.72
+  // expected = 0.9 + 0.3*0.2 = 0.96
   const weights = {
     "4-HH": 0.9, "9-HH": 0.9, "7-LH": 0.9,
     "1-HH": 0.3, "3-HL": 0.3, "6-HL": 0.3,
   } as Record<PatternTypeId, number>
   const score = calculateRecommendationBaseScore(weights, makeRec("Creative", ["Social"]))
-  assert.ok(Math.abs(score - 0.72) < 1e-9, `expected 0.72, got ${score}`)
+  assert.ok(Math.abs(score - 0.96) < 1e-9, `expected 0.96, got ${score}`)
 })
 
-test("calculateRecommendationBaseScore returns 1.0 when all pattern weights are 1 (maximum possible score)", () => {
+test("calculateRecommendationBaseScore returns 1.2 when all pattern weights are 1 (arithmetic ceiling)", () => {
   // "Compose a 1-Minute Song" (rec_006): type Creative, related_types [Artistic, Expressive]
   // Primary   Creative  → 4-HH (E+O), 9-HH (C+O),  7-LH (a+O)
   // Secondary Artistic  → 4-HH,       9-LH (c+O),   10-HH (N+O)
@@ -161,19 +161,19 @@ test("calculateRecommendationBaseScore returns 1.0 when all pattern weights are 
   // 9-HH/9-LH require C=100 vs C=0; 1-HH/7-LH require A=100 vs A=0 — these
   // weights cannot all reach 1.0 from real OCEAN scores simultaneously.
   // Weights are injected directly to verify the arithmetic ceiling of the formula.
-  // primaryAffinity = 1.0; secondaryAffinity = 1.0 → 1.0*0.7 + 1.0*0.3 = 1.0
+  // primaryAffinity = 1.0; secondaryAffinity = 1.0 → 1.0 + 1.0*0.2 = 1.2
   const weights = {
     "4-HH": 1, "9-HH": 1, "7-LH": 1,
     "9-LH": 1, "10-HH": 1, "1-HH": 1,
   } as Record<PatternTypeId, number>
-  assert.equal(calculateRecommendationBaseScore(weights, makeRec("Creative", ["Artistic", "Expressive"])), 1)
+  assert.equal(calculateRecommendationBaseScore(weights, makeRec("Creative", ["Artistic", "Expressive"])), 1.2)
 })
 
 test("calculateRecommendationBaseScore returns 0 when all pattern weights are 0 (minimum possible score)", () => {
   // Same rec as the max-score test; the same opposing-polarity conflicts apply in reverse
   // (e.g. C=0 for 9-HH vs C=100 for 9-LH), so a real user cannot hit every pattern
   // floor simultaneously either. Weights are injected directly to verify the arithmetic floor.
-  // primaryAffinity = 0.0; secondaryAffinity = 0.0 → 0.0*0.7 + 0.0*0.3 = 0.0
+  // primaryAffinity = 0.0; secondaryAffinity = 0.0 → 0.0 + 0.0*0.2 = 0.0
   const weights = {
     "4-HH": 0, "9-HH": 0, "7-LH": 0,
     "9-LH": 0, "10-HH": 0, "1-HH": 0,
@@ -184,14 +184,14 @@ test("calculateRecommendationBaseScore returns 0 when all pattern weights are 0 
 test("calculateRecommendationBaseScore treats all related-type patterns as a single secondary pool", () => {
   // secondaryPatterns = Social (3) + Reflective (3) = 6 patterns
   // primaryAffinity = 1.0; secondaryAffinity = 0.5
-  // expected = 1.0*0.7 + 0.5*0.3 = 0.85
+  // expected = 1.0 + 0.5*0.2 = 1.1
   const weights = {
     "4-HH": 1, "9-HH": 1, "7-LH": 1,
     "1-HH": 0.5, "3-HL": 0.5, "6-HL": 0.5,
     "4-LH": 0.5, "10-HH": 0.5, "6-HH": 0.5,
   } as Record<PatternTypeId, number>
   const score = calculateRecommendationBaseScore(weights, makeRec("Creative", ["Social", "Reflective"]))
-  assert.ok(Math.abs(score - 0.85) < 1e-9, `expected 0.85, got ${score}`)
+  assert.ok(Math.abs(score - 1.1) < 1e-9, `expected 1.1, got ${score}`)
 })
 
 // ─── scoreRecommendation ─────────────────────────────────────────────────────
