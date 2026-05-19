@@ -2,12 +2,14 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import type { ActivityField, BFASScores } from "@touchgrass/types"
-import { ACTIVITY_TYPES } from "@touchgrass/types/constants"
+import type { Activity, ActivityField, BFASScores, Motivation, PatternTypeId } from "@touchgrass/types"
+import { ACTIVITY_TYPES, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import {
+  calculateRecommendationBaseScore,
   getRecommendations,
   getTopActivityTypes,
+  scoreRecommendation,
 } from "./recommendation-algorithm.js"
 
 const mockUserBfas: BFASScores = {
@@ -52,6 +54,138 @@ test("getRecommendations interest boost can surface recs beyond the score-only t
     `expected interest boost not to drop matches, got without=${matchCountWithout} with=${matchCountWith}`,
   )
 })
+
+const makeRec = (
+  type: Activity["type"],
+  related_types?: Activity["related_types"],
+): Activity => ({
+  id: "test",
+  title: "Test",
+  imageUrl: "",
+  field: "Art",
+  estimated_time: "1h",
+  type,
+  related_types,
+})
+
+// Creative patterns: ['4-HH', '9-HH', '7-LH']
+// Social patterns:   ['1-HH', '3-HL', '6-HL']
+// Reflective patterns: ['4-LH', '10-HH', '6-HH']
+
+// ─── calculateRecommendationBaseScore ────────────────────────────────────────
+
+test("calculateRecommendationBaseScore returns primaryAffinity directly when there are no related types", () => {
+  // primaryAffinity = (0.6 + 0.9 + 0.3) / 3 = 0.6
+  const weights = { "4-HH": 0.6, "9-HH": 0.9, "7-LH": 0.3 } as Record<PatternTypeId, number>
+  assert.equal(calculateRecommendationBaseScore(weights, makeRec("Creative")), 0.6)
+})
+
+test("calculateRecommendationBaseScore returns 0 when userPatternWeights is empty", () => {
+  assert.equal(
+    calculateRecommendationBaseScore({} as Record<PatternTypeId, number>, makeRec("Creative")),
+    0,
+  )
+})
+
+test("calculateRecommendationBaseScore gives 0.7 when primary is perfect and secondary weights are all missing", () => {
+  // primaryAffinity = 1.0; secondaryAffinity = 0 (no Social weights)
+  // expected = 1.0*0.7 + 0*0.3 = 0.7
+  const weights = { "4-HH": 1, "9-HH": 1, "7-LH": 1 } as Record<PatternTypeId, number>
+  const score = calculateRecommendationBaseScore(weights, makeRec("Creative", ["Social"]))
+  assert.ok(Math.abs(score - 0.7) < 1e-9, `expected 0.7, got ${score}`)
+})
+
+test("calculateRecommendationBaseScore blends primary (0.7) and secondary (0.3) when related types are present", () => {
+  // primaryAffinity = (0.9+0.9+0.9)/3 = 0.9
+  // secondaryAffinity (Social) = (0.3+0.3+0.3)/3 = 0.3
+  // expected = 0.9*0.7 + 0.3*0.3 = 0.72
+  const weights = {
+    "4-HH": 0.9, "9-HH": 0.9, "7-LH": 0.9,
+    "1-HH": 0.3, "3-HL": 0.3, "6-HL": 0.3,
+  } as Record<PatternTypeId, number>
+  const score = calculateRecommendationBaseScore(weights, makeRec("Creative", ["Social"]))
+  assert.ok(Math.abs(score - 0.72) < 1e-9, `expected 0.72, got ${score}`)
+})
+
+test("calculateRecommendationBaseScore returns 1.0 when all pattern weights are 1 (maximum possible score)", () => {
+  // "Compose a 1-Minute Song" (rec_006): type Creative, related_types [Artistic, Expressive]
+  // Primary   Creative  → 4-HH (E+O), 9-HH (C+O),  7-LH (a+O)
+  // Secondary Artistic  → 4-HH,       9-LH (c+O),   10-HH (N+O)
+  //           Expressive→ 1-HH (E+A),  4-HH,         10-HH
+  // 9-HH/9-LH require C=100 vs C=0; 1-HH/7-LH require A=100 vs A=0 — these
+  // weights cannot all reach 1.0 from real OCEAN scores simultaneously.
+  // Weights are injected directly to verify the arithmetic ceiling of the formula.
+  // primaryAffinity = 1.0; secondaryAffinity = 1.0 → 1.0*0.7 + 1.0*0.3 = 1.0
+  const weights = {
+    "4-HH": 1, "9-HH": 1, "7-LH": 1,
+    "9-LH": 1, "10-HH": 1, "1-HH": 1,
+  } as Record<PatternTypeId, number>
+  assert.equal(calculateRecommendationBaseScore(weights, makeRec("Creative", ["Artistic", "Expressive"])), 1)
+})
+
+test("calculateRecommendationBaseScore returns 0 when all pattern weights are 0 (minimum possible score)", () => {
+  // Same rec as the max-score test; the same opposing-polarity conflicts apply in reverse
+  // (e.g. C=0 for 9-HH vs C=100 for 9-LH), so a real user cannot hit every pattern
+  // floor simultaneously either. Weights are injected directly to verify the arithmetic floor.
+  // primaryAffinity = 0.0; secondaryAffinity = 0.0 → 0.0*0.7 + 0.0*0.3 = 0.0
+  const weights = {
+    "4-HH": 0, "9-HH": 0, "7-LH": 0,
+    "9-LH": 0, "10-HH": 0, "1-HH": 0,
+  } as Record<PatternTypeId, number>
+  assert.equal(calculateRecommendationBaseScore(weights, makeRec("Creative", ["Artistic", "Expressive"])), 0)
+})
+
+test("calculateRecommendationBaseScore treats all related-type patterns as a single secondary pool", () => {
+  // secondaryPatterns = Social (3) + Reflective (3) = 6 patterns
+  // primaryAffinity = 1.0; secondaryAffinity = 0.5
+  // expected = 1.0*0.7 + 0.5*0.3 = 0.85
+  const weights = {
+    "4-HH": 1, "9-HH": 1, "7-LH": 1,
+    "1-HH": 0.5, "3-HL": 0.5, "6-HL": 0.5,
+    "4-LH": 0.5, "10-HH": 0.5, "6-HH": 0.5,
+  } as Record<PatternTypeId, number>
+  const score = calculateRecommendationBaseScore(weights, makeRec("Creative", ["Social", "Reflective"]))
+  assert.ok(Math.abs(score - 0.85) < 1e-9, `expected 0.85, got ${score}`)
+})
+
+// ─── scoreRecommendation ─────────────────────────────────────────────────────
+
+const creativeMotivation: Motivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
+
+test("scoreRecommendation returns the recommendation object unchanged", () => {
+  const weights = {} as Record<PatternTypeId, number>
+  const rec = makeRec("Creative")
+  const { rec: returnedRec } = scoreRecommendation(weights, rec, [])
+  assert.equal(returnedRec, rec)
+})
+
+test("scoreRecommendation returns baseScore as the score when no motivations are given", () => {
+  const weights = { "4-HH": 0.6, "9-HH": 0.9, "7-LH": 0.3 } as Record<PatternTypeId, number>
+  const rec = makeRec("Creative")
+  const { score } = scoreRecommendation(weights, rec, [])
+  // baseScore = (0.6+0.9+0.3)/3 = 0.6; motivationBoost = 0
+  assert.ok(Math.abs(score - 0.6) < 1e-9, `expected 0.6, got ${score}`)
+})
+
+test("scoreRecommendation adds motivation boost to base score", () => {
+  // Creative patterns ['4-HH','9-HH','7-LH'] all weight 1.0 → baseScore = 1.0
+  // sharedPatterns with creativeMotivation = ['4-HH','9-HH','7-LH']
+  // exactBoost = 1+1+1 = 3.0; adjacentBoost = 0; motivationBoost = 3.0/5 = 0.6
+  // expected score = 1.0 + 0.6 = 1.6
+  const weights = { "4-HH": 1, "9-HH": 1, "7-LH": 1 } as Record<PatternTypeId, number>
+  const { score } = scoreRecommendation(weights, makeRec("Creative"), [creativeMotivation])
+  assert.ok(Math.abs(score - 1.6) < 1e-9, `expected 1.6, got ${score}`)
+})
+
+test("scoreRecommendation score is higher with a matching motivation than without", () => {
+  const weights = { "4-HH": 0.8, "9-HH": 0.8, "7-LH": 0.8 } as Record<PatternTypeId, number>
+  const rec = makeRec("Creative")
+  const withoutBoost = scoreRecommendation(weights, rec, [])
+  const withBoost = scoreRecommendation(weights, rec, [creativeMotivation])
+  assert.ok(withBoost.score > withoutBoost.score, `expected boost to raise score`)
+})
+
+// ─── getTopActivityTypes ─────────────────────────────────────────────────────
 
 test("getTopActivityTypes returns 6 activity types by default", () => {
   const top = getTopActivityTypes(mockUserBfas)

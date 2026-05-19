@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-05-19 — Unit Tests: calculateRecommendationBaseScore & scoreRecommendation
+
+Added unit tests for the two private scoring functions, now exported.
+
+**Tests (`packages/core`)**
+
+- `recommendation-algorithm.test.ts` — Unit tests for `calculateRecommendationBaseScore` (no related types, weighted blend, primary-only ceiling when secondary weights are missing, pooling across multiple related types, arithmetic floor/ceiling) and `scoreRecommendation` (score equals base score with no motivations, rec object identity, motivation boost applied, boost monotonicity).
+
+**Algorithm (`packages/core`)**
+
+- `recommendation-algorithm.ts` — Exported `calculateRecommendationBaseScore` and `scoreRecommendation` to make them testable.
+
+---
+
 ## 2026-05-19 — Recommendation Engine: Interest-Aware Bucket Diversification
 
 Replaced the post-diversification interest boost with a bucket-based, interest-first diversification pipeline. The top recommendation slots now aim for one rec per user interest before activity-type diversity kicks in.

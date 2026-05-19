@@ -20,7 +20,7 @@ const TOP_ACTIVITY_TYPES_COUNT = 6
  * User's match with primary patterns = 0.63, secondary patterns = 0.59
  * Base score = (0.63 * 0.7) + (0.59 * 0.3) = 0.62
  */
-function calculateRecommendationBaseScore(
+export function calculateRecommendationBaseScore(
     userPatternWeights: Record<PatternTypeId, number>,
     recommendation: Activity,
 ): number {
@@ -38,7 +38,7 @@ function calculateRecommendationBaseScore(
 }
 
 /* Combines base pattern affinity with motivation boost to produce a final score. */
-function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, recommendation: Activity, motivations: Motivation[]): ScoredRecommendation {
+export function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, recommendation: Activity, motivations: Motivation[]): ScoredRecommendation {
     const baseScore = calculateRecommendationBaseScore(userPatternWeights, recommendation)
     const motivationBoost = calculateMotivationBoost(userPatternWeights, recommendation, motivations)
     return { rec: recommendation, score: baseScore + motivationBoost }
