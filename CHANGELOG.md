@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-05-20 — Recommendation Detail Page
+
+New mobile screen at `(authed)/recommendations/detail?id=<rec_id>` that renders an activity's title/image/metadata instantly from the dashboard cache, then async-loads a placeholder AI summary and description. Reuses the existing `RecommendationCard` as the hero via a new `size="large"` mode so the list card and detail header can't drift in styling.
+
+**Mobile (`apps/mobile`)**
+
+- `app/(authed)/recommendations/detail.tsx` (new) — Reads `?id=` via `useLocalSearchParams`, resolves the base `Activity` synchronously from `getCachedActivity(id)` (no spinner for title/image/metadata), and effects a `fetchRecommendationDetail(id)` call for the extended fields. Shows a small `ActivityIndicator` while extended data loads; on fetch rejection the extended section is hidden but the card and CTA remain. Back button calls `router.back()`; a "Start this activity" `PrimaryButton` is wired with a no-op handler.
+- `app/(authed)/recommendations/index.tsx` — Renamed from `app/(authed)/recommendations.tsx` so the route group can hold both `index` and `detail`. Each card is wrapped in a `Pressable` that pushes `/recommendations/detail?id=${rec.id}`.
+- `components/recommendations/recommendation-card.tsx` — Added `size?: "default" | "large"` prop. `large` switches the image container from a fixed `160` height to a 4:3 aspect ratio and bumps the title to `text-2xl font-bold`. The same component now serves both the dashboard list item and the detail hero so they can't drift visually.
+- `lib/recommendations/api.ts` — Added an in-memory `activityCache: Map<string, Activity>` populated inside `fetchRecommendations`; exposed `getCachedActivity(id)` for the detail screen. Added `fetchRecommendationDetail(id)` stub returning a `Pick<ActivityDetail, "aiSummary" | "description">` with mock copy — single-line swap to call `GET /recommendations/:id/detail` when the route lands (commented-out real call kept inline as a TODO).
+
+**Types (`packages/types`)**
+
+- `index.ts` — Added `ActivityDetail = Activity & { aiSummary: string; description: string }` so the detail-fetch response shape lives next to the existing `Activity` type.
+
+**Tests (`apps/mobile`)**
+
+- `__tests__/recommendations-detail.test.tsx` (new) — 6 tests: missing id → not-found; unknown id (cache miss) → not-found; cached id with pending fetch → card visible + spinner; resolved fetch → AI summary + paragraphs rendered + spinner gone; rejected fetch → card + CTA remain, summary hidden; back button → `router.back()`.
+- `__tests__/recommendations-index.test.tsx` (new) — 6 tests covering the loading spinner, list render, card-press navigation to `/recommendations/detail?id=...`, `ProfileNotFoundError` redirect to onboarding, generic-error retry path, and sign-out flow.
+- `__tests__/recommendation-card.test.tsx` (new) — 5 tests: title/type/field render, optional estimated-time row presence/absence, `getActivityTypeIcon`/`getFieldIcon` lookup, and image-error fallback swap (drives `expo-image`'s `onError` via a `Pressable` mock).
+
+**Stories (`apps/mobile`)**
+
+- `components/recommendations/recommendation-detail-page.stories.tsx` (new) — Loaded / Loading / NotFound visual states for the detail screen.
+- `components/recommendations/recommendations-index-page.stories.tsx` (new) — Loaded / Loading / Error visual states for the dashboard.
+
+---
+
 ## 2026-05-19 — Fix: Preserve Primary Affinity When Secondary Affinities Exist
 
 Reworked the base-score formula so a strong primary pattern match is no longer diluted by the presence of `related_types`.
