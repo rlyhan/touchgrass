@@ -75,7 +75,7 @@ export default function RecommendationsPage() {
     return (
       <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
         <View className="flex-1 items-center justify-center px-8">
-          <GrassLogo size={48} color="#10b981" />
+          <GrassLogo />
           {status === "loading" ? (
             <ActivityIndicator
               size="large"
@@ -120,7 +120,7 @@ export default function RecommendationsPage() {
         ListHeaderComponent={
           <>
             <View className="items-center">
-              <GrassLogo size={48} color="#10b981" />
+              <GrassLogo />
             </View>
             <Text className="mb-6 mt-8 text-3xl font-bold tracking-tight text-gray-900">
               You might be great at...

@@ -39,7 +39,7 @@ function LoadedState() {
         ListHeaderComponent={
           <>
             <View className="items-center">
-              <GrassLogo size={48} color="#10b981" />
+              <GrassLogo />
             </View>
             <Text className="mb-6 mt-8 text-3xl font-bold tracking-tight text-gray-900">
               You might be great at...
@@ -62,7 +62,7 @@ function LoadingState() {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <View className="flex-1 items-center justify-center px-8">
-        <GrassLogo size={48} color="#10b981" />
+        <GrassLogo />
         <ActivityIndicator size="large" color="#10b981" className="mt-10" />
       </View>
     </SafeAreaView>
@@ -73,12 +73,12 @@ function ErrorState() {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <View className="flex-1 items-center justify-center px-8">
-        <GrassLogo size={48} color="#10b981" />
+        <GrassLogo />
         <Text className="mt-10 text-center text-xl font-semibold text-gray-900">
           Couldn&apos;t load your recommendations.
         </Text>
         <View className="mt-8 w-full">
-          <PrimaryButton label="Try again" onPress={() => {}} />
+          <PrimaryButton label="Try again" onPress={() => { }} />
         </View>
         <Pressable
           className="mt-6"

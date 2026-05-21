@@ -37,7 +37,7 @@ export function OnboardingScreenShell({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View className="items-center px-5 pt-4">
-          <GrassLogo size={32} color="#10b981" />
+          <GrassLogo />
         </View>
         <View className="px-5 pt-4">
           <OnboardingProgress step={step} totalSteps={totalSteps} />

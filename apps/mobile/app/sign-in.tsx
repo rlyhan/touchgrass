@@ -56,7 +56,7 @@ export default function SignInScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View className="items-center px-5 pt-4">
-          <GrassLogo size={32} color="#10b981" />
+          <GrassLogo />
         </View>
 
         <ScrollView

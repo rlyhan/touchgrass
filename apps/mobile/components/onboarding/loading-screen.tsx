@@ -16,7 +16,7 @@ export function OnboardingLoadingView({ status, onRetry, errorMessage }: Props) 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <View className="flex-1 items-center justify-center px-8">
-        <GrassLogo size={48} color="#10b981" />
+        <GrassLogo />
         {status === "loading" ? (
           <>
             <ActivityIndicator
