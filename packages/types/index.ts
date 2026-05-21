@@ -193,7 +193,7 @@ export interface PatternType {
 }
 
 export type Activity = {
-  id: string
+  slug: string
   title: string
   imageUrl: string
   type: ActivityType

@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-05-21 — Refactor: Identify Activities by Slug
+
+Replaces the `rec_NNN` numeric id with a human-readable slug derived from the activity title. Slugs scale beyond a 3-digit format, double as URL path segments for a future web app, and are more meaningful in logs/debugging. Mocks expose only `slug` (no separate `id`) so the data shape matches what Sanity will return.
+
+**Types (`packages/types`)**
+
+- `index.ts` — `Activity.id: string` → `Activity.slug: string`. No optional `id` retained; the resolved JSON contract from both mock and Sanity sources is slug-only.
+
+**Mocks (`packages/mocks`)**
+
+- `recommendations.ts` — All 152 entries renamed: `id: "rec_NNN"` → `slug: "<kebab-case-from-title>"`. Picsum URL seeds updated to match the new slugs. Slugs verified unique by a one-shot transformation script.
+
+**Algorithm (`packages/core`)**
+
+- `lib/helpers/diversify.ts` — `pickedIds` set renamed to `pickedSlugs`; all `.rec.id` references switched to `.rec.slug`. No behavioural change — the set is just keyed by a different string.
+- `lib/helpers/diversify.test.ts` — Test fixture `makeRec(id, …)` signature renamed to `makeRec(slug, …)`. Synthetic fixture ids (`"top"`, `"bottom"`, `"music-best"`, etc.) already kebab-cased, so test bodies needed only the property rename.
+- `lib/recommendation-algorithm.test.ts` — Membership-check assertion switched from `ids`/`rec.id` to `slugs`/`rec.slug`; inline `Activity` fixture updated.
+- `recommendations/route.test.ts` — Shape assertion updated from `typeof rec.id` to `typeof rec.slug`.
+
+**Mobile (`apps/mobile`)**
+
+- `lib/recommendations/api.ts` — `getCachedActivity(id)` parameter renamed to `slug`; in-memory cache now keyed by `a.slug`.
+- `app/(authed)/recommendations/index.tsx` — `FlatList` `keyExtractor` uses `rec.slug`; press handler pushes `/recommendations/detail?slug=${rec.slug}`.
+- `app/(authed)/recommendations/detail.tsx` — Reads `?slug=` via `useLocalSearchParams`; passes it through to `getCachedActivity` and `fetchRecommendationDetail`.
+- `components/recommendations/recommendations-index-page.stories.tsx` — `keyExtractor` updated to use `item.slug`.
+- `__tests__/recommendations-index.test.tsx`, `__tests__/recommendations-detail.test.tsx` — Test assertions and mock params updated for the slug param.
+
+**Docs (`context`)**
+
+- `project-overview.md` — Example activity JSON shows `"slug": "build-a-guitar-pedalboard"` instead of `"id": "rec_001"`.
+
+---
+
 ## 2026-05-20 — Recommendation Detail Page
 
 New mobile screen at `(authed)/recommendations/detail?id=<rec_id>` that renders an activity's title/image/metadata instantly from the dashboard cache, then async-loads a placeholder AI summary and description. Reuses the existing `RecommendationCard` as the hero via a new `size="large"` mode so the list card and detail header can't drift in styling.

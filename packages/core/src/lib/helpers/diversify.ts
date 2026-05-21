@@ -73,15 +73,15 @@ export function diversifyAndOrder(
         .sort((a, b) => b.sortScore - a.sortScore)
 
     const picks: BucketedRecommendation[] = []
-    const pickedIds = new Set<string>()
+    const pickedSlugs = new Set<string>()
     const seenTypes = new Set<ActivityType>()
 
     // Pass 1: interest diversification — one rec per user interest, drawn from the Top bucket.
     for (const interest of interests) {
-        const best = top.find((t) => t.rec.field === interest && !pickedIds.has(t.rec.id))
+        const best = top.find((t) => t.rec.field === interest && !pickedSlugs.has(t.rec.slug))
         if (best) {
             picks.push(best)
-            pickedIds.add(best.rec.id)
+            pickedSlugs.add(best.rec.slug)
             seenTypes.add(best.rec.type)
         }
     }
@@ -92,17 +92,17 @@ export function diversifyAndOrder(
         ...middle.filter((m) => m.sortScore >= TOP_BUCKET_MIN_SCORE),
     ]
     for (const b of typeDiversifyPool) {
-        if (pickedIds.has(b.rec.id)) continue
+        if (pickedSlugs.has(b.rec.slug)) continue
         if (seenTypes.has(b.rec.type)) continue
         picks.push(b)
-        pickedIds.add(b.rec.id)
+        pickedSlugs.add(b.rec.slug)
         seenTypes.add(b.rec.type)
     }
 
     const remaining: BucketedRecommendation[] = [
-        ...top.filter((t) => !pickedIds.has(t.rec.id)),
-        ...middle.filter((m) => !pickedIds.has(m.rec.id)),
-        ...bottom.filter((bt) => !pickedIds.has(bt.rec.id)),
+        ...top.filter((t) => !pickedSlugs.has(t.rec.slug)),
+        ...middle.filter((m) => !pickedSlugs.has(m.rec.slug)),
+        ...bottom.filter((bt) => !pickedSlugs.has(bt.rec.slug)),
     ]
 
     return [...picks, ...remaining].map((b) => ({ rec: b.rec, score: b.score }))

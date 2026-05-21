@@ -109,7 +109,7 @@ describe("RecommendationsPage", () => {
     fireEvent.press(card)
 
     expect(mockPush).toHaveBeenCalledWith(
-      `/recommendations/detail?id=${RECS[0].id}`,
+      `/recommendations/detail?slug=${RECS[0].slug}`,
     )
   })
 

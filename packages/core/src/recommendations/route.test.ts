@@ -82,7 +82,7 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
   assert.ok(Array.isArray(body.recommendations))
   assert.ok(body.recommendations.length > 0)
   for (const rec of body.recommendations) {
-    assert.ok(typeof rec.id === "string")
+    assert.ok(typeof rec.slug === "string")
     assert.ok(typeof rec.title === "string")
   }
 

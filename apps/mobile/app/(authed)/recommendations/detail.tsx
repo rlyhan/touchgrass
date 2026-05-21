@@ -20,20 +20,20 @@ import {
 import type { Activity } from "@touchgrass/types"
 
 export default function RecommendationDetailPage() {
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const { slug } = useLocalSearchParams<{ slug: string }>()
 
   // Resolved immediately from cache — no loading state needed for base fields
-  const activity: Activity | undefined = id ? getCachedActivity(id) : undefined
+  const activity: Activity | undefined = slug ? getCachedActivity(slug) : undefined
 
   const [extended, setExtended] = useState<ActivityDetailExtended | null>(null)
   const [extendedError, setExtendedError] = useState(false)
 
   useEffect(() => {
-    if (!id) return
-    fetchRecommendationDetail(id)
+    if (!slug) return
+    fetchRecommendationDetail(slug)
       .then(setExtended)
       .catch(() => setExtendedError(true))
-  }, [id])
+  }, [slug])
 
   if (!activity) {
     return (

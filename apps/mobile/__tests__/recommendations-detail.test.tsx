@@ -81,17 +81,17 @@ describe("RecommendationDetailPage", () => {
   })
 
   describe("activity not found", () => {
-    it("shows not-found message when id is absent", () => {
+    it("shows not-found message when slug is absent", () => {
       mockUseLocalSearchParams.mockReturnValue({})
       render(<RecommendationDetailPage />)
       expect(screen.getByText("Activity not found.")).toBeTruthy()
       expect(screen.queryByTestId("recommendation-card")).toBeNull()
     })
 
-    it("shows not-found message when id is not in cache", () => {
-      mockUseLocalSearchParams.mockReturnValue({ id: "unknown" })
+    it("shows not-found message when slug is not in cache", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: "unknown" })
       mockGetCachedActivity.mockReturnValue(undefined)
-      // id is truthy so useEffect will fire — give it a pending promise
+      // slug is truthy so useEffect will fire — give it a pending promise
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
 
       render(<RecommendationDetailPage />)
@@ -103,7 +103,7 @@ describe("RecommendationDetailPage", () => {
 
   describe("activity found", () => {
     beforeEach(() => {
-      mockUseLocalSearchParams.mockReturnValue({ id: ACTIVITY.id })
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       mockGetCachedActivity.mockReturnValue(ACTIVITY)
     })
 
@@ -155,10 +155,10 @@ describe("RecommendationDetailPage", () => {
       expect(mockBack).toHaveBeenCalledTimes(1)
     })
 
-    it("calls fetchRecommendationDetail with the activity id", () => {
+    it("calls fetchRecommendationDetail with the activity slug", () => {
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
       render(<RecommendationDetailPage />)
-      expect(mockFetchRecommendationDetail).toHaveBeenCalledWith(ACTIVITY.id)
+      expect(mockFetchRecommendationDetail).toHaveBeenCalledWith(ACTIVITY.slug)
     })
   })
 })

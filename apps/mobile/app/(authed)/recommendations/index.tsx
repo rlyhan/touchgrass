@@ -54,7 +54,7 @@ export default function RecommendationsPage() {
     ({ item: rec }: { item: Activity }) => (
       <Pressable
         onPress={() =>
-          router.push(`/recommendations/detail?id=${rec.id}` as Href)
+          router.push(`/recommendations/detail?slug=${rec.slug}` as Href)
         }
         accessibilityRole="button"
         accessibilityLabel={`View details for ${rec.title}`}
@@ -112,7 +112,7 @@ export default function RecommendationsPage() {
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <FlatList
         data={recommendations}
-        keyExtractor={(rec) => rec.id}
+        keyExtractor={(rec) => rec.slug}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={5}

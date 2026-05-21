@@ -15,7 +15,7 @@ function LoadedState() {
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <FlatList
         data={RECOMMENDATIONS}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.slug}
         renderItem={({ item }) => (
           <Pressable
             accessibilityRole="button"

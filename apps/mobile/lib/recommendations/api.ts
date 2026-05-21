@@ -9,8 +9,8 @@ const API_BASE_URL =
 
 const activityCache = new Map<string, Activity>()
 
-export function getCachedActivity(id: string): Activity | undefined {
-  return activityCache.get(id)
+export function getCachedActivity(slug: string): Activity | undefined {
+  return activityCache.get(slug)
 }
 
 export class ProfileNotFoundError extends Error {
@@ -33,7 +33,7 @@ export async function fetchRecommendations(): Promise<Activity[]> {
 
   const body = (await response.json()) as { recommendations: Activity[] }
   const activities = body.recommendations ?? []
-  activities.forEach((a) => activityCache.set(a.id, a))
+  activities.forEach((a) => activityCache.set(a.slug, a))
   return activities
 }
 

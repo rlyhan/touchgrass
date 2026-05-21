@@ -35,9 +35,9 @@ test("getRecommendations returns up to 3 recommendations", () => {
 
 test("getRecommendations only returns items from the available recommendation pool", () => {
   const scored = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS)
-  const ids = new Set(RECOMMENDATIONS.map((r) => r.id))
+  const slugs = new Set(RECOMMENDATIONS.map((r) => r.slug))
   for (const { rec } of scored) {
-    assert.ok(ids.has(rec.id), `unknown recommendation id: ${rec.id}`)
+    assert.ok(slugs.has(rec.slug), `unknown recommendation slug: ${rec.slug}`)
   }
 })
 
@@ -105,7 +105,7 @@ const makeRec = (
   type: Activity["type"],
   related_types?: Activity["related_types"],
 ): Activity => ({
-  id: "test",
+  slug: "test",
   title: "Test",
   imageUrl: "",
   field: "Art",

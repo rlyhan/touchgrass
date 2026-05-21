@@ -6,14 +6,14 @@ import type { Activity, ActivityField, ActivityType, ScoredRecommendation } from
 import { diversifyAndOrder } from "./diversify.js"
 
 const makeRec = (
-  id: string,
+  slug: string,
   field: ActivityField,
   type: ActivityType,
   score: number,
 ): ScoredRecommendation => ({
   rec: {
-    id,
-    title: id,
+    slug,
+    title: slug,
     imageUrl: "",
     type,
     field,
@@ -33,7 +33,7 @@ test("diversifyAndOrder with no interests sorts purely by score (no Top bucket e
   // With 0 interests: Top is empty. Activity-type diversification on Middle high-score subset
   // picks one per type. Final order respects bucket priority (Middle >= 0.6 first, then Bottom).
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["a", "b", "c", "d"],
   )
 })
@@ -46,8 +46,8 @@ test("diversifyAndOrder places Top bucket recs before Middle and Bottom", () => 
     makeRec("bottom", "Art", "Creative", 0.3),            // Bottom
   ]
   const result = diversifyAndOrder(scored, interests)
-  assert.equal(result[0]?.rec.id, "top")
-  assert.equal(result[result.length - 1]?.rec.id, "bottom")
+  assert.equal(result[0]?.rec.slug, "top")
+  assert.equal(result[result.length - 1]?.rec.slug, "bottom")
 })
 
 test("diversifyAndOrder Top bucket requires both score >= 0.6 AND field in interests", () => {
@@ -58,7 +58,7 @@ test("diversifyAndOrder Top bucket requires both score >= 0.6 AND field in inter
     makeRec("top", "Music", "Reflective", 0.65),               // Top
   ]
   const result = diversifyAndOrder(scored, interests)
-  assert.equal(result[0]?.rec.id, "top", "Top bucket rec should lead")
+  assert.equal(result[0]?.rec.slug, "top", "Top bucket rec should lead")
 })
 
 test("diversifyAndOrder Middle competition: +0.1 boost lets a low-score interest rec beat a high-score non-interest rec", () => {
@@ -70,7 +70,7 @@ test("diversifyAndOrder Middle competition: +0.1 boost lets a low-score interest
   const result = diversifyAndOrder(scored, interests)
   // Both are Middle; low-interest with boost (0.65) beats high-non-interest (0.62).
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["low-interest", "high-non-interest"],
   )
 })
@@ -83,7 +83,7 @@ test("diversifyAndOrder Middle competition: a strong non-interest rec still beat
   ]
   const result = diversifyAndOrder(scored, interests)
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["high-non-interest", "low-interest"],
   )
 })
@@ -104,7 +104,7 @@ test("diversifyAndOrder Bottom bucket: recs that fail both score and interest th
   ]
   const result = diversifyAndOrder(scored, interests)
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["middle", "bottom-a", "bottom-b"],
   )
 })
@@ -120,11 +120,11 @@ test("diversifyAndOrder with >=3 interests: top slots are one per distinct user 
   ]
   const result = diversifyAndOrder(scored, interests)
   // Top three should be one-per-interest, drawn from Top bucket in score order.
-  const topThreeIds = result.slice(0, 3).map((r) => r.rec.id)
+  const topThreeIds = result.slice(0, 3).map((r) => r.rec.slug)
   assert.deepEqual(topThreeIds, ["music-best", "writing-best", "coding-best"])
   // The duplicate-interest rec ("music-second") goes to remaining Top, ahead of Middle "off-interest".
-  assert.equal(result[3]?.rec.id, "music-second")
-  assert.equal(result[4]?.rec.id, "off-interest")
+  assert.equal(result[3]?.rec.slug, "music-second")
+  assert.equal(result[4]?.rec.slug, "off-interest")
 })
 
 test("diversifyAndOrder with >=3 interests does NOT diversify by activity type within Top", () => {
@@ -138,7 +138,7 @@ test("diversifyAndOrder with >=3 interests does NOT diversify by activity type w
   ]
   const result = diversifyAndOrder(scored, interests)
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["music", "writing", "coding"],
   )
 })
@@ -154,7 +154,7 @@ test("diversifyAndOrder with 2 interests: interest pass still surfaces every int
   // Pass 1 picks music (Music) then writing (Writing), both Reflective — type collision allowed.
   // Pass 2 picks coding (Analytical, unseen type) from Middle high-score pool.
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["music", "writing", "coding"],
   )
 })
@@ -171,7 +171,7 @@ test("diversifyAndOrder with 1 interest: interest pass picks the best Top rec, t
   // Pass 2 walks remaining Top + Middle≥0.6: skips b-music (Reflective seen), picks c-coding (Analytical).
   // Remaining: Top (b-music) → Middle (none left) → Bottom.
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["a-music", "c-coding", "b-music"],
   )
 })
@@ -187,7 +187,7 @@ test("diversifyAndOrder with 0 interests skips the interest pass and diversifies
   // Top is empty. Pass 1 is a no-op. Pass 2 pool = Middle high-score (a, b, c).
   // Picks: a (Analytical), c (Creative). Remaining Middle: b. Then Bottom: d.
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["a", "c", "b", "d"],
   )
 })
@@ -201,7 +201,7 @@ test("diversifyAndOrder final ordering follows Top → Middle → Bottom across 
   ]
   const result = diversifyAndOrder(scored, interests)
   assert.deepEqual(
-    result.map((r) => r.rec.id),
+    result.map((r) => r.rec.slug),
     ["top", "middle", "bottom"],
   )
 })
