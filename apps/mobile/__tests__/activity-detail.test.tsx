@@ -79,6 +79,15 @@ const ACTIVITY_WITH_DESCRIPTION: Activity = {
   ],
 }
 
+const ACTIVITY_WITH_INSTRUCTIONS: Activity = {
+  ...ACTIVITY,
+  instructions: [
+    { title: "Gather materials", description: "Buy a board and pedals." },
+    { title: "Assemble the board", description: "Attach pedals with velcro." },
+    { title: "Wire it up" },
+  ],
+}
+
 const mockBack = jest.mocked(ExpoRouter.router.back)
 const mockReplace = jest.mocked(ExpoRouter.router.replace)
 const mockCanGoBack = jest.mocked(ExpoRouter.router.canGoBack)
@@ -198,6 +207,36 @@ describe("ActivityDetailPage", () => {
       // Default ACTIVITY has no description
       render(<ActivityDetailPage />)
       expect(screen.queryByText("About this activity")).toBeNull()
+    })
+
+    it("renders the instructions section with numbered items when present", () => {
+      mockGetCachedActivity.mockReturnValue(ACTIVITY_WITH_INSTRUCTIONS)
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY_WITH_INSTRUCTIONS)
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Instructions")).toBeTruthy()
+      expect(screen.getByText("1")).toBeTruthy()
+      expect(screen.getByText("2")).toBeTruthy()
+      expect(screen.getByText("3")).toBeTruthy()
+      expect(screen.getByText("Gather materials")).toBeTruthy()
+      expect(screen.getByText("Assemble the board")).toBeTruthy()
+      expect(screen.getByText("Wire it up")).toBeTruthy()
+      expect(screen.getByText("Buy a board and pedals.")).toBeTruthy()
+      expect(screen.getByText("Attach pedals with velcro.")).toBeTruthy()
+    })
+
+    it("hides the instructions section when the activity has no instructions", () => {
+      // Default ACTIVITY has no instructions
+      render(<ActivityDetailPage />)
+      expect(screen.queryByText("Instructions")).toBeNull()
+    })
+
+    it("hides the instructions section when instructions is an empty array", () => {
+      const empty: Activity = { ...ACTIVITY, instructions: [] }
+      mockGetCachedActivity.mockReturnValue(empty)
+      mockFetchActivityBySlug.mockResolvedValue(empty)
+      render(<ActivityDetailPage />)
+      expect(screen.queryByText("Instructions")).toBeNull()
     })
 
     it("calls router.back when the back button is pressed and history exists", async () => {

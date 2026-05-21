@@ -62,6 +62,41 @@ test("Sanity-only activities (no matching mock) pass through as-is", async () =>
   assert.equal(result[0]?.slug, "brand-new-sanity-activity")
 })
 
+test("instructions from Sanity are merged onto a matching mock", async () => {
+  const target = RECOMMENDATIONS[0]
+  assert.ok(target, "expected at least one mock")
+  const override: SanityActivity = {
+    slug: target.slug,
+    title: target.title,
+    instructions: [
+      { title: "Step one", description: "Do the first thing." },
+      { title: "Step two" },
+    ],
+  }
+
+  const result = await createRecommendationLoader(async () => [override])()
+
+  const matched = result.find((r) => r.slug === target.slug)
+  assert.ok(matched)
+  assert.deepEqual(matched.instructions, override.instructions)
+})
+
+test("null instructions from Sanity fall through to undefined (no mock instructions)", async () => {
+  const target = RECOMMENDATIONS[0]
+  assert.ok(target, "expected at least one mock")
+  const partial = {
+    slug: target.slug,
+    title: target.title,
+    instructions: null,
+  } as unknown as SanityActivity
+
+  const result = await createRecommendationLoader(async () => [partial])()
+
+  const matched = result.find((r) => r.slug === target.slug)
+  assert.ok(matched)
+  assert.equal(matched.instructions, undefined)
+})
+
 test("merged result has no duplicates by slug", async () => {
   const target = RECOMMENDATIONS[0]
   assert.ok(target, "expected at least one mock")

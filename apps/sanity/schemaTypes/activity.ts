@@ -84,6 +84,36 @@ export const activitySchema = defineType({
       title: 'Estimated Time',
       type: 'string',
     }),
+    defineField({
+      name: 'instructions',
+      title: 'Instructions',
+      type: 'array',
+      description: 'Ordered steps for completing this activity. Drag to reorder.',
+      of: [
+        {
+          type: 'object',
+          name: 'instruction',
+          title: 'Instruction',
+          fields: [
+            defineField({
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'description',
+              title: 'Description',
+              type: 'text',
+              rows: 3,
+            }),
+          ],
+          preview: {
+            select: { title: 'title' },
+          },
+        },
+      ],
+    }),
   ],
   preview: {
     select: {
