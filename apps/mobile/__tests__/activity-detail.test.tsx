@@ -61,7 +61,22 @@ import * as ExpoRouter from "expo-router"
 const ACTIVITY = RECOMMENDATIONS[0]
 const ACTIVITY_WITH_DESCRIPTION: Activity = {
   ...ACTIVITY,
-  description: "First paragraph.\n\nSecond paragraph.",
+  description: [
+    {
+      _type: "block",
+      _key: "p1",
+      style: "normal",
+      children: [{ _type: "span", _key: "p1s1", text: "First paragraph.", marks: [] }],
+      markDefs: [],
+    },
+    {
+      _type: "block",
+      _key: "p2",
+      style: "normal",
+      children: [{ _type: "span", _key: "p2s1", text: "Second paragraph.", marks: [] }],
+      markDefs: [],
+    },
+  ],
 }
 
 const mockBack = jest.mocked(ExpoRouter.router.back)
@@ -132,11 +147,33 @@ describe("ActivityDetailPage", () => {
     beforeEach(() => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       mockGetCachedActivity.mockReturnValue(ACTIVITY)
+      // Default revalidation: server returns the same activity. Tests that
+      // care about specific revalidation behavior override this.
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
     })
 
-    it("does not hit the network when the activity is already cached", () => {
+    it("revalidates from the network even when the activity is cached", () => {
       render(<ActivityDetailPage />)
-      expect(mockFetchActivityBySlug).not.toHaveBeenCalled()
+      expect(mockFetchActivityBySlug).toHaveBeenCalledWith(ACTIVITY.slug)
+    })
+
+    it("keeps showing the cached activity if revalidation fails", async () => {
+      mockFetchActivityBySlug.mockRejectedValue(new Error("network error"))
+      render(<ActivityDetailPage />)
+
+      await waitFor(() => expect(mockFetchActivityBySlug).toHaveBeenCalled())
+      expect(screen.getByTestId("recommendation-card")).toBeTruthy()
+      expect(screen.queryByText("Couldn't load activity.")).toBeNull()
+    })
+
+    it("updates the displayed activity when revalidation returns fresh data", async () => {
+      const fresh: Activity = { ...ACTIVITY, title: "Fresh title from Sanity" }
+      mockFetchActivityBySlug.mockResolvedValue(fresh)
+      render(<ActivityDetailPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Fresh title from Sanity")).toBeTruthy()
+      })
     })
 
     it("renders the cached card and CTA", () => {
@@ -149,6 +186,7 @@ describe("ActivityDetailPage", () => {
 
     it("renders the description as paragraphs when set on the activity", () => {
       mockGetCachedActivity.mockReturnValue(ACTIVITY_WITH_DESCRIPTION)
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY_WITH_DESCRIPTION)
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("About this activity")).toBeTruthy()

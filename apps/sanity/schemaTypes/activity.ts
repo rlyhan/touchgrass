@@ -1,10 +1,14 @@
-import { ACTIVITY_FIELD_OPTIONS, ACTIVITY_TYPE_OPTIONS, PATTERN_TYPES } from '@touchgrass/types/constants'
+import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from '@touchgrass/types/constants'
 import { defineField, defineType } from 'sanity'
+import { RelatedTypesInput } from './components/RelatedTypesInput'
 
-export const patternTypeOptions = PATTERN_TYPES.map(({ id, name }) => ({
-  title: `${name} (${id})`,
-  value: id,
-}))
+const ACTIVITY_TYPE_OPTIONS_ALPHA = [...ACTIVITY_TYPES]
+  .sort((a, b) => a.localeCompare(b))
+  .map((value) => ({ title: value, value }))
+
+const ACTIVITY_FIELD_OPTIONS_ALPHA = [...ACTIVITY_FIELDS]
+  .sort((a, b) => a.localeCompare(b))
+  .map((value) => ({ title: value, value }))
 
 export const activitySchema = defineType({
   name: 'activity',
@@ -28,7 +32,21 @@ export const activitySchema = defineType({
     defineField({
       name: 'description',
       title: 'Description',
-      type: 'text',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [{title: 'Paragraph', value: 'normal'}],
+          lists: [],
+          marks: {
+            decorators: [
+              {title: 'Bold', value: 'strong'},
+              {title: 'Italic', value: 'em'},
+            ],
+            annotations: [],
+          },
+        },
+      ],
     }),
     defineField({
       name: 'imageUrl',
@@ -40,32 +58,31 @@ export const activitySchema = defineType({
       name: 'type',
       title: 'Type',
       type: 'string',
-      options: { list: ACTIVITY_TYPE_OPTIONS },
-    }),
-    defineField({
-      name: 'field',
-      title: 'Field',
-      type: 'string',
-      options: { list: ACTIVITY_FIELD_OPTIONS },
-    }),
-    defineField({
-      name: 'estimated_time',
-      title: 'Estimated Time',
-      type: 'string',
+      description: "What best describes this activity's purpose?",
+      options: { list: ACTIVITY_TYPE_OPTIONS_ALPHA },
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'related_types',
       title: 'Related Types',
       type: 'array',
+      description: 'What other purposes can this activity be described as?',
       of: [{ type: 'string' }],
-      options: { list: ACTIVITY_TYPE_OPTIONS },
+      options: { list: ACTIVITY_TYPE_OPTIONS_ALPHA },
+      components: { input: RelatedTypesInput },
+      validation: (Rule) => Rule.required().min(1),
     }),
     defineField({
-      name: 'patternTypes',
-      title: 'Pattern Types',
-      type: 'array',
-      of: [{ type: 'string' }],
-      options: { list: patternTypeOptions },
+      name: 'field',
+      title: 'Field',
+      type: 'string',
+      options: { list: ACTIVITY_FIELD_OPTIONS_ALPHA },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'estimated_time',
+      title: 'Estimated Time',
+      type: 'string',
     }),
   ],
   preview: {
