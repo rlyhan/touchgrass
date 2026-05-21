@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-05-21 — Feat: Merge Sanity Activities with Mock Fallback
+
+Introduces a loader that merges activities fetched from Sanity with the existing mocks by `slug`, letting Sanity entries override mocks of the same slug and falling back to mocks for slugs not yet migrated. Sets up the integration point for the real Sanity client without yet wiring it in.
+
+**Core (`packages/core`)**
+
+- `recommendations/source.ts` (new) — `createRecommendationLoader(fetchFromSanity)` returns a `LoadRecommendations = () => Promise<Activity[]>`. Sanity entries first, then mocks filtered to exclude any slug already present in the Sanity response.
+- `recommendations/sanity-source.ts` (new) — Stub `fetchActivitiesFromSanity` returning `[]`. This is the single integration point to swap in when the real Sanity client lands.
+- `recommendations/source.test.ts` (new) — Three cases: empty Sanity → all mocks; non-overlapping Sanity → additive; same-slug Sanity → overrides mock.
+- `recommendations/route.ts` — `GetRecommendationsDeps` now requires `loadRecommendations: LoadRecommendations`. Handler awaits the loader instead of importing `RECOMMENDATIONS` directly.
+- `index.ts` — Constructs `loadRecommendations = createRecommendationLoader(fetchActivitiesFromSanity)` and passes it into `createApp`.
+- `app.test.ts`, `onboarding/route.test.ts` — Inject a no-op `loadRecommendations: async () => []` since these tests don't exercise the recommendations route.
+- `recommendations/route.test.ts` — Injects a `loadRecommendations` mock returning the full `RECOMMENDATIONS` fixture.
+
+---
+
 ## 2026-05-21 — Refactor: Identify Activities by Slug
 
 Replaces the `rec_NNN` numeric id with a human-readable slug derived from the activity title. Slugs scale beyond a 3-digit format, double as URL path segments for a future web app, and are more meaningful in logs/debugging. Mocks expose only `slug` (no separate `id`) so the data shape matches what Sanity will return.

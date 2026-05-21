@@ -49,7 +49,12 @@ let server: Server
 let baseUrl: string
 
 before(() => {
-  const app = createApp({ insertProfile, getProfileByAuthUserId, getSessionUserId })
+  const app = createApp({
+    insertProfile,
+    getProfileByAuthUserId,
+    getSessionUserId,
+    loadRecommendations: async () => [],
+  })
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
   baseUrl = `http://127.0.0.1:${port}`

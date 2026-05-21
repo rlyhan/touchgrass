@@ -6,6 +6,7 @@ import { after, before, beforeEach, mock, test } from "node:test"
 import type { Request } from "express"
 
 import type { Activity } from "@touchgrass/types"
+import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
 import { createApp } from "../app.js"
 import type { NewProfile, Profile } from "../db/schema.js"
@@ -48,6 +49,9 @@ const getProfileByAuthUserId = mock.fn<
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
+const loadRecommendations = mock.fn<() => Promise<Activity[]>>(
+  async () => RECOMMENDATIONS,
+)
 
 let server: Server
 let baseUrl: string
@@ -57,6 +61,7 @@ before(() => {
     insertProfile,
     getProfileByAuthUserId,
     getSessionUserId,
+    loadRecommendations,
   })
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
