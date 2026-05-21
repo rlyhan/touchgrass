@@ -22,7 +22,7 @@ import type { Activity } from "@touchgrass/types"
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
 
-export default function RecommendationDetailPage() {
+export default function ActivityDetailPage() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
 
   const cached = slug ? getCachedActivity(slug) : undefined
@@ -104,7 +104,6 @@ export default function RecommendationDetailPage() {
           size="large"
         />
 
-        {/* AI summary + description — loaded async from /recommendations/:id/detail */}
         {extendedError ? null : !extended ? (
           <View className="mt-6 items-center py-8">
             <ActivityIndicator size="small" color="#10b981" />

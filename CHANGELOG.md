@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-05-21 — Refactor: Move Activity Detail to a Dynamic Path Segment
+
+The detail page lived at `/recommendations/detail?slug=…`. Slug is the public identifier so it belongs in the URL path, not a query string. Also moves the page out of `/recommendations/` and into `/activities/`, mirroring the backend's `/activities/:slug` endpoint and the entity name.
+
+**Mobile (`apps/mobile`)**
+
+- `app/(authed)/activities/[slug].tsx` (new) — Dynamic route that reads `slug` from `useLocalSearchParams`. Same behaviour as the old detail page; component renamed to `ActivityDetailPage`.
+- `app/(authed)/recommendations/detail.tsx` (deleted) — Replaced by the dynamic route above.
+- `app/(authed)/recommendations/index.tsx` — Press handler now pushes `/activities/${rec.slug}` instead of `/recommendations/detail?slug=${rec.slug}`.
+- `__tests__/activity-detail.test.tsx` (renamed from `recommendations-detail.test.tsx`) — Updated import path to the new file and component name (`ActivityDetailPage`).
+- `__tests__/recommendations-index.test.tsx` — Updated press-target assertion to the new URL.
+
+---
+
 ## 2026-05-21 — Fix: Fetch Activity Detail by Slug
 
 The detail page previously read from an in-memory cache populated only by the curated top-3 recommendations, so any deep link or refresh (or any slug outside the user's top picks) showed "Activity not found". Adds a `GET /activities/:slug` endpoint backed by the same shared activity source, plus a `fetchActivityBySlug` client that the detail page falls back to when the cache misses. Cache still serves the first paint when the user navigates from the recommendations list.

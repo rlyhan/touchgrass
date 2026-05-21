@@ -74,10 +74,10 @@ const EXTENDED: ActivityDetailExtended = {
   description: "First paragraph.\n\nSecond paragraph.",
 }
 
-import RecommendationDetailPage from "@/app/(authed)/recommendations/detail"
+import ActivityDetailPage from "@/app/(authed)/activities/[slug]"
 
 // ── tests ─────────────────────────────────────────────────────────────────────
-describe("RecommendationDetailPage", () => {
+describe("ActivityDetailPage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -85,7 +85,7 @@ describe("RecommendationDetailPage", () => {
   describe("activity not found", () => {
     it("shows not-found message when slug is absent", () => {
       mockUseLocalSearchParams.mockReturnValue({})
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
       expect(screen.getByText("Activity not found.")).toBeTruthy()
       expect(screen.queryByTestId("recommendation-card")).toBeNull()
     })
@@ -96,7 +96,7 @@ describe("RecommendationDetailPage", () => {
       mockFetchActivityBySlug.mockResolvedValue(null)
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
 
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
 
       expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy()
 
@@ -112,7 +112,7 @@ describe("RecommendationDetailPage", () => {
       mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
 
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
 
       await waitFor(() => {
         expect(screen.getByText(ACTIVITY.title)).toBeTruthy()
@@ -126,7 +126,7 @@ describe("RecommendationDetailPage", () => {
       mockFetchActivityBySlug.mockRejectedValue(new Error("network error"))
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
 
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
 
       await waitFor(() => {
         expect(screen.getByText("Couldn't load activity.")).toBeTruthy()
@@ -142,13 +142,13 @@ describe("RecommendationDetailPage", () => {
 
     it("does not hit the network when the activity is already cached", () => {
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
       expect(mockFetchActivityBySlug).not.toHaveBeenCalled()
     })
 
     it("renders the cached card with a spinner for extended details on first paint", () => {
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
 
       expect(screen.getByTestId("recommendation-card")).toBeTruthy()
       expect(screen.getByText(ACTIVITY.title)).toBeTruthy()
@@ -158,7 +158,7 @@ describe("RecommendationDetailPage", () => {
 
     it("renders extended summary and description when the fetch resolves", async () => {
       mockFetchRecommendationDetail.mockResolvedValue(EXTENDED)
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
 
       await waitFor(() => {
         expect(screen.getByText(EXTENDED.aiSummary)).toBeTruthy()
@@ -171,7 +171,7 @@ describe("RecommendationDetailPage", () => {
 
     it("hides the extended section but keeps the card and CTA when the fetch rejects", async () => {
       mockFetchRecommendationDetail.mockRejectedValue(new Error("network error"))
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
 
       await waitFor(() => {
         expect(screen.UNSAFE_queryByType(ActivityIndicator)).toBeNull()
@@ -184,7 +184,7 @@ describe("RecommendationDetailPage", () => {
 
     it("calls router.back when the back button is pressed", async () => {
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
 
       const backButton = screen.getByRole("button", { name: "Go back" })
       await act(async () => {
@@ -196,7 +196,7 @@ describe("RecommendationDetailPage", () => {
 
     it("calls fetchRecommendationDetail with the activity slug", () => {
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
-      render(<RecommendationDetailPage />)
+      render(<ActivityDetailPage />)
       expect(mockFetchRecommendationDetail).toHaveBeenCalledWith(ACTIVITY.slug)
     })
   })

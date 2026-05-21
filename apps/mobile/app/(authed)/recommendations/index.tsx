@@ -54,7 +54,7 @@ export default function RecommendationsPage() {
     ({ item: rec }: { item: Activity }) => (
       <Pressable
         onPress={() =>
-          router.push(`/recommendations/detail?slug=${rec.slug}` as Href)
+          router.push(`/activities/${rec.slug}` as Href)
         }
         accessibilityRole="button"
         accessibilityLabel={`View details for ${rec.title}`}
