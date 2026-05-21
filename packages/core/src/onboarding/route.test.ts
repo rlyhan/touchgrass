@@ -69,6 +69,7 @@ before(() => {
     getProfileByAuthUserId,
     getSessionUserId,
     loadRecommendations: async () => [],
+    getActivityBySlug: async () => null,
   })
   server = app.listen(0)
   const { port } = server.address() as AddressInfo

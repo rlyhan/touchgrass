@@ -5,12 +5,17 @@ import { fetchActivitiesFromSanity } from "./recommendations/sanity-source.js"
 import { createRecommendationLoader } from "./recommendations/source.js"
 
 const loadRecommendations = createRecommendationLoader(fetchActivitiesFromSanity)
+const getActivityBySlug = async (slug: string) => {
+  const activities = await loadRecommendations()
+  return activities.find((a) => a.slug === slug) ?? null
+}
 
 const app = createApp({
   insertProfile,
   getProfileByAuthUserId,
   getSessionUserId,
   loadRecommendations,
+  getActivityBySlug,
 })
 const port = Number(process.env.PORT ?? 3000)
 

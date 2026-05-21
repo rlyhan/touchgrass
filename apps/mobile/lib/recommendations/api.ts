@@ -37,6 +37,21 @@ export async function fetchRecommendations(): Promise<Activity[]> {
   return activities
 }
 
+export async function fetchActivityBySlug(slug: string): Promise<Activity | null> {
+  const response = await authedFetch(
+    `${API_BASE_URL}/activities/${encodeURIComponent(slug)}`,
+  )
+
+  if (response.status === 404) return null
+  if (!response.ok) {
+    throw new Error(`Failed to fetch activity (${response.status})`)
+  }
+
+  const body = (await response.json()) as { activity: Activity }
+  activityCache.set(body.activity.slug, body.activity)
+  return body.activity
+}
+
 export type ActivityDetailExtended = Pick<ActivityDetail, "aiSummary" | "description">
 
 // TODO: replace mock with real API call once GET /recommendations/:id/detail is implemented

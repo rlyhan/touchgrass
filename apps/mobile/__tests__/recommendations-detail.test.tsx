@@ -18,6 +18,7 @@ jest.mock("expo-router", () => ({
 // ── api ───────────────────────────────────────────────────────────────────────
 jest.mock("@/lib/recommendations/api", () => ({
   getCachedActivity: jest.fn(),
+  fetchActivityBySlug: jest.fn(),
   fetchRecommendationDetail: jest.fn(),
 }))
 
@@ -64,6 +65,7 @@ const ACTIVITY = RECOMMENDATIONS[0]
 const mockBack = jest.mocked(ExpoRouter.router.back)
 const mockUseLocalSearchParams = jest.mocked(ExpoRouter.useLocalSearchParams)
 const mockGetCachedActivity = jest.mocked(Api.getCachedActivity)
+const mockFetchActivityBySlug = jest.mocked(Api.fetchActivityBySlug)
 const mockFetchRecommendationDetail = jest.mocked(Api.fetchRecommendationDetail)
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
@@ -88,16 +90,47 @@ describe("RecommendationDetailPage", () => {
       expect(screen.queryByTestId("recommendation-card")).toBeNull()
     })
 
-    it("shows not-found message when slug is not in cache", () => {
+    it("shows a spinner while fetching, then not-found when the server has no such activity", async () => {
       mockUseLocalSearchParams.mockReturnValue({ slug: "unknown" })
       mockGetCachedActivity.mockReturnValue(undefined)
-      // slug is truthy so useEffect will fire — give it a pending promise
+      mockFetchActivityBySlug.mockResolvedValue(null)
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
 
       render(<RecommendationDetailPage />)
 
-      expect(screen.getByText("Activity not found.")).toBeTruthy()
+      expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy()
+
+      await waitFor(() => {
+        expect(screen.getByText("Activity not found.")).toBeTruthy()
+      })
       expect(screen.queryByTestId("recommendation-card")).toBeNull()
+    })
+
+    it("fetches the activity from the network when the cache misses and renders it", async () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
+      mockGetCachedActivity.mockReturnValue(undefined)
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
+      mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
+
+      render(<RecommendationDetailPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText(ACTIVITY.title)).toBeTruthy()
+      })
+      expect(mockFetchActivityBySlug).toHaveBeenCalledWith(ACTIVITY.slug)
+    })
+
+    it("shows an error message when the activity fetch rejects", async () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
+      mockGetCachedActivity.mockReturnValue(undefined)
+      mockFetchActivityBySlug.mockRejectedValue(new Error("network error"))
+      mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
+
+      render(<RecommendationDetailPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Couldn't load activity.")).toBeTruthy()
+      })
     })
   })
 
@@ -105,6 +138,12 @@ describe("RecommendationDetailPage", () => {
     beforeEach(() => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       mockGetCachedActivity.mockReturnValue(ACTIVITY)
+    })
+
+    it("does not hit the network when the activity is already cached", () => {
+      mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
+      render(<RecommendationDetailPage />)
+      expect(mockFetchActivityBySlug).not.toHaveBeenCalled()
     })
 
     it("renders the cached card with a spinner for extended details on first paint", () => {

@@ -14,32 +14,64 @@ import { RecommendationCard } from "@/components/recommendations/recommendation-
 import { PrimaryButton } from "@/components/ui/primary-button"
 import {
   type ActivityDetailExtended,
+  fetchActivityBySlug,
   fetchRecommendationDetail,
   getCachedActivity,
 } from "@/lib/recommendations/api"
 import type { Activity } from "@touchgrass/types"
 
+type ActivityStatus = "loading" | "ready" | "not-found" | "error"
+
 export default function RecommendationDetailPage() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
 
-  // Resolved immediately from cache — no loading state needed for base fields
-  const activity: Activity | undefined = slug ? getCachedActivity(slug) : undefined
+  const cached = slug ? getCachedActivity(slug) : undefined
+  const [activity, setActivity] = useState<Activity | null>(cached ?? null)
+  const [activityStatus, setActivityStatus] = useState<ActivityStatus>(
+    slug ? (cached ? "ready" : "loading") : "not-found",
+  )
 
   const [extended, setExtended] = useState<ActivityDetailExtended | null>(null)
   const [extendedError, setExtendedError] = useState(false)
 
   useEffect(() => {
     if (!slug) return
+    if (!cached) {
+      fetchActivityBySlug(slug)
+        .then((a) => {
+          if (a) {
+            setActivity(a)
+            setActivityStatus("ready")
+          } else {
+            setActivityStatus("not-found")
+          }
+        })
+        .catch(() => setActivityStatus("error"))
+    }
     fetchRecommendationDetail(slug)
       .then(setExtended)
       .catch(() => setExtendedError(true))
-  }, [slug])
+  }, [slug, cached])
 
-  if (!activity) {
+  if (activityStatus === "loading") {
     return (
       <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
         <View className="flex-1 items-center justify-center">
-          <Text className="text-base text-gray-500">Activity not found.</Text>
+          <ActivityIndicator size="large" color="#10b981" />
+        </View>
+      </SafeAreaView>
+    )
+  }
+
+  if (activityStatus !== "ready" || !activity) {
+    const message =
+      activityStatus === "error"
+        ? "Couldn't load activity."
+        : "Activity not found."
+    return (
+      <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-base text-gray-500">{message}</Text>
         </View>
       </SafeAreaView>
     )

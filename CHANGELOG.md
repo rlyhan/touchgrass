@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-05-21 — Fix: Fetch Activity Detail by Slug
+
+The detail page previously read from an in-memory cache populated only by the curated top-3 recommendations, so any deep link or refresh (or any slug outside the user's top picks) showed "Activity not found". Adds a `GET /activities/:slug` endpoint backed by the same shared activity source, plus a `fetchActivityBySlug` client that the detail page falls back to when the cache misses. Cache still serves the first paint when the user navigates from the recommendations list.
+
+**Core (`packages/core`)**
+
+- `activities/route.ts` (new) — `getActivityHandler` requires auth; calls `getActivityBySlug(req.params.slug)`; returns `{ activity }` on hit, `404 { error: "Activity not found" }` on miss, `500` on lookup failure.
+- `activities/route.test.ts` (new) — Four cases: 200 with body, 404 unknown slug, 401 unauthenticated (handler short-circuits before `getActivityBySlug`), 500 on lookup throw.
+- `app.ts` — `AppDeps` now includes `GetActivityDeps`; new route `app.get("/activities/:slug", getActivityHandler(deps))`.
+- `index.ts` — Adds `getActivityBySlug` as a local closure over the merged activity loader: `(await loadRecommendations()).find((a) => a.slug === slug) ?? null`. Cheap full-pool scan for now; can be swapped for a Sanity GROQ-by-slug query if/when it matters.
+- `app.test.ts`, `onboarding/route.test.ts`, `recommendations/route.test.ts` — Inject a no-op `getActivityBySlug: async () => null` since those suites don't exercise the new route.
+
+**Mobile (`apps/mobile`)**
+
+- `lib/recommendations/api.ts` — New `fetchActivityBySlug(slug)`: hits `GET /activities/:slug` (slug URL-encoded), returns `null` on 404, throws on other non-2xx, and primes the shared `activityCache` on success.
+- `app/(authed)/recommendations/detail.tsx` — Reworked around a four-state `ActivityStatus` (`loading | ready | not-found | error`). Cache hit → render immediately. Cache miss → spinner, then network fetch fills the activity or surfaces "Activity not found." / "Couldn't load activity.". Existing extended-fetch behaviour unchanged.
+- `__tests__/recommendations-detail.test.tsx` — Three new cases for the not-found describe block (spinner → not-found on null response; spinner → render on hit; spinner → error on reject) and one new "activity found" case asserting that a cache hit short-circuits the network call. Existing tests adapted to the new state machine.
+
+---
+
 ## 2026-05-21 — Feat: Add Slug Field to Activity Schema
 
 Adds the `slug` field to the Sanity activity document, mirroring the slug identifier the app now uses. Auto-derived from `title` via Sanity's built-in `slug` type, with the dataset-wide uniqueness check that comes with the type by default. Required field — the merge logic in `core` depends on every Sanity activity having a slug.
