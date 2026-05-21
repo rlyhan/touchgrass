@@ -11,7 +11,7 @@ import { ActivityIndicator } from "react-native"
 // jest.mock factories are hoisted above const declarations, so we must define
 // mock fns inline and reference them via the module after import.
 jest.mock("expo-router", () => ({
-  router: { back: jest.fn() },
+  router: { back: jest.fn(), replace: jest.fn(), canGoBack: jest.fn() },
   useLocalSearchParams: jest.fn(),
 }))
 
@@ -63,6 +63,8 @@ import * as ExpoRouter from "expo-router"
 const ACTIVITY = RECOMMENDATIONS[0]
 
 const mockBack = jest.mocked(ExpoRouter.router.back)
+const mockReplace = jest.mocked(ExpoRouter.router.replace)
+const mockCanGoBack = jest.mocked(ExpoRouter.router.canGoBack)
 const mockUseLocalSearchParams = jest.mocked(ExpoRouter.useLocalSearchParams)
 const mockGetCachedActivity = jest.mocked(Api.getCachedActivity)
 const mockFetchActivityBySlug = jest.mocked(Api.fetchActivityBySlug)
@@ -182,8 +184,9 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByTestId("primary-button")).toBeTruthy()
     })
 
-    it("calls router.back when the back button is pressed", async () => {
+    it("calls router.back when the back button is pressed and history exists", async () => {
       mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
+      mockCanGoBack.mockReturnValue(true)
       render(<ActivityDetailPage />)
 
       const backButton = screen.getByRole("button", { name: "Go back" })
@@ -192,6 +195,21 @@ describe("ActivityDetailPage", () => {
       })
 
       expect(mockBack).toHaveBeenCalledTimes(1)
+      expect(mockReplace).not.toHaveBeenCalled()
+    })
+
+    it("redirects to recommendations when the back button is pressed and there's no history (deep link)", async () => {
+      mockFetchRecommendationDetail.mockReturnValue(new Promise(() => {}))
+      mockCanGoBack.mockReturnValue(false)
+      render(<ActivityDetailPage />)
+
+      const backButton = screen.getByRole("button", { name: "Go back" })
+      await act(async () => {
+        fireEvent.press(backButton)
+      })
+
+      expect(mockReplace).toHaveBeenCalledWith("/recommendations")
+      expect(mockBack).not.toHaveBeenCalled()
     })
 
     it("calls fetchRecommendationDetail with the activity slug", () => {

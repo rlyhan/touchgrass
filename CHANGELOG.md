@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-05-21 — Fix: Handle Activity Detail Back Button with Empty Stack
+
+After moving the detail page to `/activities/[slug]`, deep-linking or refreshing directly on a detail URL meant the navigator had no previous screen to pop. Pressing back triggered React Navigation's "GO_BACK was not handled" warning. The previous detail route at `/recommendations/detail` masked this because Expo Router auto-included the sibling `index.tsx` as the stack's initial route; the new `/activities/` group has no sibling, so the stack contains only the detail screen.
+
+**Mobile (`apps/mobile`)**
+
+- `app/(authed)/activities/[slug].tsx` — Back button now calls a `handleBack` that uses `router.canGoBack()`: pops the stack when there is history, otherwise `router.replace("/recommendations")` to land on the authed home.
+- `__tests__/activity-detail.test.tsx` — Mock now exposes `router.replace` and `router.canGoBack`. Old "calls router.back" test split into two cases: `canGoBack === true` → `back()` called, `replace()` not called; `canGoBack === false` → `replace("/recommendations")` called, `back()` not called.
+
+---
+
 ## 2026-05-21 — Refactor: Move Activity Detail to a Dynamic Path Segment
 
 The detail page lived at `/recommendations/detail?slug=…`. Slug is the public identifier so it belongs in the URL path, not a query string. Also moves the page out of `/recommendations/` and into `/activities/`, mirroring the backend's `/activities/:slug` endpoint and the entity name.

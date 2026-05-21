@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from "expo-router"
+import { router, useLocalSearchParams, type Href } from "expo-router"
 import { ArrowLeft, Sparkle } from "lucide-react-native"
 import { useEffect, useState } from "react"
 import {
@@ -33,6 +33,11 @@ export default function ActivityDetailPage() {
 
   const [extended, setExtended] = useState<ActivityDetailExtended | null>(null)
   const [extendedError, setExtendedError] = useState(false)
+
+  const handleBack = () => {
+    if (router.canGoBack()) router.back()
+    else router.replace("/recommendations" as Href)
+  }
 
   useEffect(() => {
     if (!slug) return
@@ -82,7 +87,7 @@ export default function ActivityDetailPage() {
       {/* Header with back button */}
       <View className="z-10 bg-white/80 px-4 py-3">
         <Pressable
-          onPress={() => router.back()}
+          onPress={handleBack}
           className="h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white"
           accessibilityRole="button"
           accessibilityLabel="Go back"
