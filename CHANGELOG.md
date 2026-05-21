@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-05-22 — Feat: Activity Instructions Field
+
+Adds an optional ordered `instructions` field to the Activity schema, allowing editors to author step-by-step guidance for each activity. Instructions render on the activity detail page as a numbered list with emerald step-indicator circles.
+
+**Sanity Studio (`apps/sanity`)**
+
+- New `instructions` array field on the `activity` schema. Each item is an inline object with a required `title` (string) and an optional `description` (plain text, 3-row textarea). Drag-to-reorder is enabled by default. Item preview shows the title so editors can identify steps while reordering.
+
+**Types (`packages/types`)**
+
+- New `ActivityInstruction` type (`{ title: string; description?: string }`). `Activity` gains an optional `instructions?: ActivityInstruction[]` field.
+
+**Backend (`packages/core`)**
+
+- GROQ query in `sanity-source.ts` updated to project the `instructions` array alongside existing fields.
+- Two new `source.test.ts` cases: instructions from Sanity are merged onto a matching mock; a `null` instructions field falls through to `undefined`.
+
+**Mobile (`apps/mobile`)**
+
+- Activity detail page renders an "Instructions" section when the field is non-empty. Each step shows a numbered emerald circle (1…N, positional) on the left, the step title, and the plain-text description below it.
+- Three new `activity-detail.test.tsx` cases: renders section + numbered items when instructions are present, hides section when absent, hides section when empty array.
+- Two new Storybook stories: `WithInstructions` and `WithDescriptionAndInstructions`.
+
 ## 2026-05-21 — Feat: Sanity CMS Integration
 
 Wires Sanity as the authoritative source for activity content, replacing the static mock dataset incrementally. Activities authored in the Sanity Studio flow into the app's recommendations and detail pages, with mocks serving as a fallback for any activity not yet migrated.
