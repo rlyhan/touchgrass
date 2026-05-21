@@ -1,7 +1,9 @@
+import type { PortableTextBlock } from "@portabletext/types"
 import type { Meta, StoryObj } from "@storybook/react-native"
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
+import { PortableText } from "@/components/ui/portable-text"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { RecommendationCard } from "./recommendation-card"
 
@@ -15,8 +17,37 @@ const ACTIVITY = {
   estimatedTime: "2 hrs",
 }
 
-const DESCRIPTION =
-  "In this beginner-friendly class you'll learn to make sourdough from scratch — starter maintenance, hydration, shaping, and scoring.\n\nAll ingredients and tools are provided. No prior baking experience required."
+const DESCRIPTION: PortableTextBlock[] = [
+  {
+    _type: "block",
+    _key: "p1",
+    style: "normal",
+    children: [
+      {
+        _type: "span",
+        _key: "p1s1",
+        text:
+          "In this beginner-friendly class you'll learn to make sourdough from scratch — starter maintenance, hydration, shaping, and scoring.",
+        marks: [],
+      },
+    ],
+    markDefs: [],
+  },
+  {
+    _type: "block",
+    _key: "p2",
+    style: "normal",
+    children: [
+      {
+        _type: "span",
+        _key: "p2s1",
+        text: "All ingredients and tools are provided. No prior baking experience required.",
+        marks: [],
+      },
+    ],
+    markDefs: [],
+  },
+]
 
 // ── shared sub-components ─────────────────────────────────────────────────────
 function Header() {
@@ -35,7 +66,7 @@ function Header() {
 }
 
 // ── story components (one per visual state) ───────────────────────────────────
-function LoadedState({ description }: { description?: string }) {
+function LoadedState({ description }: { description?: PortableTextBlock[] }) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <Header />
@@ -45,16 +76,12 @@ function LoadedState({ description }: { description?: string }) {
       >
         <RecommendationCard {...ACTIVITY} size="large" />
 
-        {description ? (
+        {description && description.length > 0 ? (
           <View className="mt-6">
             <Text className="mb-3 text-lg font-semibold text-gray-900">
               About this activity
             </Text>
-            {description.split("\n\n").map((paragraph, index) => (
-              <Text key={index} className="mb-4 leading-relaxed text-gray-500">
-                {paragraph}
-              </Text>
-            ))}
+            <PortableText blocks={description} />
           </View>
         ) : null}
 

@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
+import { PortableText } from "@/components/ui/portable-text"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import {
   fetchActivityBySlug,
@@ -35,18 +36,29 @@ export default function ActivityDetailPage() {
   }
 
   useEffect(() => {
-    if (!slug || cached) return
+    if (!slug) return
+    let cancelled = false
     fetchActivityBySlug(slug)
       .then((a) => {
+        if (cancelled) return
         if (a) {
           setActivity(a)
           setActivityStatus("ready")
         } else {
-          setActivityStatus("not-found")
+          // Server has no such activity. If we were showing a cached copy,
+          // keep it; otherwise mark not-found.
+          setActivityStatus((prev) => (prev === "ready" ? prev : "not-found"))
         }
       })
-      .catch(() => setActivityStatus("error"))
-  }, [slug, cached])
+      .catch(() => {
+        if (cancelled) return
+        // Network error: keep showing cached copy if we had one.
+        setActivityStatus((prev) => (prev === "ready" ? prev : "error"))
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [slug])
 
   if (activityStatus === "loading") {
     return (
@@ -99,19 +111,12 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        {activity.description ? (
+        {activity.description && activity.description.length > 0 ? (
           <View className="mt-6">
             <Text className="mb-3 text-lg font-semibold text-gray-900">
               About this activity
             </Text>
-            {activity.description.split("\n\n").map((paragraph, index) => (
-              <Text
-                key={index}
-                className="mb-4 leading-relaxed text-gray-500"
-              >
-                {paragraph}
-              </Text>
-            ))}
+            <PortableText blocks={activity.description} />
           </View>
         ) : null}
 

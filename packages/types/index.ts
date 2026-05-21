@@ -1,3 +1,5 @@
+import type { PortableTextBlock } from "@portabletext/types"
+
 export type Gender =
   | "Male"
   | "Female"
@@ -200,9 +202,7 @@ export type Activity = {
   field: ActivityField
   estimated_time: string
   related_types?: ActivityType[]
-  // Human-curated matches
-  patternTypes?: PatternTypeId[];
-  description?: string
+  description?: PortableTextBlock[]
 }
 
 export type ScoredRecommendation = {

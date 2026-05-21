@@ -8,5 +8,8 @@
   "exports": {
     ".": "./index.ts",
     "./constants": "./constants.ts"
+  },
+  "dependencies": {
+    "@portabletext/types": "^4.0.2"
   }
 }
