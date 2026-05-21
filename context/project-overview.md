@@ -94,7 +94,7 @@ export type Recommendation = {
 
 ```
 {
-  "id": "rec_001",
+  "slug": "build-a-guitar-pedalboard",
   "title": "Build a Guitar Pedalboard",
   "description": "Design and assemble a custom effects pedalboard for your guitar setup.",
   "category": "Music",

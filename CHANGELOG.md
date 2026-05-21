@@ -1,5 +1,145 @@
 # Changelog
 
+## 2026-05-21 — Feat: Render Sanity Description; Drop AI Summary Placeholder
+
+Editor-authored description now flows from Sanity through the activity loader to the detail page. As part of this, dropped the `aiSummary` placeholder fetch — it was always hardcoded text behind `fetchRecommendationDetail`, with no real endpoint behind it. The "Summary" emerald box and its loading spinner are gone; if/when an actual personalized-summary feature is built, it can be re-added as a separate fetch then.
+
+**Types (`packages/types`)**
+
+- `index.ts` — Added `description?: string` to `Activity` (optional — Sanity schema marks the field as not required, and mocks don't carry descriptions yet). Removed the `ActivityDetail = Activity & { aiSummary, description }` type; with description on `Activity` and no `aiSummary` left, the wrapper has nothing to add.
+
+**Core (`packages/core`)**
+
+- `recommendations/sanity-source.ts` — GROQ query now projects `description` alongside the other fields.
+
+**Mobile (`apps/mobile`)**
+
+- `lib/recommendations/api.ts` — Removed `fetchRecommendationDetail` and its `ActivityDetailExtended` type. Removed the `ActivityDetail` import.
+- `app/(authed)/activities/[slug].tsx` — Removed the `extended` / `extendedError` state and the second `useEffect` branch. Description now renders directly from `activity.description`, paragraph-split on `\n\n`, with the whole "About this activity" section hidden when the field is empty. Removed the Sparkle/Summary emerald box and the `Sparkle` import.
+- `components/recommendations/recommendation-detail-page.stories.tsx` — Story title updated to `Activities/ActivityDetailPage`. `LoadedState` now takes a `description` arg; replaced the old `Loaded` story with two variants — `WithDescription` (full paragraphs) and `WithoutDescription` (only the card + CTA). `Loading` story repurposed for the full-page activity-fetch spinner (no more inline extended-fetch spinner). `NotFound` retained.
+- `__tests__/activity-detail.test.tsx` — Rewritten. Dropped the `fetchRecommendationDetail` mock and the four tests built around it (extended spinner, resolved render, rejected render, "called with slug"). Two new cases for description: renders as paragraphs when set; section hidden when empty. Other cases (slug absent → not-found, cache miss → spinner → network, error path, back-button branches) preserved with the new shape.
+
+---
+
+## 2026-05-21 — Feat: Fetch Published Activities from Sanity
+
+Wires the `fetchActivitiesFromSanity` stub up to a real `@sanity/client` call against the `93cev0va` / `production` dataset, published perspective only. Also refines the merge so partially-migrated Sanity docs don't break the UI: Sanity non-null fields override the mock; null/undefined fields fall through to the mock's value.
+
+Why per-field merge instead of whole-document replacement: the Sanity schema only enforces `title` + `slug` as required. While the editor is mid-migration, a doc may have e.g. `imageUrl` still empty. The earlier "Sanity wins entirely" rule would have shipped a `null` image and broken the card render. The new rule lets the editor fill fields in incrementally.
+
+**Core (`packages/core`)**
+
+- `package.json` — Added `@sanity/client ^7.22.0`.
+- `recommendations/source.ts` — New `SanityActivity = Partial<Activity> & Pick<Activity, "title" | "slug">` type (only title + slug are guaranteed; everything else is optional). `LoadSanityActivities` returns `SanityActivity[]`. `createRecommendationLoader` now merges per field via `mergeNonNull`: mocks are the base list, Sanity entries with a matching slug override non-null fields, and Sanity-only entries (no matching mock) are concatenated at the head of the list as-is.
+- `recommendations/sanity-source.ts` — Replaced the `[]` stub with a real `createClient` call. Hardcoded `projectId`/`dataset` to match `apps/sanity/sanity.config.ts`. `useCdn: true`, `apiVersion: "2024-01-01"`, `perspective: "published"`. GROQ query projects the slug from `slug.current` and the image from `imageUrl.asset->url`. Errors logged and swallowed — returns `[]` so the recommendations endpoint stays up even if Sanity is unreachable.
+- `recommendations/source.test.ts` — Rewritten cases for the new merge semantics: all-mocks when Sanity empty; field override by matching slug; null Sanity fields fall through to mock; Sanity-only entries appended; no duplicate slugs in the merged result.
+
+---
+
+## 2026-05-21 — Fix: Handle Activity Detail Back Button with Empty Stack
+
+After moving the detail page to `/activities/[slug]`, deep-linking or refreshing directly on a detail URL meant the navigator had no previous screen to pop. Pressing back triggered React Navigation's "GO_BACK was not handled" warning. The previous detail route at `/recommendations/detail` masked this because Expo Router auto-included the sibling `index.tsx` as the stack's initial route; the new `/activities/` group has no sibling, so the stack contains only the detail screen.
+
+**Mobile (`apps/mobile`)**
+
+- `app/(authed)/activities/[slug].tsx` — Back button now calls a `handleBack` that uses `router.canGoBack()`: pops the stack when there is history, otherwise `router.replace("/recommendations")` to land on the authed home.
+- `__tests__/activity-detail.test.tsx` — Mock now exposes `router.replace` and `router.canGoBack`. Old "calls router.back" test split into two cases: `canGoBack === true` → `back()` called, `replace()` not called; `canGoBack === false` → `replace("/recommendations")` called, `back()` not called.
+
+---
+
+## 2026-05-21 — Refactor: Move Activity Detail to a Dynamic Path Segment
+
+The detail page lived at `/recommendations/detail?slug=…`. Slug is the public identifier so it belongs in the URL path, not a query string. Also moves the page out of `/recommendations/` and into `/activities/`, mirroring the backend's `/activities/:slug` endpoint and the entity name.
+
+**Mobile (`apps/mobile`)**
+
+- `app/(authed)/activities/[slug].tsx` (new) — Dynamic route that reads `slug` from `useLocalSearchParams`. Same behaviour as the old detail page; component renamed to `ActivityDetailPage`.
+- `app/(authed)/recommendations/detail.tsx` (deleted) — Replaced by the dynamic route above.
+- `app/(authed)/recommendations/index.tsx` — Press handler now pushes `/activities/${rec.slug}` instead of `/recommendations/detail?slug=${rec.slug}`.
+- `__tests__/activity-detail.test.tsx` (renamed from `recommendations-detail.test.tsx`) — Updated import path to the new file and component name (`ActivityDetailPage`).
+- `__tests__/recommendations-index.test.tsx` — Updated press-target assertion to the new URL.
+
+---
+
+## 2026-05-21 — Fix: Fetch Activity Detail by Slug
+
+The detail page previously read from an in-memory cache populated only by the curated top-3 recommendations, so any deep link or refresh (or any slug outside the user's top picks) showed "Activity not found". Adds a `GET /activities/:slug` endpoint backed by the same shared activity source, plus a `fetchActivityBySlug` client that the detail page falls back to when the cache misses. Cache still serves the first paint when the user navigates from the recommendations list.
+
+**Core (`packages/core`)**
+
+- `activities/route.ts` (new) — `getActivityHandler` requires auth; calls `getActivityBySlug(req.params.slug)`; returns `{ activity }` on hit, `404 { error: "Activity not found" }` on miss, `500` on lookup failure.
+- `activities/route.test.ts` (new) — Four cases: 200 with body, 404 unknown slug, 401 unauthenticated (handler short-circuits before `getActivityBySlug`), 500 on lookup throw.
+- `app.ts` — `AppDeps` now includes `GetActivityDeps`; new route `app.get("/activities/:slug", getActivityHandler(deps))`.
+- `index.ts` — Adds `getActivityBySlug` as a local closure over the merged activity loader: `(await loadRecommendations()).find((a) => a.slug === slug) ?? null`. Cheap full-pool scan for now; can be swapped for a Sanity GROQ-by-slug query if/when it matters.
+- `app.test.ts`, `onboarding/route.test.ts`, `recommendations/route.test.ts` — Inject a no-op `getActivityBySlug: async () => null` since those suites don't exercise the new route.
+
+**Mobile (`apps/mobile`)**
+
+- `lib/recommendations/api.ts` — New `fetchActivityBySlug(slug)`: hits `GET /activities/:slug` (slug URL-encoded), returns `null` on 404, throws on other non-2xx, and primes the shared `activityCache` on success.
+- `app/(authed)/recommendations/detail.tsx` — Reworked around a four-state `ActivityStatus` (`loading | ready | not-found | error`). Cache hit → render immediately. Cache miss → spinner, then network fetch fills the activity or surfaces "Activity not found." / "Couldn't load activity.". Existing extended-fetch behaviour unchanged.
+- `__tests__/recommendations-detail.test.tsx` — Three new cases for the not-found describe block (spinner → not-found on null response; spinner → render on hit; spinner → error on reject) and one new "activity found" case asserting that a cache hit short-circuits the network call. Existing tests adapted to the new state machine.
+
+---
+
+## 2026-05-21 — Feat: Add Slug Field to Activity Schema
+
+Adds the `slug` field to the Sanity activity document, mirroring the slug identifier the app now uses. Auto-derived from `title` via Sanity's built-in `slug` type, with the dataset-wide uniqueness check that comes with the type by default. Required field — the merge logic in `core` depends on every Sanity activity having a slug.
+
+**Sanity (`apps/sanity`)**
+
+- `schemaTypes/activity.ts` — New `slug` field positioned right after `title`. `type: 'slug'`, `options.source: 'title'`, `maxLength: 128`, `validation: Rule.required()`. Description note flags that when migrating an existing mock, the slug must match the mock's slug for the merge to take effect.
+
+---
+
+## 2026-05-21 — Feat: Merge Sanity Activities with Mock Fallback
+
+Introduces a loader that merges activities fetched from Sanity with the existing mocks by `slug`, letting Sanity entries override mocks of the same slug and falling back to mocks for slugs not yet migrated. Sets up the integration point for the real Sanity client without yet wiring it in.
+
+**Core (`packages/core`)**
+
+- `recommendations/source.ts` (new) — `createRecommendationLoader(fetchFromSanity)` returns a `LoadRecommendations = () => Promise<Activity[]>`. Sanity entries first, then mocks filtered to exclude any slug already present in the Sanity response.
+- `recommendations/sanity-source.ts` (new) — Stub `fetchActivitiesFromSanity` returning `[]`. This is the single integration point to swap in when the real Sanity client lands.
+- `recommendations/source.test.ts` (new) — Three cases: empty Sanity → all mocks; non-overlapping Sanity → additive; same-slug Sanity → overrides mock.
+- `recommendations/route.ts` — `GetRecommendationsDeps` now requires `loadRecommendations: LoadRecommendations`. Handler awaits the loader instead of importing `RECOMMENDATIONS` directly.
+- `index.ts` — Constructs `loadRecommendations = createRecommendationLoader(fetchActivitiesFromSanity)` and passes it into `createApp`.
+- `app.test.ts`, `onboarding/route.test.ts` — Inject a no-op `loadRecommendations: async () => []` since these tests don't exercise the recommendations route.
+- `recommendations/route.test.ts` — Injects a `loadRecommendations` mock returning the full `RECOMMENDATIONS` fixture.
+
+---
+
+## 2026-05-21 — Refactor: Identify Activities by Slug
+
+Replaces the `rec_NNN` numeric id with a human-readable slug derived from the activity title. Slugs scale beyond a 3-digit format, double as URL path segments for a future web app, and are more meaningful in logs/debugging. Mocks expose only `slug` (no separate `id`) so the data shape matches what Sanity will return.
+
+**Types (`packages/types`)**
+
+- `index.ts` — `Activity.id: string` → `Activity.slug: string`. No optional `id` retained; the resolved JSON contract from both mock and Sanity sources is slug-only.
+
+**Mocks (`packages/mocks`)**
+
+- `recommendations.ts` — All 152 entries renamed: `id: "rec_NNN"` → `slug: "<kebab-case-from-title>"`. Picsum URL seeds updated to match the new slugs. Slugs verified unique by a one-shot transformation script.
+
+**Algorithm (`packages/core`)**
+
+- `lib/helpers/diversify.ts` — `pickedIds` set renamed to `pickedSlugs`; all `.rec.id` references switched to `.rec.slug`. No behavioural change — the set is just keyed by a different string.
+- `lib/helpers/diversify.test.ts` — Test fixture `makeRec(id, …)` signature renamed to `makeRec(slug, …)`. Synthetic fixture ids (`"top"`, `"bottom"`, `"music-best"`, etc.) already kebab-cased, so test bodies needed only the property rename.
+- `lib/recommendation-algorithm.test.ts` — Membership-check assertion switched from `ids`/`rec.id` to `slugs`/`rec.slug`; inline `Activity` fixture updated.
+- `recommendations/route.test.ts` — Shape assertion updated from `typeof rec.id` to `typeof rec.slug`.
+
+**Mobile (`apps/mobile`)**
+
+- `lib/recommendations/api.ts` — `getCachedActivity(id)` parameter renamed to `slug`; in-memory cache now keyed by `a.slug`.
+- `app/(authed)/recommendations/index.tsx` — `FlatList` `keyExtractor` uses `rec.slug`; press handler pushes `/recommendations/detail?slug=${rec.slug}`.
+- `app/(authed)/recommendations/detail.tsx` — Reads `?slug=` via `useLocalSearchParams`; passes it through to `getCachedActivity` and `fetchRecommendationDetail`.
+- `components/recommendations/recommendations-index-page.stories.tsx` — `keyExtractor` updated to use `item.slug`.
+- `__tests__/recommendations-index.test.tsx`, `__tests__/recommendations-detail.test.tsx` — Test assertions and mock params updated for the slug param.
+
+**Docs (`context`)**
+
+- `project-overview.md` — Example activity JSON shows `"slug": "build-a-guitar-pedalboard"` instead of `"id": "rec_001"`.
+
+---
+
 ## 2026-05-20 — Recommendation Detail Page
 
 New mobile screen at `(authed)/recommendations/detail?id=<rec_id>` that renders an activity's title/image/metadata instantly from the dashboard cache, then async-loads a placeholder AI summary and description. Reuses the existing `RecommendationCard` as the hero via a new `size="large"` mode so the list card and detail header can't drift in styling.
