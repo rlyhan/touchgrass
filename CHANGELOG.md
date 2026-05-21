@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-05-21 — Feat: Render Sanity Description; Drop AI Summary Placeholder
+
+Editor-authored description now flows from Sanity through the activity loader to the detail page. As part of this, dropped the `aiSummary` placeholder fetch — it was always hardcoded text behind `fetchRecommendationDetail`, with no real endpoint behind it. The "Summary" emerald box and its loading spinner are gone; if/when an actual personalized-summary feature is built, it can be re-added as a separate fetch then.
+
+**Types (`packages/types`)**
+
+- `index.ts` — Added `description?: string` to `Activity` (optional — Sanity schema marks the field as not required, and mocks don't carry descriptions yet). Removed the `ActivityDetail = Activity & { aiSummary, description }` type; with description on `Activity` and no `aiSummary` left, the wrapper has nothing to add.
+
+**Core (`packages/core`)**
+
+- `recommendations/sanity-source.ts` — GROQ query now projects `description` alongside the other fields.
+
+**Mobile (`apps/mobile`)**
+
+- `lib/recommendations/api.ts` — Removed `fetchRecommendationDetail` and its `ActivityDetailExtended` type. Removed the `ActivityDetail` import.
+- `app/(authed)/activities/[slug].tsx` — Removed the `extended` / `extendedError` state and the second `useEffect` branch. Description now renders directly from `activity.description`, paragraph-split on `\n\n`, with the whole "About this activity" section hidden when the field is empty. Removed the Sparkle/Summary emerald box and the `Sparkle` import.
+- `components/recommendations/recommendation-detail-page.stories.tsx` — Story title updated to `Activities/ActivityDetailPage`. `LoadedState` now takes a `description` arg; replaced the old `Loaded` story with two variants — `WithDescription` (full paragraphs) and `WithoutDescription` (only the card + CTA). `Loading` story repurposed for the full-page activity-fetch spinner (no more inline extended-fetch spinner). `NotFound` retained.
+- `__tests__/activity-detail.test.tsx` — Rewritten. Dropped the `fetchRecommendationDetail` mock and the four tests built around it (extended spinner, resolved render, rejected render, "called with slug"). Two new cases for description: renders as paragraphs when set; section hidden when empty. Other cases (slug absent → not-found, cache miss → spinner → network, error path, back-button branches) preserved with the new shape.
+
+---
+
 ## 2026-05-21 — Feat: Fetch Published Activities from Sanity
 
 Wires the `fetchActivitiesFromSanity` stub up to a real `@sanity/client` call against the `93cev0va` / `production` dataset, published perspective only. Also refines the merge so partially-migrated Sanity docs don't break the UI: Sanity non-null fields override the mock; null/undefined fields fall through to the mock's value.

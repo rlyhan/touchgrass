@@ -1,4 +1,4 @@
-import type { Activity, ActivityDetail } from "@touchgrass/types"
+import type { Activity } from "@touchgrass/types"
 
 import { authedFetch } from "@/lib/auth/fetch"
 
@@ -50,19 +50,4 @@ export async function fetchActivityBySlug(slug: string): Promise<Activity | null
   const body = (await response.json()) as { activity: Activity }
   activityCache.set(body.activity.slug, body.activity)
   return body.activity
-}
-
-export type ActivityDetailExtended = Pick<ActivityDetail, "aiSummary" | "description">
-
-// TODO: replace mock with real API call once GET /recommendations/:id/detail is implemented
-export async function fetchRecommendationDetail(id: string): Promise<ActivityDetailExtended> {
-  void id
-  // const response = await authedFetch(`${API_BASE_URL}/recommendations/${id}/detail`)
-  // return response.json() as Promise<ActivityDetailExtended>
-  return {
-    aiSummary:
-      "This activity was recommended because it aligns with your creative interests and fits well within your current energy and budget.",
-    description:
-      "This is a placeholder description. Once the detail endpoint is live, this will contain a full overview of the activity — what it involves, what you'll need, and how to get started.",
-  }
 }

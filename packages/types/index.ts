@@ -202,11 +202,7 @@ export type Activity = {
   related_types?: ActivityType[]
   // Human-curated matches
   patternTypes?: PatternTypeId[];
-}
-
-export type ActivityDetail = Activity & {
-  aiSummary: string
-  description: string
+  description?: string
 }
 
 export type ScoredRecommendation = {

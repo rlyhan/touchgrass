@@ -18,7 +18,8 @@ const ACTIVITIES_QUERY = `*[_type == "activity" && defined(slug.current) && defi
   field,
   estimated_time,
   related_types,
-  patternTypes
+  patternTypes,
+  description
 }`
 
 export const fetchActivitiesFromSanity: LoadSanityActivities = async () => {

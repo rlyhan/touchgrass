@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams, type Href } from "expo-router"
-import { ArrowLeft, Sparkle } from "lucide-react-native"
+import { ArrowLeft } from "lucide-react-native"
 import { useEffect, useState } from "react"
 import {
   ActivityIndicator,
@@ -13,9 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import {
-  type ActivityDetailExtended,
   fetchActivityBySlug,
-  fetchRecommendationDetail,
   getCachedActivity,
 } from "@/lib/recommendations/api"
 import type { Activity } from "@touchgrass/types"
@@ -31,31 +29,23 @@ export default function ActivityDetailPage() {
     slug ? (cached ? "ready" : "loading") : "not-found",
   )
 
-  const [extended, setExtended] = useState<ActivityDetailExtended | null>(null)
-  const [extendedError, setExtendedError] = useState(false)
-
   const handleBack = () => {
     if (router.canGoBack()) router.back()
     else router.replace("/recommendations" as Href)
   }
 
   useEffect(() => {
-    if (!slug) return
-    if (!cached) {
-      fetchActivityBySlug(slug)
-        .then((a) => {
-          if (a) {
-            setActivity(a)
-            setActivityStatus("ready")
-          } else {
-            setActivityStatus("not-found")
-          }
-        })
-        .catch(() => setActivityStatus("error"))
-    }
-    fetchRecommendationDetail(slug)
-      .then(setExtended)
-      .catch(() => setExtendedError(true))
+    if (!slug || cached) return
+    fetchActivityBySlug(slug)
+      .then((a) => {
+        if (a) {
+          setActivity(a)
+          setActivityStatus("ready")
+        } else {
+          setActivityStatus("not-found")
+        }
+      })
+      .catch(() => setActivityStatus("error"))
   }, [slug, cached])
 
   if (activityStatus === "loading") {
@@ -109,43 +99,21 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        {extendedError ? null : !extended ? (
-          <View className="mt-6 items-center py-8">
-            <ActivityIndicator size="small" color="#10b981" />
-          </View>
-        ) : (
-          <>
-            <View className="mt-6 rounded-2xl bg-emerald-50 p-5">
-              <View className="flex-row items-start gap-3">
-                <View className="h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
-                  <Sparkle size={16} color="#10b981" />
-                </View>
-                <View className="flex-1">
-                  <Text className="mb-1 text-sm font-semibold text-gray-900">
-                    Summary
-                  </Text>
-                  <Text className="text-sm leading-relaxed text-gray-500">
-                    {extended.aiSummary}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <View className="mt-6">
-              <Text className="mb-3 text-lg font-semibold text-gray-900">
-                About this activity
+        {activity.description ? (
+          <View className="mt-6">
+            <Text className="mb-3 text-lg font-semibold text-gray-900">
+              About this activity
+            </Text>
+            {activity.description.split("\n\n").map((paragraph, index) => (
+              <Text
+                key={index}
+                className="mb-4 leading-relaxed text-gray-500"
+              >
+                {paragraph}
               </Text>
-              {extended.description.split("\n\n").map((paragraph, index) => (
-                <Text
-                  key={index}
-                  className="mb-4 leading-relaxed text-gray-500"
-                >
-                  {paragraph}
-                </Text>
-              ))}
-            </View>
-          </>
-        )}
+            ))}
+          </View>
+        ) : null}
 
         {/* CTA */}
         <View className="mt-8">
