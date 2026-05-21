@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-05-21 — Feat: Add Slug Field to Activity Schema
+
+Adds the `slug` field to the Sanity activity document, mirroring the slug identifier the app now uses. Auto-derived from `title` via Sanity's built-in `slug` type, with the dataset-wide uniqueness check that comes with the type by default. Required field — the merge logic in `core` depends on every Sanity activity having a slug.
+
+**Sanity (`apps/sanity`)**
+
+- `schemaTypes/activity.ts` — New `slug` field positioned right after `title`. `type: 'slug'`, `options.source: 'title'`, `maxLength: 128`, `validation: Rule.required()`. Description note flags that when migrating an existing mock, the slug must match the mock's slug for the merge to take effect.
+
+---
+
 ## 2026-05-21 — Feat: Merge Sanity Activities with Mock Fallback
 
 Introduces a loader that merges activities fetched from Sanity with the existing mocks by `slug`, letting Sanity entries override mocks of the same slug and falling back to mocks for slugs not yet migrated. Sets up the integration point for the real Sanity client without yet wiring it in.

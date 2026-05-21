@@ -18,6 +18,14 @@ export const activitySchema = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      description: 'URL-friendly identifier. Auto-derived from the title; must match the legacy mock slug when migrating an existing activity.',
+      options: { source: 'title', maxLength: 128 },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
