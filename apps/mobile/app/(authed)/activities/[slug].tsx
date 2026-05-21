@@ -120,6 +120,36 @@ export default function ActivityDetailPage() {
           </View>
         ) : null}
 
+        {activity.instructions && activity.instructions.length > 0 ? (
+          <View className="mt-6">
+            <Text className="mb-3 text-lg font-semibold text-gray-900">
+              Instructions
+            </Text>
+            {activity.instructions.map((step, idx) => (
+              <View
+                key={idx}
+                className="mb-4 flex-row items-start"
+              >
+                <View className="mr-3 h-7 w-7 items-center justify-center rounded-full bg-emerald-500">
+                  <Text className="text-sm font-semibold text-white">
+                    {idx + 1}
+                  </Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="mb-1 text-base font-semibold text-gray-900">
+                    {step.title}
+                  </Text>
+                  {step.description ? (
+                    <Text className="leading-relaxed text-gray-500">
+                      {step.description}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+            ))}
+          </View>
+        ) : null}
+
         {/* CTA */}
         <View className="mt-8">
           <PrimaryButton label="Start this activity" onPress={() => {}} />

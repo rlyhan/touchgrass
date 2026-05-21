@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { PortableText } from "@/components/ui/portable-text"
 import { PrimaryButton } from "@/components/ui/primary-button"
+import type { ActivityInstruction } from "@touchgrass/types"
 import { RecommendationCard } from "./recommendation-card"
 
 // ── shared fixtures ───────────────────────────────────────────────────────────
@@ -49,6 +50,31 @@ const DESCRIPTION: PortableTextBlock[] = [
   },
 ]
 
+const INSTRUCTIONS: ActivityInstruction[] = [
+  {
+    title: "Feed your starter",
+    description:
+      "12 hours before class, give your starter equal parts flour and water and leave it at room temperature until it doubles.",
+  },
+  {
+    title: "Mix and autolyse",
+    description:
+      "Combine flour and water, rest for 30 minutes, then add salt and starter and mix until just incorporated.",
+  },
+  {
+    title: "Bulk ferment with stretch-and-folds",
+    description:
+      "Over 3–4 hours, perform a set of stretch-and-folds every 30 minutes until the dough is smooth and airy.",
+  },
+  {
+    title: "Shape and proof",
+  },
+  {
+    title: "Score and bake",
+    description: "Bake covered at 250°C for 20 minutes, then uncovered for another 20 until deeply golden.",
+  },
+]
+
 // ── shared sub-components ─────────────────────────────────────────────────────
 function Header() {
   return (
@@ -66,7 +92,13 @@ function Header() {
 }
 
 // ── story components (one per visual state) ───────────────────────────────────
-function LoadedState({ description }: { description?: PortableTextBlock[] }) {
+function LoadedState({
+  description,
+  instructions,
+}: {
+  description?: PortableTextBlock[]
+  instructions?: ActivityInstruction[]
+}) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <Header />
@@ -82,6 +114,33 @@ function LoadedState({ description }: { description?: PortableTextBlock[] }) {
               About this activity
             </Text>
             <PortableText blocks={description} />
+          </View>
+        ) : null}
+
+        {instructions && instructions.length > 0 ? (
+          <View className="mt-6">
+            <Text className="mb-3 text-lg font-semibold text-gray-900">
+              Instructions
+            </Text>
+            {instructions.map((step, idx) => (
+              <View key={idx} className="mb-4 flex-row items-start">
+                <View className="mr-3 h-7 w-7 items-center justify-center rounded-full bg-emerald-500">
+                  <Text className="text-sm font-semibold text-white">
+                    {idx + 1}
+                  </Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="mb-1 text-base font-semibold text-gray-900">
+                    {step.title}
+                  </Text>
+                  {step.description ? (
+                    <Text className="leading-relaxed text-gray-500">
+                      {step.description}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+            ))}
           </View>
         ) : null}
 
@@ -129,6 +188,14 @@ export const WithDescription: Story = {
 
 export const WithoutDescription: Story = {
   args: {},
+}
+
+export const WithInstructions: Story = {
+  args: { instructions: INSTRUCTIONS },
+}
+
+export const WithDescriptionAndInstructions: Story = {
+  args: { description: DESCRIPTION, instructions: INSTRUCTIONS },
 }
 
 export const Loading: Story = {

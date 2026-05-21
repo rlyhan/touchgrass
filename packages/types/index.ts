@@ -194,6 +194,11 @@ export interface PatternType {
   };
 }
 
+export type ActivityInstruction = {
+  title: string
+  description?: string
+}
+
 export type Activity = {
   slug: string
   title: string
@@ -203,6 +208,7 @@ export type Activity = {
   estimated_time: string
   related_types?: ActivityType[]
   description?: PortableTextBlock[]
+  instructions?: ActivityInstruction[]
 }
 
 export type ScoredRecommendation = {
