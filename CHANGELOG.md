@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-05-21 — Feat: Fetch Published Activities from Sanity
+
+Wires the `fetchActivitiesFromSanity` stub up to a real `@sanity/client` call against the `93cev0va` / `production` dataset, published perspective only. Also refines the merge so partially-migrated Sanity docs don't break the UI: Sanity non-null fields override the mock; null/undefined fields fall through to the mock's value.
+
+Why per-field merge instead of whole-document replacement: the Sanity schema only enforces `title` + `slug` as required. While the editor is mid-migration, a doc may have e.g. `imageUrl` still empty. The earlier "Sanity wins entirely" rule would have shipped a `null` image and broken the card render. The new rule lets the editor fill fields in incrementally.
+
+**Core (`packages/core`)**
+
+- `package.json` — Added `@sanity/client ^7.22.0`.
+- `recommendations/source.ts` — New `SanityActivity = Partial<Activity> & Pick<Activity, "title" | "slug">` type (only title + slug are guaranteed; everything else is optional). `LoadSanityActivities` returns `SanityActivity[]`. `createRecommendationLoader` now merges per field via `mergeNonNull`: mocks are the base list, Sanity entries with a matching slug override non-null fields, and Sanity-only entries (no matching mock) are concatenated at the head of the list as-is.
+- `recommendations/sanity-source.ts` — Replaced the `[]` stub with a real `createClient` call. Hardcoded `projectId`/`dataset` to match `apps/sanity/sanity.config.ts`. `useCdn: true`, `apiVersion: "2024-01-01"`, `perspective: "published"`. GROQ query projects the slug from `slug.current` and the image from `imageUrl.asset->url`. Errors logged and swallowed — returns `[]` so the recommendations endpoint stays up even if Sanity is unreachable.
+- `recommendations/source.test.ts` — Rewritten cases for the new merge semantics: all-mocks when Sanity empty; field override by matching slug; null Sanity fields fall through to mock; Sanity-only entries appended; no duplicate slugs in the merged result.
+
+---
+
 ## 2026-05-21 — Fix: Handle Activity Detail Back Button with Empty Stack
 
 After moving the detail page to `/activities/[slug]`, deep-linking or refreshing directly on a detail URL meant the navigator had no previous screen to pop. Pressing back triggered React Navigation's "GO_BACK was not handled" warning. The previous detail route at `/recommendations/detail` masked this because Expo Router auto-included the sibling `index.tsx` as the stack's initial route; the new `/activities/` group has no sibling, so the stack contains only the detail screen.

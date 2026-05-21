@@ -1,21 +1,9 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
-import type { Activity } from "@touchgrass/types"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
-import { createRecommendationLoader } from "./source.js"
-
-const sanityActivity = (
-  overrides: Partial<Activity> & { slug: string },
-): Activity => ({
-  title: "From Sanity",
-  imageUrl: "https://example.com/image.jpg",
-  type: "Active",
-  field: "Music",
-  estimated_time: "1 hour",
-  ...overrides,
-})
+import { createRecommendationLoader, type SanityActivity } from "./source.js"
 
 test("returns all mocks when Sanity has no activities", async () => {
   const load = createRecommendationLoader(async () => [])
@@ -25,30 +13,65 @@ test("returns all mocks when Sanity has no activities", async () => {
   assert.deepEqual(result, RECOMMENDATIONS)
 })
 
-test("merges non-overlapping Sanity activities with the mocks", async () => {
-  const fresh = sanityActivity({ slug: "brand-new-activity", title: "Brand New" })
-  const load = createRecommendationLoader(async () => [fresh])
+test("Sanity activities with a matching slug override the mock's fields", async () => {
+  const target = RECOMMENDATIONS[0]
+  assert.ok(target, "expected at least one mock")
+  const override: SanityActivity = {
+    slug: target.slug,
+    title: "Title From Sanity",
+  }
 
-  const result = await load()
+  const result = await createRecommendationLoader(async () => [override])()
 
-  assert.equal(result.length, RECOMMENDATIONS.length + 1)
-  assert.equal(result[0], fresh)
-  assert.ok(result.some((r) => r.slug === RECOMMENDATIONS[0]?.slug))
+  const matched = result.find((r) => r.slug === target.slug)
+  assert.ok(matched)
+  assert.equal(matched.title, "Title From Sanity")
 })
 
-test("Sanity activities override mocks with the same slug", async () => {
-  const overriddenSlug = RECOMMENDATIONS[0]?.slug
-  assert.ok(overriddenSlug, "expected at least one mock to derive a slug from")
-  const overridden = sanityActivity({
-    slug: overriddenSlug,
-    title: "Sanity Override",
-  })
-  const load = createRecommendationLoader(async () => [overridden])
+test("null/undefined Sanity fields fall through to the mock value", async () => {
+  const target = RECOMMENDATIONS[0]
+  assert.ok(target, "expected at least one mock")
+  // Simulates a partially-migrated Sanity doc: title set, image not uploaded yet.
+  const partial = {
+    slug: target.slug,
+    title: "Title From Sanity",
+    imageUrl: null,
+  } as unknown as SanityActivity
 
-  const result = await load()
+  const result = await createRecommendationLoader(async () => [partial])()
 
-  assert.equal(result.length, RECOMMENDATIONS.length)
-  const matches = result.filter((r) => r.slug === overriddenSlug)
-  assert.equal(matches.length, 1)
-  assert.equal(matches[0]?.title, "Sanity Override")
+  const matched = result.find((r) => r.slug === target.slug)
+  assert.ok(matched)
+  assert.equal(matched.title, "Title From Sanity")
+  assert.equal(matched.imageUrl, target.imageUrl)
+})
+
+test("Sanity-only activities (no matching mock) pass through as-is", async () => {
+  const sanityOnly: SanityActivity = {
+    slug: "brand-new-sanity-activity",
+    title: "Brand New",
+    imageUrl: "https://example.com/new.jpg",
+    type: "Active",
+    field: "Music",
+    estimated_time: "1 hour",
+  }
+
+  const result = await createRecommendationLoader(async () => [sanityOnly])()
+
+  assert.equal(result.length, RECOMMENDATIONS.length + 1)
+  assert.equal(result[0]?.slug, "brand-new-sanity-activity")
+})
+
+test("merged result has no duplicates by slug", async () => {
+  const target = RECOMMENDATIONS[0]
+  assert.ok(target, "expected at least one mock")
+  const override: SanityActivity = {
+    slug: target.slug,
+    title: "Override",
+  }
+
+  const result = await createRecommendationLoader(async () => [override])()
+
+  const slugs = result.map((r) => r.slug)
+  assert.equal(new Set(slugs).size, slugs.length)
 })
