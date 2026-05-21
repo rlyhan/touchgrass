@@ -2,19 +2,21 @@ import type { Request, Response } from "express"
 
 import type { ActivityField, Motivation } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
-import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendation-algorithm.js"
 import { bfasScoresSchema } from "../onboarding/schema.js"
+import type { LoadRecommendations } from "./source.js"
 
 export type GetRecommendationsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
   getSessionUserId: (req: Request) => Promise<string | null>
+  loadRecommendations: LoadRecommendations
 }
 
 export function getRecommendationsHandler({
   getProfileByAuthUserId,
   getSessionUserId,
+  loadRecommendations,
 }: GetRecommendationsDeps) {
   return async function handler(req: Request, res: Response) {
     const authUserId = await getSessionUserId(req)
@@ -40,7 +42,7 @@ export function getRecommendationsHandler({
         personality,
         motivations,
         interests,
-        RECOMMENDATIONS,
+        await loadRecommendations(),
       ).map((s) => s.rec)
       res.status(200).json({ recommendations })
     } catch (error) {

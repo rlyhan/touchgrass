@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-05-21 — Feat: Sanity CMS Integration
+
+Wires Sanity as the authoritative source for activity content, replacing the static mock dataset incrementally. Activities authored in the Sanity Studio flow into the app's recommendations and detail pages, with mocks serving as a fallback for any activity not yet migrated.
+
+**Sanity Studio (`apps/sanity`)**
+
+- New Sanity Studio app with an `activity` document schema covering title, slug, type, field, related types, image, estimated time, and a Portable Text description. The `related_types` field uses a custom multi-select input that excludes the already-selected primary type. Type and field dropdowns are alphabetically sorted. Validation requires title, slug, type, field, and at least one related type.
+
+**Backend (`packages/core`)**
+
+- Activities are now identified by a human-readable slug (replacing the old `rec_NNN` numeric id) so they can double as URL path segments.
+- A merge loader combines Sanity-fetched activities with the mock catalog: Sanity entries with a matching slug override the mock field-by-field (null Sanity fields fall through to the mock value), and Sanity-only entries are prepended. The mock list remains whole for any slug not yet in Sanity.
+- New `GET /activities/:slug` endpoint — requires auth, returns the merged activity on hit, 404 on miss. Backed by the same merge loader as the recommendations endpoint.
+
+**Mobile (`apps/mobile`)**
+
+- Activity detail moved from a query-string route (`/recommendations/detail?slug=`) to a dynamic path segment (`/activities/[slug]`), matching the backend endpoint shape.
+- Detail page shows a cached copy immediately if available and revalidates in the background; shows a spinner on a cold load. Back button falls back to `/recommendations` when navigated to directly (no stack history).
+- Editor-authored Portable Text description renders in the "About this activity" section; the section is hidden when the field is empty. The previous hardcoded AI-summary placeholder and its fetch stub are removed.
+
+---
+
 ## 2026-05-20 — Recommendation Detail Page
 
 New mobile screen at `(authed)/recommendations/detail?id=<rec_id>` that renders an activity's title/image/metadata instantly from the dashboard cache, then async-loads a placeholder AI summary and description. Reuses the existing `RecommendationCard` as the hero via a new `size="large"` mode so the list card and detail header can't drift in styling.

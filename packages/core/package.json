@@ -21,6 +21,7 @@
   "dependencies": {
     "@better-auth/expo": "^1.6.9",
     "@neondatabase/serverless": "^1.1.0",
+    "@sanity/client": "^7.22.0",
     "@touchgrass/types": "^0.0.0",
     "@types/cors": "^2.8.19",
     "better-auth": "^1.6.9",

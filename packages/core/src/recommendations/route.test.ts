@@ -6,6 +6,7 @@ import { after, before, beforeEach, mock, test } from "node:test"
 import type { Request } from "express"
 
 import type { Activity } from "@touchgrass/types"
+import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
 import { createApp } from "../app.js"
 import type { NewProfile, Profile } from "../db/schema.js"
@@ -48,6 +49,9 @@ const getProfileByAuthUserId = mock.fn<
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
+const loadRecommendations = mock.fn<() => Promise<Activity[]>>(
+  async () => RECOMMENDATIONS,
+)
 
 let server: Server
 let baseUrl: string
@@ -57,6 +61,8 @@ before(() => {
     insertProfile,
     getProfileByAuthUserId,
     getSessionUserId,
+    loadRecommendations,
+    getActivityBySlug: async () => null,
   })
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
@@ -82,7 +88,7 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
   assert.ok(Array.isArray(body.recommendations))
   assert.ok(body.recommendations.length > 0)
   for (const rec of body.recommendations) {
-    assert.ok(typeof rec.id === "string")
+    assert.ok(typeof rec.slug === "string")
     assert.ok(typeof rec.title === "string")
   }
 

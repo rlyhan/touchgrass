@@ -68,6 +68,10 @@ export const ACTIVITY_TYPES: ActivityType[] = [
   "Emotional",
 ]
 
+export const ACTIVITY_TYPE_OPTIONS: { title: string; value: ActivityType }[] = ACTIVITY_TYPES.map(
+  (value) => ({ title: value, value }),
+)
+
 export const ACTIVITY_FIELDS: ActivityField[] = [
   "Music",
   "Art",
@@ -126,6 +130,10 @@ export const ACTIVITY_FIELDS: ActivityField[] = [
   "Home Design",
   "Collecting",
 ]
+
+export const ACTIVITY_FIELD_OPTIONS: { title: string; value: ActivityField }[] = ACTIVITY_FIELDS.map(
+  (value) => ({ title: value, value }),
+)
 
 export const PERSONALITY_TRAITS: PersonalityTrait[] = [
   {
