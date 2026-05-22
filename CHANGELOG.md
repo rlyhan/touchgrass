@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-05-22 — Fix: Auth Rate Limiting Behind Render's Proxy
+
+Fixes the `429 Too Many Requests` lockout hit by all users sharing a
+single bucket after deploying the backend to Render. Two related
+changes:
+
+**Backend (`packages/core`)**
+
+- `createApp` now calls `app.set("trust proxy", 1)` so
+  `express-rate-limit` keys by the real client IP (from
+  `X-Forwarded-For`) instead of Render's load-balancer IP. Without
+  this, every visitor on the service shared one 20-req / 15-min
+  bucket — a single tester refreshing pages would lock out everyone
+  else.
+- The `authLimiter` is no longer mounted on the entire `/api/auth`
+  prefix. It now scopes only to mutation endpoints
+  (`/api/auth/sign-in`, `/api/auth/sign-up`,
+  `/api/auth/forget-password`) — the endpoints actually at risk of
+  brute force / credential stuffing. `GET /api/auth/get-session`,
+  which the client hits on every protected page load, is no longer
+  rate-limited.
+
 ## 2026-05-22 — Chore: Deployment Configs for Render, Vercel, and EAS
 
 Adds infrastructure-as-code so the three deployable artifacts (Express

@@ -41,6 +41,7 @@ const profileLimiter = rateLimit({
 
 export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   const app = express()
+  app.set("trust proxy", 1)
   app.use(
     cors({
       origin: trustedOrigins,
@@ -49,7 +50,9 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   )
 
   if (!options.disableRateLimits) {
-    app.use("/api/auth", authLimiter)
+    app.use("/api/auth/sign-in", authLimiter)
+    app.use("/api/auth/sign-up", authLimiter)
+    app.use("/api/auth/forget-password", authLimiter)
   }
 
   app.all("/api/auth/{*splat}", toNodeHandler(auth))
