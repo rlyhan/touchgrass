@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-nati
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { PortableText } from "@/components/ui/portable-text"
-import { PrimaryButton } from "@/components/ui/primary-button"
+// import { PrimaryButton } from "@/components/ui/primary-button"
 import type { ActivityInstruction, ActivityTip } from "@touchgrass/types"
 import { RecommendationCard } from "./recommendation-card"
 
@@ -182,9 +182,9 @@ function LoadedState({
           </View>
         ) : null}
 
-        <View className="mt-8">
+        {/* <View className="mt-8">
           <PrimaryButton label="Start this activity" onPress={() => {}} />
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   )

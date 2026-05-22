@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PortableText } from "@/components/ui/portable-text"
-import { PrimaryButton } from "@/components/ui/primary-button"
+// import { PrimaryButton } from "@/components/ui/primary-button"
 import {
   fetchActivityBySlug,
   getCachedActivity,
@@ -169,9 +169,9 @@ export default function ActivityDetailPage() {
         ) : null}
 
         {/* CTA */}
-        <View className="mt-8">
+        {/* <View className="mt-8">
           <PrimaryButton label="Start this activity" onPress={() => {}} />
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   )
