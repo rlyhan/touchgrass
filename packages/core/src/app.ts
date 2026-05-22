@@ -3,6 +3,7 @@ import express, {
   type Express,
   type NextFunction,
   type Request,
+  type RequestHandler,
   type Response,
 } from "express"
 import rateLimit from "express-rate-limit"
@@ -28,29 +29,19 @@ export type AppOptions = {
   disableRateLimits?: boolean
 }
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 20,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: { error: "Too many requests" },
-})
+function createLimiter(windowMs: number, limit: number) {
+  return rateLimit({
+    windowMs,
+    limit,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: { error: "Too many requests" },
+  })
+}
 
-const profileLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  limit: 10,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: { error: "Too many requests" },
-})
-
-const readLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 120,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: { error: "Too many requests" },
-})
+const authLimiter = createLimiter(15 * 60 * 1000, 20)
+const profileLimiter = createLimiter(60 * 60 * 1000, 10)
+const readLimiter = createLimiter(60 * 1000, 120)
 
 export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   const app = express()
@@ -61,6 +52,9 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
       credentials: true,
     }),
   )
+
+  const maybeLimit = (limiter: RequestHandler): RequestHandler[] =>
+    options.disableRateLimits ? [] : [limiter]
 
   if (!options.disableRateLimits) {
     app.use("/api/auth/sign-in", authLimiter)
@@ -76,21 +70,9 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
     res.json({ ok: true })
   })
 
-  app.post(
-    "/profiles",
-    ...(options.disableRateLimits ? [] : [profileLimiter]),
-    createProfileHandler(deps),
-  )
-  app.get(
-    "/recommendations",
-    ...(options.disableRateLimits ? [] : [readLimiter]),
-    getRecommendationsHandler(deps),
-  )
-  app.get(
-    "/activities/:slug",
-    ...(options.disableRateLimits ? [] : [readLimiter]),
-    getActivityHandler(deps),
-  )
+  app.post("/profiles", ...maybeLimit(profileLimiter), createProfileHandler(deps))
+  app.get("/recommendations", ...maybeLimit(readLimiter), getRecommendationsHandler(deps))
+  app.get("/activities/:slug", ...maybeLimit(readLimiter), getActivityHandler(deps))
 
   app.use((_req: Request, res: Response) => {
     res.status(404).json({ error: "Not found" })
