@@ -112,3 +112,12 @@ test("CORS: preflight from untrusted origin is denied", async () => {
 
   assert.equal(res.headers.get("access-control-allow-origin"), null)
 })
+
+test("unknown routes return a JSON 404", async () => {
+  const res = await fetch(`${baseUrl}/does-not-exist`)
+
+  assert.equal(res.status, 404)
+  assert.ok(res.headers.get("content-type")?.includes("application/json"))
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Not found")
+})

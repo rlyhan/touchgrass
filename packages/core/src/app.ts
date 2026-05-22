@@ -1,5 +1,10 @@
 import cors from "cors"
-import express, { type Express } from "express"
+import express, {
+  type Express,
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express"
 import rateLimit from "express-rate-limit"
 
 import { auth, trustedOrigins } from "./auth.js"
@@ -70,6 +75,18 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   )
   app.get("/recommendations", getRecommendationsHandler(deps))
   app.get("/activities/:slug", getActivityHandler(deps))
+
+  app.use((_req: Request, res: Response) => {
+    res.status(404).json({ error: "Not found" })
+  })
+
+  app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    console.error("Unhandled error", err)
+    if (res.headersSent) {
+      return
+    }
+    res.status(500).json({ error: "Internal server error" })
+  })
 
   return app
 }
