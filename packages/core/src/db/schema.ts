@@ -17,6 +17,10 @@ export * from "./auth-schema.js"
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
+  // The .unique() constraint auto-creates a btree index in Postgres, which
+  // serves as the lookup index for getProfileByAuthUserId — every
+  // authenticated request hits this column, so the constraint doubles as
+  // the hot-path index. Do NOT add a redundant .index() here.
   authUserId: text("auth_user_id")
     .notNull()
     .unique()
