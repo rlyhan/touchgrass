@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams, type Href } from "expo-router"
-import { ArrowLeft } from "lucide-react-native"
+import { ArrowLeft, Lightbulb } from "lucide-react-native"
 import { useEffect, useState } from "react"
 import {
   ActivityIndicator,
@@ -117,6 +117,24 @@ export default function ActivityDetailPage() {
               About this activity
             </Text>
             <PortableText blocks={activity.description} />
+          </View>
+        ) : null}
+
+        {activity.tips && activity.tips.length > 0 ? (
+          <View className="mt-6 gap-3">
+            {activity.tips.map((tip) => (
+              <View
+                key={tip.key}
+                className="flex-row items-start rounded-2xl p-4"
+                style={{ backgroundColor: "#FFF3E0" }}
+              >
+                <Lightbulb size={18} color="#C2692A" style={{ marginTop: 2, marginRight: 10 }} />
+                <Text className="flex-1 leading-relaxed text-gray-800">
+                  <Text className="font-semibold text-gray-900">Tip: </Text>
+                  {tip.description}
+                </Text>
+              </View>
+            ))}
           </View>
         ) : null}
 
