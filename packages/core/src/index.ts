@@ -1,9 +1,15 @@
 import { createApp } from "./app.js"
 import { getSessionUserId } from "./auth-session.js"
 import { getProfileByAuthUserId, insertProfile } from "./db/profiles.js"
-import { fetchActivitiesFromSanity } from "./recommendations/sanity-source.js"
+import {
+  createFetchActivitiesFromSanity,
+  createSanityClient,
+  readSanityConfigFromEnv,
+} from "./recommendations/sanity-source.js"
 import { createRecommendationLoader } from "./recommendations/source.js"
 
+const sanityClient = createSanityClient(readSanityConfigFromEnv())
+const fetchActivitiesFromSanity = createFetchActivitiesFromSanity(sanityClient)
 const loadRecommendations = createRecommendationLoader(fetchActivitiesFromSanity)
 const getActivityBySlug = async (slug: string) => {
   const activities = await loadRecommendations()
