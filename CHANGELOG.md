@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-23 — Refactor: Toggle Utility, Async Data Hook, Nav Handler Memoization
+
+**Mobile (`apps/mobile`)**
+
+- Extracted a shared `toggleItem<T>` utility to replace duplicated include/filter array logic in the interests and motivation onboarding screens.
+- Extracted a `useAsyncData<T>` hook encapsulating the `status / data / useEffect` fetch pattern, replacing the manual state management in the recommendations screen.
+- Wrapped `goNext`, `skip`, and `onSubmit` navigation handlers in `useCallback` across the interests, personality, and motivation onboarding screens.
+
 ## 2026-05-22 — Fix: Accessibility and Display Polish
 
 **Mobile (`apps/mobile`)**
