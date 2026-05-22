@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-05-22 — Fix: Backend Audit (High-Severity Findings)
+
+Addresses the four high-severity findings from the backend code audit.
+Each fix landed as its own commit on `fix/backend-audit`.
+
+**Backend (`packages/core`)**
+
+- **Route handlers wrap their full body in `try/catch`.** Previously
+  `getSessionUserId` (and `getProfileByAuthUserId` in the onboarding
+  handler) ran outside the existing `try` block. A transient Neon or
+  `better-auth` error during those calls would fall through to
+  Express's default error handler and return a non-JSON 500,
+  breaking the API contract. The two handlers that were missing
+  `Promise<void>` return types are now annotated.
+- **Global JSON error-handler and 404 middlewares.** Anything that
+  escapes a route's `try/catch` — or hits an undefined path — now
+  goes through a four-argument `(err, req, res, next)` handler that
+  logs the error and returns a generic `{ error: "Internal server
+  error" }` JSON 500. Unknown routes return a JSON 404 instead of
+  Express's default HTML.
+- **Rate limit on the two authenticated read endpoints.** Added a
+  shared `readLimiter` (120 req/min per IP) on `GET /recommendations`
+  and `GET /activities/:slug`. Both routes touch `better-auth`'s
+  session table and Neon on every request, so an unthrottled loop
+  could exhaust the connection pool. Same `disableRateLimits` escape
+  hatch as the existing limiters.
+- **`SANITY_API_VERSION` must be a dated `YYYY-MM-DD` string.**
+  `readSanityConfigFromEnv` previously accepted any non-empty value.
+  A floating version like `"v1"` would silently change response
+  shape over time as Sanity evolves the API. Startup now fails fast
+  with a clear error if the variable is not a dated string.
+
 ## 2026-05-22 — Fix: Cross-Site Auth Cookies for Vercel ↔ Render
 
 Fixes the bug where sign-in succeeded but `useSession()` immediately
