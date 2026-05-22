@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-05-22 — Fix: Cross-Site Auth Cookies for Vercel ↔ Render
+
+Fixes the bug where sign-in succeeded but `useSession()` immediately
+reported no user, bouncing the web client to `/onboarding/name` on every
+login.
+
+**Backend (`packages/core`)**
+
+- `betterAuth` config now sets `advanced.defaultCookieAttributes` to
+  `{ sameSite: "none", secure: true }`. With the web client hosted on
+  Vercel and the API on Render — a true cross-site setup — the
+  default `SameSite=Lax` meant the browser stored the session cookie
+  but refused to send it on cross-site fetch requests to
+  `/api/auth/get-session`, so the client thought the user was logged
+  out. `SameSite=None; Secure` allows the cookie to be sent on
+  cross-site fetches that include credentials.
+
 ## 2026-05-22 — Fix: Auth Rate Limiting Behind Render's Proxy
 
 Fixes the `429 Too Many Requests` lockout hit by all users sharing a

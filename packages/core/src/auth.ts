@@ -33,4 +33,10 @@ export const auth = betterAuth({
     minPasswordLength: 8,
   },
   plugins: [expo()],
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+    },
+  },
 })
