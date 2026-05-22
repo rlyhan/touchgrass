@@ -49,6 +49,7 @@ jest.mock("lucide-react-native", () => {
   const { View } = require("react-native")
   return {
     ArrowLeft: (p: object) => <View {...p} />,
+    Lightbulb: (p: object) => <View testID="lightbulb-icon" {...p} />,
   }
 })
 
@@ -85,6 +86,14 @@ const ACTIVITY_WITH_INSTRUCTIONS: Activity = {
     { title: "Gather materials", description: "Buy a board and pedals." },
     { title: "Assemble the board", description: "Attach pedals with velcro." },
     { title: "Wire it up" },
+  ],
+}
+
+const ACTIVITY_WITH_TIPS: Activity = {
+  ...ACTIVITY,
+  tips: [
+    { key: "tip-a", description: "Start with a small board." },
+    { key: "tip-b", description: "Use velcro for flexibility." },
   ],
 }
 
@@ -237,6 +246,31 @@ describe("ActivityDetailPage", () => {
       mockFetchActivityBySlug.mockResolvedValue(empty)
       render(<ActivityDetailPage />)
       expect(screen.queryByText("Instructions")).toBeNull()
+    })
+
+    it("renders each tip with the 'Tip:' prefix and a lightbulb icon when present", () => {
+      mockGetCachedActivity.mockReturnValue(ACTIVITY_WITH_TIPS)
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY_WITH_TIPS)
+      render(<ActivityDetailPage />)
+
+      expect(screen.getAllByTestId("lightbulb-icon")).toHaveLength(2)
+      expect(screen.getAllByText("Tip: ")).toHaveLength(2)
+      expect(screen.getByText(/Start with a small board\./)).toBeTruthy()
+      expect(screen.getByText(/Use velcro for flexibility\./)).toBeTruthy()
+    })
+
+    it("hides the tips section when the activity has no tips", () => {
+      // Default ACTIVITY has no tips
+      render(<ActivityDetailPage />)
+      expect(screen.queryByTestId("lightbulb-icon")).toBeNull()
+    })
+
+    it("hides the tips section when tips is an empty array", () => {
+      const empty: Activity = { ...ACTIVITY, tips: [] }
+      mockGetCachedActivity.mockReturnValue(empty)
+      mockFetchActivityBySlug.mockResolvedValue(empty)
+      render(<ActivityDetailPage />)
+      expect(screen.queryByTestId("lightbulb-icon")).toBeNull()
     })
 
     it("calls router.back when the back button is pressed and history exists", async () => {

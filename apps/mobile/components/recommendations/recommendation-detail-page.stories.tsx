@@ -1,11 +1,12 @@
 import type { PortableTextBlock } from "@portabletext/types"
 import type { Meta, StoryObj } from "@storybook/react-native"
+import { Lightbulb } from "lucide-react-native"
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { PortableText } from "@/components/ui/portable-text"
 import { PrimaryButton } from "@/components/ui/primary-button"
-import type { ActivityInstruction } from "@touchgrass/types"
+import type { ActivityInstruction, ActivityTip } from "@touchgrass/types"
 import { RecommendationCard } from "./recommendation-card"
 
 // ── shared fixtures ───────────────────────────────────────────────────────────
@@ -47,6 +48,23 @@ const DESCRIPTION: PortableTextBlock[] = [
       },
     ],
     markDefs: [],
+  },
+]
+
+const TIPS: ActivityTip[] = [
+  {
+    key: "sourdough-tip-0",
+    description:
+      "Warm your oven with a baking stone or Dutch oven inside for at least 45 minutes for an even bake.",
+  },
+  {
+    key: "sourdough-tip-1",
+    description:
+      "If your dough feels too slack, do one extra stretch-and-fold before shaping.",
+  },
+  {
+    key: "sourdough-tip-2",
+    description: "Score with a sharp blade at a shallow angle for the prettiest ear.",
   },
 ]
 
@@ -95,9 +113,11 @@ function Header() {
 function LoadedState({
   description,
   instructions,
+  tips,
 }: {
   description?: PortableTextBlock[]
   instructions?: ActivityInstruction[]
+  tips?: ActivityTip[]
 }) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
@@ -114,6 +134,24 @@ function LoadedState({
               About this activity
             </Text>
             <PortableText blocks={description} />
+          </View>
+        ) : null}
+
+        {tips && tips.length > 0 ? (
+          <View className="mt-6 gap-3">
+            {tips.map((tip) => (
+              <View
+                key={tip.key}
+                className="flex-row items-start rounded-2xl p-4"
+                style={{ backgroundColor: "#FFF3E0" }}
+              >
+                <Lightbulb size={18} color="#C2692A" style={{ marginTop: 2, marginRight: 10 }} />
+                <Text className="flex-1 leading-relaxed text-gray-800">
+                  <Text className="font-semibold text-gray-900">Tip: </Text>
+                  {tip.description}
+                </Text>
+              </View>
+            ))}
           </View>
         ) : null}
 
@@ -196,6 +234,14 @@ export const WithInstructions: Story = {
 
 export const WithDescriptionAndInstructions: Story = {
   args: { description: DESCRIPTION, instructions: INSTRUCTIONS },
+}
+
+export const WithTips: Story = {
+  args: { tips: TIPS },
+}
+
+export const WithEverything: Story = {
+  args: { description: DESCRIPTION, instructions: INSTRUCTIONS, tips: TIPS },
 }
 
 export const Loading: Story = {

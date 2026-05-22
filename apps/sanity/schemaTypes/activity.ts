@@ -36,12 +36,12 @@ export const activitySchema = defineType({
       of: [
         {
           type: 'block',
-          styles: [{title: 'Paragraph', value: 'normal'}],
+          styles: [{ title: 'Paragraph', value: 'normal' }],
           lists: [],
           marks: {
             decorators: [
-              {title: 'Bold', value: 'strong'},
-              {title: 'Italic', value: 'em'},
+              { title: 'Bold', value: 'strong' },
+              { title: 'Italic', value: 'em' },
             ],
             annotations: [],
           },
@@ -83,6 +83,43 @@ export const activitySchema = defineType({
       name: 'estimated_time',
       title: 'Estimated Time',
       type: 'string',
+    }),
+    defineField({
+      name: 'tips',
+      title: 'Tips',
+      type: 'array',
+      description: 'Optional tips for this activity. Maximum 3.',
+      of: [
+        {
+          type: 'object',
+          name: 'tip',
+          title: 'Tip',
+          initialValue: () => ({
+            key: Math.random().toString(36).slice(2, 10),
+          }),
+          fields: [
+            defineField({
+              name: 'key',
+              title: 'Key',
+              type: 'string',
+              hidden: true,
+              readOnly: true,
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'description',
+              title: 'Description',
+              type: 'text',
+              rows: 3,
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: { title: 'description' },
+          },
+        },
+      ],
+      validation: (Rule) => Rule.max(3),
     }),
     defineField({
       name: 'instructions',

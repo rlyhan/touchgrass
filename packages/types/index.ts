@@ -199,6 +199,11 @@ export type ActivityInstruction = {
   description?: string
 }
 
+export type ActivityTip = {
+  key: string
+  description: string
+}
+
 export type Activity = {
   slug: string
   title: string
@@ -208,6 +213,7 @@ export type Activity = {
   estimated_time: string
   related_types?: ActivityType[]
   description?: PortableTextBlock[]
+  tips?: ActivityTip[]
   instructions?: ActivityInstruction[]
 }
 
