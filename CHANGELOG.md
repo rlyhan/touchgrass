@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-05-22 — Chore: Deployment Configs for Render, Vercel, and EAS
+
+Adds infrastructure-as-code so the three deployable artifacts (Express
+backend, Expo web client, Expo mobile client) can be hosted on free tiers
+without per-environment manual setup. No runtime behavior changes.
+
+**Backend (`packages/core`)**
+
+- Added `start` script (`tsx src/index.ts`) so Render's free Web Service
+  can boot the app via `npm run start`.
+- Moved `tsx` from `devDependencies` to `dependencies` so it survives
+  production installs.
+
+**Mobile (`apps/mobile`)**
+
+- Added `vercel-build` script (`expo export --platform web --output-dir dist`)
+  invoked by Vercel during static web builds.
+- Added `runtimeVersion: { policy: "sdkVersion" }` to `app.json` so EAS
+  Update can target Expo Go testers without a custom dev client.
+- New `eas.json` with `development`, `preview`, and `production` build
+  profiles, each setting `EXPO_PUBLIC_API_BASE_URL` to the appropriate
+  backend URL (localhost for dev, Render URL for preview/production).
+
+**Repo root**
+
+- New `render.yaml` blueprint declaring the `touchgrass-api` Web Service
+  on Render's free plan: monorepo-aware build (`npm install --workspaces
+  --include-workspace-root`), `/health` check, and placeholders for the
+  seven runtime env vars (DATABASE_URL, BETTER_AUTH_*, SANITY_*).
+- New `vercel.json` declaring the monorepo web build: installs the full
+  workspace, runs `vercel-build` in `@touchgrass/mobile`, serves
+  `apps/mobile/dist`.
+
 ## 2026-05-22 — Chore: Backend Audit Fixes
 
 Closes the Critical and High findings from the backend code audit. No

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install",
+  "buildCommand": "npm run vercel-build --workspace=@touchgrass/mobile",
+  "outputDirectory": "apps/mobile/dist",
+  "framework": null,
+  "trailingSlash": false
+}

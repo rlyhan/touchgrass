@@ -9,6 +9,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "vercel-build": "expo export --platform web --output-dir dist",
     "lint": "expo lint",
     "test": "jest",
     "storybook": "EXPO_PUBLIC_STORYBOOK=true expo start --port 7007",
