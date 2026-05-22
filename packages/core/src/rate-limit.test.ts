@@ -86,3 +86,15 @@ test("POST /profiles is rate-limited after the per-IP threshold", async () => {
 
   assert.equal(lastStatus, 429)
 })
+
+test("GET /recommendations is rate-limited after the per-IP threshold", async () => {
+  // The read limiter is 120 / minute. Fire 121 requests; the last one must 429.
+  let lastStatus = 0
+  for (let i = 0; i < 121; i++) {
+    const res = await fetch(`${baseUrl}/recommendations`)
+    lastStatus = res.status
+    await res.text()
+  }
+
+  assert.equal(lastStatus, 429)
+})

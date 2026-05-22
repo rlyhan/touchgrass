@@ -44,6 +44,14 @@ const profileLimiter = rateLimit({
   message: { error: "Too many requests" },
 })
 
+const readLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 120,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+})
+
 export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   const app = express()
   app.set("trust proxy", 1)
@@ -73,8 +81,16 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
     ...(options.disableRateLimits ? [] : [profileLimiter]),
     createProfileHandler(deps),
   )
-  app.get("/recommendations", getRecommendationsHandler(deps))
-  app.get("/activities/:slug", getActivityHandler(deps))
+  app.get(
+    "/recommendations",
+    ...(options.disableRateLimits ? [] : [readLimiter]),
+    getRecommendationsHandler(deps),
+  )
+  app.get(
+    "/activities/:slug",
+    ...(options.disableRateLimits ? [] : [readLimiter]),
+    getActivityHandler(deps),
+  )
 
   app.use((_req: Request, res: Response) => {
     res.status(404).json({ error: "Not found" })
