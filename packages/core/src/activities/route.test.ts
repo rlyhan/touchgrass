@@ -92,6 +92,16 @@ test("GET /activities/:slug returns 401 when there is no session", async () => {
   assert.equal(getActivityBySlug.mock.callCount(), 0)
 })
 
+test("GET /activities/:slug returns 400 when the slug contains invalid characters", async () => {
+  const res = await fetch(`${baseUrl}/activities/${encodeURIComponent("Bad Slug!")}`)
+
+  assert.equal(res.status, 400)
+  const body = (await res.json()) as { errors: { path: unknown[]; message: string }[] }
+  assert.ok(Array.isArray(body.errors))
+  assert.ok(body.errors.length > 0)
+  assert.equal(getActivityBySlug.mock.callCount(), 0)
+})
+
 test("GET /activities/:slug returns 500 when the lookup fails", async () => {
   getActivityBySlug.mock.mockImplementation(async () => {
     throw new Error("source down")
