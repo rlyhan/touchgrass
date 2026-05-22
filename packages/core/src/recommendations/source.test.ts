@@ -97,6 +97,19 @@ test("null instructions from Sanity fall through to undefined (no mock instructi
   assert.equal(matched.instructions, undefined)
 })
 
+test("Sanity-only activities missing required Activity fields are dropped", async () => {
+  // Only title + slug — missing imageUrl, type, field, estimated_time.
+  const incomplete: SanityActivity = {
+    slug: "incomplete-sanity-only",
+    title: "Incomplete",
+  }
+
+  const result = await createRecommendationLoader(async () => [incomplete])()
+
+  assert.equal(result.length, RECOMMENDATIONS.length)
+  assert.ok(!result.find((r) => r.slug === "incomplete-sanity-only"))
+})
+
 test("merged result has no duplicates by slug", async () => {
   const target = RECOMMENDATIONS[0]
   assert.ok(target, "expected at least one mock")

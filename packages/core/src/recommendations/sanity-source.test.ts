@@ -22,6 +22,31 @@ test("createFetchActivitiesFromSanity returns activities from the injected clien
   assert.deepEqual(result, [sanityActivity])
 })
 
+test("createFetchActivitiesFromSanity drops docs that fail schema validation", async () => {
+  const valid: SanityActivity = { slug: "ok", title: "OK" }
+  const invalid = { slug: "no-title" } // missing required title
+  const fakeClient = {
+    fetch: async <T,>(_query: string): Promise<T> => [valid, invalid] as T,
+  }
+
+  const fetchActivities = createFetchActivitiesFromSanity(fakeClient)
+  const result = await fetchActivities()
+
+  assert.equal(result.length, 1)
+  assert.equal(result[0]?.slug, "ok")
+})
+
+test("createFetchActivitiesFromSanity returns [] when Sanity returns a non-array", async () => {
+  const fakeClient = {
+    fetch: async <T,>(_query: string): Promise<T> => ({ not: "an array" } as T),
+  }
+
+  const fetchActivities = createFetchActivitiesFromSanity(fakeClient)
+  const result = await fetchActivities()
+
+  assert.deepEqual(result, [])
+})
+
 test("createFetchActivitiesFromSanity falls back to [] on fetch error", async () => {
   const fakeClient = {
     fetch: async <T,>(_query: string): Promise<T> => {

@@ -1,5 +1,6 @@
 import { createClient, type SanityClient } from "@sanity/client"
 
+import { sanityActivitySchema } from "./schema.js"
 import type { LoadSanityActivities, SanityActivity } from "./source.js"
 
 export type SanityClientConfig = {
@@ -37,7 +38,25 @@ export function createFetchActivitiesFromSanity(
 ): LoadSanityActivities {
   return async () => {
     try {
-      return await client.fetch<SanityActivity[]>(ACTIVITIES_QUERY)
+      const raw = await client.fetch<unknown>(ACTIVITIES_QUERY)
+      if (!Array.isArray(raw)) {
+        console.error("Sanity returned a non-array response", raw)
+        return []
+      }
+      const activities: SanityActivity[] = []
+      for (const doc of raw) {
+        const parsed = sanityActivitySchema.safeParse(doc)
+        if (parsed.success) {
+          activities.push(parsed.data as SanityActivity)
+        } else {
+          console.error(
+            "Dropping malformed Sanity activity",
+            parsed.error.issues,
+            doc,
+          )
+        }
+      }
+      return activities
     } catch (error) {
       console.error(
         "Failed to fetch activities from Sanity, falling back to mocks only",
