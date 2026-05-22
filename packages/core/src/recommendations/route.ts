@@ -17,14 +17,14 @@ export function getRecommendationsHandler({
   getSessionUserId,
   loadRecommendations,
 }: GetRecommendationsDeps) {
-  return async function handler(req: Request, res: Response) {
-    const authUserId = await getSessionUserId(req)
-    if (!authUserId) {
-      res.status(401).json({ error: "Not authenticated" })
-      return
-    }
-
+  return async function handler(req: Request, res: Response): Promise<void> {
     try {
+      const authUserId = await getSessionUserId(req)
+      if (!authUserId) {
+        res.status(401).json({ error: "Not authenticated" })
+        return
+      }
+
       const profile = await getProfileByAuthUserId(authUserId)
       if (!profile) {
         res.status(404).json({ error: "Profile not found" })

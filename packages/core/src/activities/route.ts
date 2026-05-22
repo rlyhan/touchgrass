@@ -22,24 +22,24 @@ export function getActivityHandler({
     req: Request<{ slug: string }>,
     res: Response,
   ): Promise<void> {
-    const authUserId = await getSessionUserId(req)
-    if (!authUserId) {
-      res.status(401).json({ error: "Not authenticated" })
-      return
-    }
-
-    const parsedSlug = slugSchema.safeParse(req.params.slug)
-    if (!parsedSlug.success) {
-      res.status(400).json({
-        errors: parsedSlug.error.issues.map(({ path, message }) => ({
-          path,
-          message,
-        })),
-      })
-      return
-    }
-
     try {
+      const authUserId = await getSessionUserId(req)
+      if (!authUserId) {
+        res.status(401).json({ error: "Not authenticated" })
+        return
+      }
+
+      const parsedSlug = slugSchema.safeParse(req.params.slug)
+      if (!parsedSlug.success) {
+        res.status(400).json({
+          errors: parsedSlug.error.issues.map(({ path, message }) => ({
+            path,
+            message,
+          })),
+        })
+        return
+      }
+
       const activity = await getActivityBySlug(parsedSlug.data)
       if (!activity) {
         res.status(404).json({ error: "Activity not found" })

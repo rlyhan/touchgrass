@@ -118,6 +118,18 @@ test("GET /recommendations returns 404 when the user has no profile yet", async 
   assert.equal(body.error, "Profile not found")
 })
 
+test("GET /recommendations returns 500 when getSessionUserId throws", async () => {
+  getSessionUserId.mock.mockImplementation(async () => {
+    throw new Error("session lookup failed")
+  })
+
+  const res = await fetch(`${baseUrl}/recommendations`)
+
+  assert.equal(res.status, 500)
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Failed to get recommendations")
+})
+
 test("GET /recommendations returns 500 when the lookup fails", async () => {
   getProfileByAuthUserId.mock.mockImplementation(async () => {
     throw new Error("db down")
