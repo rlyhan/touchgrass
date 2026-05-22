@@ -93,7 +93,7 @@ export default function RecommendationsPage() {
               <Pressable
                 onPress={handleSignOut}
                 disabled={signingOut}
-                className="mt-6"
+                className="mt-6 py-3"
                 accessibilityRole="button"
                 accessibilityLabel="Sign out"
               >
@@ -132,6 +132,7 @@ export default function RecommendationsPage() {
             <Pressable
               onPress={handleSignOut}
               disabled={signingOut}
+              className="py-3"
               accessibilityRole="button"
               accessibilityLabel="Sign out"
             >

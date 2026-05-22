@@ -90,7 +90,7 @@ export default function ActivityDetailPage() {
       <View className="z-10 bg-white/80 px-4 py-3">
         <Pressable
           onPress={handleBack}
-          className="h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white"
+          className="h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white"
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >

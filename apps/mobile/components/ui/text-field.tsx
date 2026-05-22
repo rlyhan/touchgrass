@@ -10,6 +10,7 @@ export function TextField({ label, ...inputProps }: Props) {
       <Text className="text-sm font-medium text-gray-700">{label}</Text>
       <TextInput
         {...inputProps}
+        accessibilityLabel={label}
         placeholderTextColor="#9ca3af"
         className="h-14 rounded-2xl border border-gray-200 bg-white px-4 text-base text-gray-900"
       />

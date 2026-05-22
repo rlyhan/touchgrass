@@ -108,7 +108,7 @@ export default function SignInScreen() {
           </View>
 
           <View className="mt-8 flex-row justify-center">
-            <Link href={"/onboarding/name" as Href} className="text-sm">
+            <Link href={"/onboarding/name" as Href} className="text-sm" accessibilityRole="link" accessibilityLabel="New here? Create an account">
               <Text className="text-gray-500">New here? </Text>
               <Text className="font-semibold text-emerald-600">
                 Create an account
