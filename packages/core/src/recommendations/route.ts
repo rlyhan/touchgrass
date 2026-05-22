@@ -17,36 +17,31 @@ export function getRecommendationsHandler({
   getSessionUserId,
   loadRecommendations,
 }: GetRecommendationsDeps) {
-  return async function handler(req: Request, res: Response) {
+  return async function handler(req: Request, res: Response): Promise<void> {
     const authUserId = await getSessionUserId(req)
     if (!authUserId) {
       res.status(401).json({ error: "Not authenticated" })
       return
     }
 
-    try {
-      const profile = await getProfileByAuthUserId(authUserId)
-      if (!profile) {
-        res.status(404).json({ error: "Profile not found" })
-        return
-      }
-      const personality = profile.personality
-      const motivations = profile.motivations
-        .map((v) => MOTIVATION_OPTIONS.find((m) => m.value === v))
-        .filter((m): m is Motivation => m !== undefined)
-      const interests = profile.interests.filter((i): i is ActivityField =>
-        (ACTIVITY_FIELDS as readonly string[]).includes(i),
-      )
-      const recommendations = getRecommendations(
-        personality,
-        motivations,
-        interests,
-        await loadRecommendations(),
-      ).map((s) => s.rec)
-      res.status(200).json({ recommendations })
-    } catch (error) {
-      console.error("Failed to get recommendations", error)
-      res.status(500).json({ error: "Failed to get recommendations" })
+    const profile = await getProfileByAuthUserId(authUserId)
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found" })
+      return
     }
+    const personality = profile.personality
+    const motivations = profile.motivations
+      .map((v) => MOTIVATION_OPTIONS.find((m) => m.value === v))
+      .filter((m): m is Motivation => m !== undefined)
+    const interests = profile.interests.filter((i): i is ActivityField =>
+      (ACTIVITY_FIELDS as readonly string[]).includes(i),
+    )
+    const recommendations = getRecommendations(
+      personality,
+      motivations,
+      interests,
+      await loadRecommendations(),
+    ).map((s) => s.rec)
+    res.status(200).json({ recommendations })
   }
 }

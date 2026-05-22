@@ -14,7 +14,7 @@ export function createProfileHandler({
   getProfileByAuthUserId,
   getSessionUserId,
 }: CreateProfileDeps) {
-  return async function handler(req: Request, res: Response) {
+  return async function handler(req: Request, res: Response): Promise<void> {
     const authUserId = await getSessionUserId(req)
     if (!authUserId) {
       res.status(401).json({ error: "Not authenticated" })
@@ -58,8 +58,7 @@ export function createProfileHandler({
         res.status(409).json({ error: "Profile already exists" })
         return
       }
-      console.error("Failed to create profile", error)
-      res.status(500).json({ error: "Failed to create profile" })
+      throw error
     }
   }
 }

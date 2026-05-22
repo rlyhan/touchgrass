@@ -1,5 +1,69 @@
 # Changelog
 
+## 2026-05-22 — Refactor: Centralize Error Handling, DRY Rate-Limiter Setup
+
+Cleanup pass on the backend-audit fixes below. With the global
+error-handler middleware in place, per-route `try/catch` blocks
+became redundant for the "log + 500" case. Rate-limiter configs
+also had a repeated shape worth factoring.
+
+**Backend (`packages/core`)**
+
+- **Removed redundant `try/catch` from read-only handlers.** The
+  recommendations and activities handlers were doing
+  `try { ... } catch { console.error + 500 }` — exactly what the
+  global handler now does. Express 5 propagates async rejections
+  automatically, so the handlers just throw and the centralized
+  middleware logs + returns a generic `{ error: "Internal server
+  error" }` JSON 500.
+- **Narrowed onboarding handler's `try/catch` to `insertProfile`
+  only.** It still needs one for the Postgres `23505` →
+  HTTP 409 translation, but the outer wrap added during the audit
+  is now redundant. Non-`23505` errors are re-thrown to the global
+  handler.
+- **Extracted `createLimiter(windowMs, limit)` factory.** All three
+  rate-limiters shared the same `standardHeaders`, `legacyHeaders`,
+  and `message` config — only window and limit differed. Single
+  factory replaces ~15 lines of near-duplicate config.
+- **Extracted `maybeLimit(limiter)` helper.** Replaces the
+  `...(options.disableRateLimits ? [] : [limiter])` spread that was
+  repeated at every rate-limited route mount.
+
+## 2026-05-22 — Fix: Backend Audit (High-Severity Findings)
+
+Addresses the four high-severity findings from the backend code audit.
+Each fix landed as its own commit on `fix/backend-audit`.
+
+**Backend (`packages/core`)**
+
+- **Auth/profile lookup errors no longer leak as non-JSON 500s.**
+  Previously `getSessionUserId` (and `getProfileByAuthUserId` in the
+  onboarding handler) ran outside the route's `try/catch`. A
+  transient Neon or `better-auth` error during those calls would
+  fall through to Express's default error handler and return a
+  non-JSON 500. With the global error-handler middleware now in
+  place (see next bullet), any such error flows through the JSON
+  500 path. Route handlers also gained consistent `Promise<void>`
+  annotations.
+- **Global JSON error-handler and 404 middlewares.** Anything that
+  reaches the end of the middleware chain unhandled — an error
+  thrown from a handler or an undefined path — now goes through a
+  four-argument `(err, req, res, next)` handler that logs the error
+  and returns a generic `{ error: "Internal server error" }` JSON
+  500. Unknown routes return a JSON 404 instead of Express's default
+  HTML.
+- **Rate limit on the two authenticated read endpoints.** Added a
+  shared `readLimiter` (120 req/min per IP) on `GET /recommendations`
+  and `GET /activities/:slug`. Both routes touch `better-auth`'s
+  session table and Neon on every request, so an unthrottled loop
+  could exhaust the connection pool. Same `disableRateLimits` escape
+  hatch as the existing limiters.
+- **`SANITY_API_VERSION` must be a dated `YYYY-MM-DD` string.**
+  `readSanityConfigFromEnv` previously accepted any non-empty value.
+  A floating version like `"v1"` would silently change response
+  shape over time as Sanity evolves the API. Startup now fails fast
+  with a clear error if the variable is not a dated string.
+
 ## 2026-05-22 — Fix: Cross-Site Auth Cookies for Vercel ↔ Render
 
 Fixes the bug where sign-in succeeded but `useSession()` immediately

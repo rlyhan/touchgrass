@@ -173,6 +173,40 @@ test("POST /profiles returns 409 on DB unique constraint violation (race conditi
   assert.equal(body.error, "Profile already exists")
 })
 
+test("POST /profiles returns 500 when getSessionUserId throws", async () => {
+  getSessionUserId.mock.mockImplementation(async () => {
+    throw new Error("session lookup failed")
+  })
+
+  const res = await fetch(`${baseUrl}/profiles`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(validPayload),
+  })
+
+  assert.equal(res.status, 500)
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Internal server error")
+  assert.equal(insertProfile.mock.callCount(), 0)
+})
+
+test("POST /profiles returns 500 when getProfileByAuthUserId throws", async () => {
+  getProfileByAuthUserId.mock.mockImplementation(async () => {
+    throw new Error("db down")
+  })
+
+  const res = await fetch(`${baseUrl}/profiles`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(validPayload),
+  })
+
+  assert.equal(res.status, 500)
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Internal server error")
+  assert.equal(insertProfile.mock.callCount(), 0)
+})
+
 test("POST /profiles returns 500 when the database insert fails", async () => {
   insertProfile.mock.mockImplementation(async () => {
     throw new Error("db down")
@@ -186,5 +220,5 @@ test("POST /profiles returns 500 when the database insert fails", async () => {
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to create profile")
+  assert.equal(body.error, "Internal server error")
 })

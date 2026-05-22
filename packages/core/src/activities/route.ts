@@ -39,16 +39,11 @@ export function getActivityHandler({
       return
     }
 
-    try {
-      const activity = await getActivityBySlug(parsedSlug.data)
-      if (!activity) {
-        res.status(404).json({ error: "Activity not found" })
-        return
-      }
-      res.status(200).json({ activity })
-    } catch (error) {
-      console.error("Failed to get activity", error)
-      res.status(500).json({ error: "Failed to get activity" })
+    const activity = await getActivityBySlug(parsedSlug.data)
+    if (!activity) {
+      res.status(404).json({ error: "Activity not found" })
+      return
     }
+    res.status(200).json({ activity })
   }
 }

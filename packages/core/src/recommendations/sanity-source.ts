@@ -80,5 +80,10 @@ export function readSanityConfigFromEnv(): SanityClientConfig {
   if (!apiVersion) {
     throw new Error("SANITY_API_VERSION is not set")
   }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(apiVersion)) {
+    throw new Error(
+      `SANITY_API_VERSION must be a dated string in YYYY-MM-DD format (got "${apiVersion}")`,
+    )
+  }
   return { projectId, dataset, apiVersion }
 }

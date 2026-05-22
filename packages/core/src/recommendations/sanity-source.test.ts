@@ -76,6 +76,22 @@ test("readSanityConfigFromEnv throws when SANITY_PROJECT_ID is missing", () => {
   }
 })
 
+test("readSanityConfigFromEnv throws when SANITY_API_VERSION is not a dated YYYY-MM-DD string", () => {
+  const original = { ...process.env }
+  process.env.SANITY_PROJECT_ID = "test-project"
+  process.env.SANITY_DATASET = "test-dataset"
+  process.env.SANITY_API_VERSION = "v1"
+
+  try {
+    assert.throws(
+      () => readSanityConfigFromEnv(),
+      /SANITY_API_VERSION must be a dated string/,
+    )
+  } finally {
+    process.env = original
+  }
+})
+
 test("readSanityConfigFromEnv returns the config when all vars are set", () => {
   const original = { ...process.env }
   process.env.SANITY_PROJECT_ID = "test-project"
