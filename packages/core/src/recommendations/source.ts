@@ -2,6 +2,8 @@ import type { Activity } from "@touchgrass/types"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
+import { activitySchema } from "./schema.js"
+
 // Sanity enforces title + slug as required; every other field may be null
 // while an editor is mid-migration. The merge layer treats nulls as "fall
 // through to the mock value" so partial Sanity docs don't break the UI.
@@ -23,9 +25,19 @@ export function createRecommendationLoader(
       return sanity ? mergeNonNull(mock, sanity) : mock
     })
 
-    const sanityOnly = fromSanity
-      .filter((s) => !mockSlugs.has(s.slug))
-      .map((s) => s as Activity)
+    const sanityOnly: Activity[] = []
+    for (const s of fromSanity) {
+      if (mockSlugs.has(s.slug)) continue
+      const parsed = activitySchema.safeParse(s)
+      if (parsed.success) {
+        sanityOnly.push(parsed.data)
+      } else {
+        console.error(
+          "Dropping Sanity-only activity that is missing required fields",
+          { slug: s.slug, issues: parsed.error.issues },
+        )
+      }
+    }
 
     return [...sanityOnly, ...mergedMocks]
   }

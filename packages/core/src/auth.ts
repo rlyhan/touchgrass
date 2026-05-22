@@ -3,6 +3,10 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { expo } from "@better-auth/expo"
 
 import { db } from "./db/client.js"
+import {
+  parseExtraTrustedOrigins,
+  resolveTrustedOrigins,
+} from "./trusted-origins.js"
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set")
@@ -12,26 +16,12 @@ if (!process.env.BETTER_AUTH_URL) {
   throw new Error("BETTER_AUTH_URL is not set")
 }
 
-const extraTrustedOrigins =
-  process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",")
-    .map((s) => s.trim())
-    .filter(Boolean) ?? []
-
-const isProd = process.env.NODE_ENV === "production"
-
-const devTrustedOrigins = isProd
-  ? []
-  : [
-      "http://localhost:8081",
-      "http://localhost:19006",
-      "http://localhost:19000",
-    ]
-
-export const trustedOrigins = [
-  "touchgrass://",
-  ...devTrustedOrigins,
-  ...extraTrustedOrigins,
-]
+export const trustedOrigins = resolveTrustedOrigins({
+  extraTrustedOrigins: parseExtraTrustedOrigins(
+    process.env.BETTER_AUTH_TRUSTED_ORIGINS,
+  ),
+  isProd: process.env.NODE_ENV === "production",
+})
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),

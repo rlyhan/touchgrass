@@ -1,5 +1,6 @@
 import cors from "cors"
 import express, { type Express } from "express"
+import rateLimit from "express-rate-limit"
 
 import { auth, trustedOrigins } from "./auth.js"
 import { toNodeHandler } from "better-auth/node"
@@ -18,7 +19,27 @@ import {
 
 export type AppDeps = CreateProfileDeps & GetRecommendationsDeps & GetActivityDeps
 
-export function createApp(deps: AppDeps): Express {
+export type AppOptions = {
+  disableRateLimits?: boolean
+}
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+})
+
+const profileLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Too many requests" },
+})
+
+export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   const app = express()
   app.use(
     cors({
@@ -26,6 +47,10 @@ export function createApp(deps: AppDeps): Express {
       credentials: true,
     }),
   )
+
+  if (!options.disableRateLimits) {
+    app.use("/api/auth", authLimiter)
+  }
 
   app.all("/api/auth/{*splat}", toNodeHandler(auth))
 
@@ -35,7 +60,11 @@ export function createApp(deps: AppDeps): Express {
     res.json({ ok: true })
   })
 
-  app.post("/profiles", createProfileHandler(deps))
+  app.post(
+    "/profiles",
+    ...(options.disableRateLimits ? [] : [profileLimiter]),
+    createProfileHandler(deps),
+  )
   app.get("/recommendations", getRecommendationsHandler(deps))
   app.get("/activities/:slug", getActivityHandler(deps))
 

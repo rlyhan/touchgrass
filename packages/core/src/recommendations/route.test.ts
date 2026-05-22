@@ -57,13 +57,16 @@ let server: Server
 let baseUrl: string
 
 before(() => {
-  const app = createApp({
-    insertProfile,
-    getProfileByAuthUserId,
-    getSessionUserId,
-    loadRecommendations,
-    getActivityBySlug: async () => null,
-  })
+  const app = createApp(
+    {
+      insertProfile,
+      getProfileByAuthUserId,
+      getSessionUserId,
+      loadRecommendations,
+      getActivityBySlug: async () => null,
+    },
+    { disableRateLimits: true },
+  )
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
   baseUrl = `http://127.0.0.1:${port}`
@@ -127,12 +130,12 @@ test("GET /recommendations returns 500 when the lookup fails", async () => {
   assert.equal(body.error, "Failed to get recommendations")
 })
 
-test("GET /recommendations returns 500 when personality data is malformed", async () => {
-  // Simulates a jsonb row that bypasses the ORM's compile-time .$type<T>() cast
-  getProfileByAuthUserId.mock.mockImplementation(async () => ({
-    ...fakeProfile,
-    personality: { Openness: 999 }, // out-of-range, missing 9 required traits
-  } as unknown as Profile))
+test("GET /recommendations returns 500 when the DB layer rejects malformed personality", async () => {
+  // The real db/profiles layer parses jsonb personality with Zod and throws on
+  // malformed rows, so a corrupted jsonb value surfaces as a thrown error here.
+  getProfileByAuthUserId.mock.mockImplementation(async () => {
+    throw new Error("Invalid personality")
+  })
 
   const res = await fetch(`${baseUrl}/recommendations`)
 

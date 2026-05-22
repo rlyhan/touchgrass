@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-05-22 — Chore: Backend Audit Fixes
+
+Closes the Critical and High findings from the backend code audit. No
+public API changes.
+
+**Backend (`packages/core`)**
+
+- **Sanity client is injectable and env-driven.** Project ID, dataset, and API version are now read from `SANITY_PROJECT_ID` / `SANITY_DATASET` / `SANITY_API_VERSION` (added to `.env.local`). The client is constructed via a factory in `index.ts` instead of at module scope, so tests no longer hit the real project.
+- **Sanity responses are validated at runtime.** New `sanityActivitySchema` (partial) and `activitySchema` (full) Zod schemas. Malformed docs are dropped on fetch; Sanity-only docs missing required Activity fields are dropped before being served to clients.
+- **Profile `personality` jsonb is parsed in the DB layer.** `insertProfile` validates on write and `getProfileByAuthUserId` validates on read, so corrupted rows cannot reach handlers under a typed cast.
+- **Rate limiting on `/api/auth/*` and `POST /profiles`.** `express-rate-limit` mounted at 20 req / 15 min and 10 req / hour per IP respectively. `createApp` accepts `disableRateLimits` for tests.
+- **`GET /activities/:slug` validates the path param.** Slug must be lowercase alphanumeric with hyphens, 1–200 chars; returns 400 with sanitized errors otherwise.
+- **Production CORS requires an HTTPS origin.** `resolveTrustedOrigins` throws on boot if `BETTER_AUTH_TRUSTED_ORIGINS` lacks at least one `https://` entry when `NODE_ENV=production`. Dev localhost origins are excluded from production.
+- **Documented `profiles.auth_user_id` lookup-index design** in `db/schema.ts` — the UNIQUE constraint's auto-generated btree is the hot-path index.
+
 ## 2026-05-22 — Feat: Activity Tips Field
 
 Adds an optional `tips` field to the Activity schema (max 3 per activity), giving editors a place to author short, glanceable hints. Tips render on the activity detail page as rounded callout cards with a pale orange-brown background and a lightbulb icon.

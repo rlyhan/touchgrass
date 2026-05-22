@@ -36,13 +36,16 @@ let server: Server
 let baseUrl: string
 
 before(() => {
-  const app = createApp({
-    insertProfile,
-    getProfileByAuthUserId,
-    getSessionUserId,
-    loadRecommendations: async () => [],
-    getActivityBySlug,
-  })
+  const app = createApp(
+    {
+      insertProfile,
+      getProfileByAuthUserId,
+      getSessionUserId,
+      loadRecommendations: async () => [],
+      getActivityBySlug,
+    },
+    { disableRateLimits: true },
+  )
   server = app.listen(0)
   const { port } = server.address() as AddressInfo
   baseUrl = `http://127.0.0.1:${port}`
@@ -86,6 +89,16 @@ test("GET /activities/:slug returns 401 when there is no session", async () => {
   const res = await fetch(`${baseUrl}/activities/${activity.slug}`)
 
   assert.equal(res.status, 401)
+  assert.equal(getActivityBySlug.mock.callCount(), 0)
+})
+
+test("GET /activities/:slug returns 400 when the slug contains invalid characters", async () => {
+  const res = await fetch(`${baseUrl}/activities/${encodeURIComponent("Bad Slug!")}`)
+
+  assert.equal(res.status, 400)
+  const body = (await res.json()) as { errors: { path: unknown[]; message: string }[] }
+  assert.ok(Array.isArray(body.errors))
+  assert.ok(body.errors.length > 0)
   assert.equal(getActivityBySlug.mock.callCount(), 0)
 })
 
