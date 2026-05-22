@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-05-22 — Feat: Activity Tips Field
+
+Adds an optional `tips` field to the Activity schema (max 3 per activity), giving editors a place to author short, glanceable hints. Tips render on the activity detail page as rounded callout cards with a pale orange-brown background and a lightbulb icon.
+
+**Sanity Studio (`apps/sanity`)**
+
+- New `tips` array field on the `activity` schema, capped at 3 items via `Rule.max(3)`. Each item is an inline `tip` object with a required `description` (plain text, 3-row textarea) and an auto-generated `key` (hidden, read-only, populated via the object's `initialValue`).
+
+**Types (`packages/types`)**
+
+- New `ActivityTip` type (`{ key: string; description: string }`). `Activity` gains an optional `tips?: ActivityTip[]` field.
+
+**Backend (`packages/core`)**
+
+- GROQ query in `sanity-source.ts` updated to project the `tips` array alongside existing fields.
+
+**Mobile (`apps/mobile`)**
+
+- Activity detail page renders a tips section below the description when the field is non-empty. Each tip displays as a rounded card with a pale orange-brown background (`#FFF3E0`), a lightbulb icon on the left, and the description prepended with **"Tip:"** in bold.
+- Three new `activity-detail.test.tsx` cases: renders each tip with "Tip:" prefix and a lightbulb icon when present, hides section when absent, hides section when empty array.
+- Two new Storybook stories: `WithTips` and `WithEverything` (description + instructions + tips).
+
 ## 2026-05-22 — Feat: Activity Instructions Field
 
 Adds an optional ordered `instructions` field to the Activity schema, allowing editors to author step-by-step guidance for each activity. Instructions render on the activity detail page as a numbered list with emerald step-indicator circles.
