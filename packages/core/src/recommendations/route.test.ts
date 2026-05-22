@@ -127,7 +127,7 @@ test("GET /recommendations returns 500 when getSessionUserId throws", async () =
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to get recommendations")
+  assert.equal(body.error, "Internal server error")
 })
 
 test("GET /recommendations returns 500 when the lookup fails", async () => {
@@ -139,7 +139,7 @@ test("GET /recommendations returns 500 when the lookup fails", async () => {
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to get recommendations")
+  assert.equal(body.error, "Internal server error")
 })
 
 test("GET /recommendations returns 500 when the DB layer rejects malformed personality", async () => {
@@ -153,5 +153,5 @@ test("GET /recommendations returns 500 when the DB layer rejects malformed perso
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to get recommendations")
+  assert.equal(body.error, "Internal server error")
 })

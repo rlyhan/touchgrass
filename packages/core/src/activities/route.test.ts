@@ -111,7 +111,7 @@ test("GET /activities/:slug returns 500 when getSessionUserId throws", async () 
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to get activity")
+  assert.equal(body.error, "Internal server error")
   assert.equal(getActivityBySlug.mock.callCount(), 0)
 })
 
@@ -124,5 +124,5 @@ test("GET /activities/:slug returns 500 when the lookup fails", async () => {
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to get activity")
+  assert.equal(body.error, "Internal server error")
 })
