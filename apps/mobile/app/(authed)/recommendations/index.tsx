@@ -1,5 +1,5 @@
 import { router, type Href } from "expo-router"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -11,38 +11,30 @@ import {
   fetchRecommendations,
   ProfileNotFoundError,
 } from "@/lib/recommendations/api"
+import { useAsyncData } from "@/lib/use-async-data"
 import type { Activity } from "@touchgrass/types"
-
-type Status = "loading" | "ready" | "error"
 
 const ItemSeparator = () => <View style={{ height: 16 }} />
 
 export default function RecommendationsPage() {
-  const [recommendations, setRecommendations] = useState<Activity[]>([])
-  const [status, setStatus] = useState<Status>("loading")
   const [signingOut, setSigningOut] = useState(false)
 
-  const load = useCallback(async () => {
-    setStatus("loading")
+  const fetcher = useCallback(async (): Promise<Activity[]> => {
     try {
-      const recs = await fetchRecommendations()
-      setRecommendations(recs)
-      setStatus("ready")
+      return await fetchRecommendations()
     } catch (err) {
       // The user is authenticated but has no profile — most likely because
       // onboarding was interrupted before profile creation completed. Send
       // them back to finish it rather than leaving them on a dead-end error.
       if (err instanceof ProfileNotFoundError) {
         router.replace("/onboarding/basic-details" as Href)
-        return
+        return []
       }
-      setStatus("error")
+      throw err
     }
   }, [])
 
-  useEffect(() => {
-    load()
-  }, [load])
+  const { data: recommendations = [], status, reload } = useAsyncData(fetcher)
 
   const handleSignOut = useCallback(async () => {
     setSigningOut(true)
@@ -88,7 +80,7 @@ export default function RecommendationsPage() {
                 Couldn&apos;t load your recommendations.
               </Text>
               <View className="mt-8 w-full">
-                <PrimaryButton label="Try again" onPress={load} />
+                <PrimaryButton label="Try again" onPress={reload} />
               </View>
               <Pressable
                 onPress={handleSignOut}

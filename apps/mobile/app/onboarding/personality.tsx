@@ -1,4 +1,5 @@
 import { router, type Href } from "expo-router"
+import { useCallback } from "react"
 import { Controller } from "react-hook-form"
 import { Text, View } from "react-native"
 
@@ -27,7 +28,7 @@ const BFAS_GROUPS: TraitGroup[] = BFAS_TRAITS.reduce<TraitGroup[]>(
 export default function PersonalityScreen() {
   const { control } = useOnboardingForm()
 
-  const goNext = () => router.push("/onboarding/motivation" as Href)
+  const goNext = useCallback(() => router.push("/onboarding/motivation" as Href), [])
 
   return (
     <OnboardingScreenShell
