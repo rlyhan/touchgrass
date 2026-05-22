@@ -186,7 +186,7 @@ test("POST /profiles returns 500 when getSessionUserId throws", async () => {
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to create profile")
+  assert.equal(body.error, "Internal server error")
   assert.equal(insertProfile.mock.callCount(), 0)
 })
 
@@ -203,7 +203,7 @@ test("POST /profiles returns 500 when getProfileByAuthUserId throws", async () =
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to create profile")
+  assert.equal(body.error, "Internal server error")
   assert.equal(insertProfile.mock.callCount(), 0)
 })
 
@@ -220,5 +220,5 @@ test("POST /profiles returns 500 when the database insert fails", async () => {
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Failed to create profile")
+  assert.equal(body.error, "Internal server error")
 })
