@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-05-23 — Fix: Blank Screen in Expo Go After `eas update`
+
+Every `eas update` build loaded as a blank white screen in Expo Go (worked fine locally). Root cause was a stale Metro cache: `lib/config.ts` had been bundled before `EXPO_PUBLIC_API_BASE_URL` was set, so it still threw at module load — crashing the import chain before any UI mounted. With no `ErrorBoundary` in place the crash was silent.
+
+**Mobile (`apps/mobile`)**
+
+- **Added `ErrorBoundary` export to `_layout.tsx`.** Expo Router renders this named export instead of crashing silently, surfacing the actual error message and stack trace in production.
+- **New `apps/mobile/.env` with `EXPO_PUBLIC_API_BASE_URL`.** Expo reads `.env` automatically during bundling, ensuring the value is reliably inlined after a cache clear.
+- **Disabled `reactCompiler` experiment in `app.json`.** Its compiled output can produce Hermes bytecode incompatible with Expo Go; re-enable when targeting a custom dev client.
+
+**Workflow note:** run `eas update` with `--clear-cache` (or delete `apps/mobile/.expo/`) whenever env-var-dependent code changes, or Metro will bundle stale transforms.
+
 ## 2026-05-23 — Refactor: Toggle Utility, Async Data Hook
 
 **Mobile (`apps/mobile`)**
