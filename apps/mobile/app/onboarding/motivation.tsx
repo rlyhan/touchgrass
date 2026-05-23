@@ -1,5 +1,4 @@
 import { router, type Href } from "expo-router"
-import { useCallback } from "react"
 import { Controller, useWatch } from "react-hook-form"
 import { View } from "react-native"
 
@@ -15,11 +14,7 @@ export default function MotivationScreen() {
   const motivations = useWatch({ control, name: "motivations" })
   const canContinue = motivations.length >= 1
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onSubmit = useCallback(
-    handleSubmit(() => router.replace("/onboarding/loading" as Href)),
-    [handleSubmit],
-  )
+  const onSubmit = handleSubmit(() => router.replace("/onboarding/loading" as Href))
 
   return (
     <OnboardingScreenShell

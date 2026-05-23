@@ -1,12 +1,11 @@
 # Changelog
 
-## 2026-05-23 — Refactor: Toggle Utility, Async Data Hook, Nav Handler Memoization
+## 2026-05-23 — Refactor: Toggle Utility, Async Data Hook
 
 **Mobile (`apps/mobile`)**
 
 - Extracted a shared `toggleItem<T>` utility to replace duplicated include/filter array logic in the interests and motivation onboarding screens.
 - Extracted a `useAsyncData<T>` hook encapsulating the `status / data / useEffect` fetch pattern, replacing the manual state management in the recommendations screen.
-- Wrapped `goNext`, `skip`, and `onSubmit` navigation handlers in `useCallback` across the interests, personality, and motivation onboarding screens.
 
 ## 2026-05-22 — Fix: Accessibility and Display Polish
 
@@ -20,7 +19,6 @@
 - Activity detail header gets `elevation: 4` on Android so it correctly occludes `ScrollView` content that scrolls beneath it (`zIndex` alone has no effect without an elevation stacking context on Android).
 - Recommendation card metadata row changed from `gap-x-6 gap-y-2` to `gap-3` — axis-specific gap utilities are not reliably supported on `flex-wrap` rows in NativeWind v4.
 - `API_BASE_URL` extracted into `lib/config.ts` and imported by `lib/auth/client`, `lib/onboarding/api`, and `lib/recommendations/api`, removing three copies of the same env-var fallback expression.
-- `handleBack` in the activity detail screen wrapped in `useCallback` to prevent recreation on every render.
 
 ## 2026-05-22 — Refactor: Centralize Error Handling, DRY Rate-Limiter Setup
 

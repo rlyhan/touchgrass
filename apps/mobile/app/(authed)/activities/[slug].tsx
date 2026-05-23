@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams, type Href } from "expo-router"
 import { ArrowLeft, Lightbulb } from "lucide-react-native"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ActivityIndicator,
   Pressable,
@@ -30,10 +30,10 @@ export default function ActivityDetailPage() {
     slug ? (cached ? "ready" : "loading") : "not-found",
   )
 
-  const handleBack = useCallback(() => {
+  function handleBack() {
     if (router.canGoBack()) router.back()
     else router.replace("/recommendations" as Href)
-  }, [])
+  }
 
   useEffect(() => {
     if (!slug) return

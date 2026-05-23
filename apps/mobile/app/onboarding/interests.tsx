@@ -1,5 +1,4 @@
 import { router, type Href } from "expo-router"
-import { useCallback } from "react"
 import { Controller } from "react-hook-form"
 import { View } from "react-native"
 
@@ -16,11 +15,11 @@ import type { ActivityField } from "@touchgrass/types"
 export default function InterestsScreen() {
   const { control, setValue } = useOnboardingForm()
 
-  const goNext = useCallback(() => router.push("/onboarding/personality" as Href), [])
-  const skip = useCallback(() => {
+  function goNext() { router.push("/onboarding/personality" as Href) }
+  function skip() {
     setValue("interests", [])
     goNext()
-  }, [setValue, goNext])
+  }
 
   return (
     <OnboardingScreenShell
