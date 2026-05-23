@@ -1,50 +1,154 @@
-# Welcome to your Expo app 👋
+# Touchgrass
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile app that helps people who feel stuck or stagnant discover meaningful, realistic activities and hobbies — personalised to who they are right now.
 
-## Get started
+---
 
-1. Install dependencies
+## Monorepo structure
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+apps/
+  mobile/     Expo (React Native) app — iOS, Android, and web
+  sanity/     Sanity Studio CMS for managing activity content
+  web/        Web app stub (in progress)
+packages/
+  core/       Express API server — auth, profiles, recommendations
+  types/      Shared TypeScript types
+  mocks/      Shared mock data for tests
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Prerequisites
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Node.js** 20+
+- **npm** 10+ (workspaces used throughout)
+- **Expo Go** app on a physical device, or Xcode (iOS Simulator) / Android Studio (Android Emulator)
+- An [Expo account](https://expo.dev) for EAS builds/updates
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## Environment setup
 
-Join our community of developers creating universal apps.
+Copy the example and fill in values:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+cp .env.local.example .env.local
+```
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | Neon PostgreSQL connection string (pooled) |
+| `BETTER_AUTH_SECRET` | Random secret — generate with `openssl rand -base64 32` |
+| `BETTER_AUTH_URL` | Base URL of the running API (e.g. `http://localhost:3000` locally) |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated list of allowed client origins (leave unset locally) |
+| `SANITY_PROJECT_ID` | Sanity project ID |
+| `SANITY_DATASET` | Sanity dataset name (e.g. `production`) |
+| `SANITY_API_VERSION` | Sanity API version as `YYYY-MM-DD` (e.g. `2024-01-01`) |
+
+`EXPO_PUBLIC_API_BASE_URL` is not needed locally — the mobile app falls back to `http://localhost:3000` in dev mode.
+
+---
+
+## Local development
+
+Install all workspace dependencies from the repo root:
+
+```bash
+npm install
+```
+
+Start both the API server and Expo dev server together:
+
+```bash
+npm start
+```
+
+This runs `@touchgrass/core` (Express on port 3000) and `@touchgrass/mobile` (Expo) concurrently. Both must be running for auth, profiles, and recommendations to work.
+
+**Platform-specific:**
+
+```bash
+npm run ios       # iOS Simulator
+npm run android   # Android Emulator
+npm run web       # Browser at http://localhost:8081
+```
+
+**Run workspaces individually:**
+
+```bash
+# API only
+npm run dev --workspace=@touchgrass/core
+
+# Mobile only
+npm run start --workspace=@touchgrass/mobile
+
+# Sanity Studio
+npm run dev --workspace=@touchgrass/sanity
+```
+
+**Lint:**
+
+```bash
+npm run lint
+```
+
+**Tests:**
+
+```bash
+npm run test --workspace=@touchgrass/core
+```
+
+---
+
+## Database migrations
+
+Migrations live in `packages/core/drizzle/`. Run against the target database:
+
+```bash
+# local (.env.local)
+npm run db:migrate --workspace=@touchgrass/core
+
+# production (override DATABASE_URL inline)
+DATABASE_URL='<prod url>' npm run db:migrate --workspace=@touchgrass/core
+```
+
+---
+
+## Deployment
+
+| Artifact | Host | Config |
+|---|---|---|
+| API (`packages/core`) | [Render](https://render.com) free Web Service | `render.yaml` |
+| Web client (`apps/mobile`) | [Vercel](https://vercel.com) | `vercel.json` |
+| Mobile (Expo Go) | EAS Update | `apps/mobile/eas.json` |
+
+**Render** reads `render.yaml` automatically when you connect the repo. Set the seven env vars listed above in the Render dashboard (add `BETTER_AUTH_TRUSTED_ORIGINS` once the Vercel URL is known).
+
+**Vercel** reads `vercel.json` from the repo root. Set `EXPO_PUBLIC_API_BASE_URL` to your Render service URL in the Vercel project settings.
+
+**EAS Update** (Expo Go testers):
+
+```bash
+cd apps/mobile
+eas login
+eas init          # first time only — writes projectId to app.json
+eas update:configure  # first time only — writes updates.url to app.json
+EXPO_PUBLIC_API_BASE_URL=https://<render-url>.onrender.com \
+  eas update --branch preview --message "description"
+```
+
+---
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Mobile / web client | React Native, Expo SDK 54, Expo Router v6 |
+| Styling | NativeWind v4 (Tailwind CSS for React Native) |
+| API server | Express 5, TypeScript, tsx |
+| Auth | better-auth with Expo plugin |
+| Database | Neon (PostgreSQL serverless), Drizzle ORM |
+| CMS | Sanity Studio v3 |
+| Icons | lucide-react-native |
+| Testing | Node built-in test runner (`node:test`) |
