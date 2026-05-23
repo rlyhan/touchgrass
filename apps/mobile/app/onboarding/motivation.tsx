@@ -1,20 +1,20 @@
+import { router, type Href } from "expo-router"
+import { Controller, useWatch } from "react-hook-form"
+import { View } from "react-native"
+
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { OptionCard } from "@/components/ui/option-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { toggleItem } from "@/lib/toggle-item"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
-import { router, type Href } from "expo-router"
-import { Controller, useWatch } from "react-hook-form"
-import { View } from "react-native"
 
 export default function MotivationScreen() {
   const { control, handleSubmit } = useOnboardingForm()
   const motivations = useWatch({ control, name: "motivations" })
   const canContinue = motivations.length >= 1
 
-  const onSubmit = handleSubmit(() => {
-    router.replace("/onboarding/loading" as Href)
-  })
+  const onSubmit = handleSubmit(() => router.replace("/onboarding/loading" as Href))
 
   return (
     <OnboardingScreenShell
@@ -34,13 +34,6 @@ export default function MotivationScreen() {
         name="motivations"
         rules={{ validate: (v) => v.length >= 1 }}
         render={({ field: { value, onChange } }) => {
-          const toggle = (optionValue: string) => {
-            const next = value.includes(optionValue)
-              ? value.filter((m) => m !== optionValue)
-              : [...value, optionValue]
-            onChange(next)
-          }
-
           return (
             <View className="gap-3">
               {MOTIVATION_OPTIONS.map((option) => (
@@ -48,7 +41,7 @@ export default function MotivationScreen() {
                   key={option.value}
                   label={option.label}
                   selected={value.includes(option.value)}
-                  onPress={() => toggle(option.value)}
+                  onPress={() => onChange(toggleItem(value, option.value))}
                 />
               ))}
             </View>

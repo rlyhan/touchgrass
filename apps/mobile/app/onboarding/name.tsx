@@ -167,7 +167,7 @@ export default function NameScreen() {
         {error ? <Text className="text-sm text-red-600">{error}</Text> : null}
 
         <View className="mt-2 flex-row justify-center">
-          <Link href={"/sign-in" as Href}>
+          <Link href={"/sign-in" as Href} accessibilityRole="link" accessibilityLabel="Already have an account? Sign in">
             <Text className="text-gray-500">Already have an account? </Text>
             <Text className="font-semibold text-emerald-600">Sign in</Text>
           </Link>

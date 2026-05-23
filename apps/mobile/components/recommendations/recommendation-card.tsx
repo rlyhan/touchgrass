@@ -65,7 +65,7 @@ export function RecommendationCard({
         )}
       </View>
 
-      <View className="flex-row flex-wrap gap-x-6 gap-y-2 px-4 py-3">
+      <View className="flex-row flex-wrap gap-3 px-4 py-3">
         <View className="flex-row items-center gap-2">
           <TypeIcon size={16} color="#4b5563" />
           <Text className="text-sm text-gray-600">{type}</Text>

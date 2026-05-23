@@ -13,6 +13,7 @@ export function PrimaryButton({ label, onPress, disabled }: Props) {
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ disabled: !!disabled }}
       className={`h-14 items-center justify-center rounded-2xl ${
         disabled ? "bg-gray-200" : "bg-emerald-500 active:bg-emerald-600"
       }`}

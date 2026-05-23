@@ -27,7 +27,7 @@ const BFAS_GROUPS: TraitGroup[] = BFAS_TRAITS.reduce<TraitGroup[]>(
 export default function PersonalityScreen() {
   const { control } = useOnboardingForm()
 
-  const goNext = () => router.push("/onboarding/motivation" as Href)
+  function goNext() { router.push("/onboarding/motivation" as Href) }
 
   return (
     <OnboardingScreenShell

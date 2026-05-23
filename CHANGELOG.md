@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-05-23 — Refactor: Toggle Utility, Async Data Hook
+
+**Mobile (`apps/mobile`)**
+
+- Extracted a shared `toggleItem<T>` utility to replace duplicated include/filter array logic in the interests and motivation onboarding screens.
+- Extracted a `useAsyncData<T>` hook encapsulating the `status / data / useEffect` fetch pattern, replacing the manual state management in the recommendations screen.
+
+## 2026-05-22 — Fix: Accessibility and Display Polish
+
+**Mobile (`apps/mobile`)**
+
+- `TextField` now forwards its `label` prop as `accessibilityLabel` on the underlying `TextInput`, so VoiceOver/TalkBack announces the field name instead of the generic "text field".
+- `OptionCard` `accessibilityRole` corrected from `radio` to `checkbox` — the component is used in multi-select contexts and was misreporting single-select semantics to assistive tech.
+- `PrimaryButton` now explicitly sets `accessibilityState={{ disabled }}`, making the disabled state reliable across platforms and test frameworks.
+- `SkipButton` and auth-flow `Link` components (`Sign in`, `Create an account`) now carry `accessibilityRole` and `accessibilityLabel`.
+- Back button on the activity detail screen increased from 40×40 pt to 44×44 pt (Apple HIG / Material minimum). Sign-out `Pressable` targets gained `py-3` padding for the same reason.
+- Activity detail header gets `elevation: 4` on Android so it correctly occludes `ScrollView` content that scrolls beneath it (`zIndex` alone has no effect without an elevation stacking context on Android).
+- Recommendation card metadata row changed from `gap-x-6 gap-y-2` to `gap-3` — axis-specific gap utilities are not reliably supported on `flex-wrap` rows in NativeWind v4.
+- `API_BASE_URL` extracted into `lib/config.ts` and imported by `lib/auth/client`, `lib/onboarding/api`, and `lib/recommendations/api`, removing three copies of the same env-var fallback expression.
+
 ## 2026-05-22 — Refactor: Centralize Error Handling, DRY Rate-Limiter Setup
 
 Cleanup pass on the backend-audit fixes below. With the global

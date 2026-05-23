@@ -30,7 +30,7 @@ export default function ActivityDetailPage() {
     slug ? (cached ? "ready" : "loading") : "not-found",
   )
 
-  const handleBack = () => {
+  function handleBack() {
     if (router.canGoBack()) router.back()
     else router.replace("/recommendations" as Href)
   }
@@ -87,10 +87,10 @@ export default function ActivityDetailPage() {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       {/* Header with back button */}
-      <View className="z-10 bg-white/80 px-4 py-3">
+      <View className="z-10 bg-white/80 px-4 py-3" style={{ elevation: 4 }}>
         <Pressable
           onPress={handleBack}
-          className="h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white"
+          className="h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white"
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
@@ -145,7 +145,7 @@ export default function ActivityDetailPage() {
             </Text>
             {activity.instructions.map((step, idx) => (
               <View
-                key={idx}
+                key={`${idx}-${step.title}`}
                 className="mb-4 flex-row items-start"
               >
                 <View className="mr-3 h-7 w-7 items-center justify-center rounded-full bg-emerald-500">

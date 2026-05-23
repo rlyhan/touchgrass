@@ -8,14 +8,15 @@ import { Chip, ChipGroup } from "@/components/ui/chip"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { getFieldIcon } from "@/lib/icons"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { toggleItem } from "@/lib/toggle-item"
 import { ACTIVITY_FIELDS } from "@touchgrass/types/constants"
 import type { ActivityField } from "@touchgrass/types"
 
 export default function InterestsScreen() {
   const { control, setValue } = useOnboardingForm()
 
-  const goNext = () => router.push("/onboarding/personality" as Href)
-  const skip = () => {
+  function goNext() { router.push("/onboarding/personality" as Href) }
+  function skip() {
     setValue("interests", [])
     goNext()
   }
@@ -37,13 +38,6 @@ export default function InterestsScreen() {
         control={control}
         name="interests"
         render={({ field: { value, onChange } }) => {
-          const toggle = (field: ActivityField) => {
-            const next = value.includes(field)
-              ? value.filter((f) => f !== field)
-              : [...value, field]
-            onChange(next)
-          }
-
           return (
             <ChipGroup>
               {ACTIVITY_FIELDS.map((field) => (
@@ -52,7 +46,7 @@ export default function InterestsScreen() {
                   label={field}
                   icon={getFieldIcon(field)}
                   selected={value.includes(field)}
-                  onPress={() => toggle(field)}
+                  onPress={() => onChange(toggleItem(value, field))}
                 />
               ))}
             </ChipGroup>
