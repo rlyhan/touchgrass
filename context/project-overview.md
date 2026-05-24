@@ -8,16 +8,26 @@ The core idea is: Help users who are thinking "I want to try something new, but 
 
 ## Core Features
 
-### Profile 
+### Profile
 
-Users define key aspects of themselves, including:
+The onboarding flow collects the following user data (see [`apps/mobile/app/onboarding/`](../apps/mobile/app/onboarding/) and the `profiles` table in [`packages/core/src/db/schema.ts`](../packages/core/src/db/schema.ts)):
 
-- Interests (e.g. music, fitness, creative arts)
-- Personality style (introverted, extroverted, introspective, etc.)
-- Budget level (low, medium, high)
-- Social preference (solo, small group, social)
-- Energy level (relaxed, focused, active)
-- Location context (indoor, outdoor, local, online)
+- Name
+- Birthdate
+- Height (cm)
+- Gender — `Male`, `Female`, `Non-binary`, `Prefer not to say`
+- Build — `Slim`, `Athletic`, `Average`, `Heavy`
+- Location — free-text city/country
+- Employment status — `Student`, `Employed`, `Unemployed`, `Retired`
+- Interests — multi-select from `ActivityField` list (Music, Art, Coding, Fitness, etc.)
+- Personality — 10 BFAS aspect scores (0–100), see [recommendation-engine.md](./recommendation-engine.md)
+- Motivations — one or more from a fixed list (e.g. "Explore my creative side", "Learn, think, and expand my mind")
+
+**YET TO IMPLEMENT** on the profile:
+- Budget level (low / medium / high)
+- Social preference (solo / small group / social)
+- Energy level (relaxed / focused / active)
+- Location context (indoor / outdoor / local / online)
 
 ### Recommendation Engine
 
@@ -28,86 +38,114 @@ The app generates personalised activity suggestions such as:
 - Write a short horror screenplay
 - Go to a local open mic night
 
-Each recommendation includes:
+The scoring algorithm uses BFAS personality scores, motivations, and interests to rank activities. See [recommendation-engine.md](./recommendation-engine.md) for the full algorithm.
+
+Each activity currently includes:
 
 - Title
-- Type - what hobby this is (eg. creative, outdoorsy, intellectual, etc.)
-- Role - what kind of unspecific role/profession this relates to (eg. artist, builder, scholar, etc. but NOTHING SPECIFIC like musician, plumber, etc.)
-- AI-generated summary of why it fits the user
-- Practical constraints (budget, difficulty, time)
-- Optional tags for filtering and scoring
+- Slug (URL-friendly identifier)
+- Image
+- Type — primary `ActivityType` describing the activity's purpose (e.g. `Creative`, `Physical`, `Reflective`)
+- Related Types — additional `ActivityType`s the activity also expresses
+- Field — the domain/hobby area (e.g. `Music`, `Coding`, `Hiking`) — used for interest matching
+- Estimated time (free-text)
+- Description (Portable Text / rich text from Sanity)
+- Tips (optional, max 3)
+- Instructions (optional, ordered steps)
+
+**YET TO IMPLEMENT** on activities:
+- Practical constraints — budget level, difficulty, energy type, social level, location type
+- Cost range (min/max)
 
 ### Activity Exploration
 
-Users can:
+Users can currently:
 
-- Browse suggestions
+- Browse personalised suggestions on the recommendations screen
+- Open an activity to view its description, tips, and instructions
+
+**YET TO IMPLEMENT**:
 - Save interesting activities
 - Dismiss irrelevant ones
 - Request alternative suggestions
 
-### Feedback Loop
+### Feedback Loop — **YET TO IMPLEMENT**
 
-The system will learn from user behaviour:
+The system will eventually learn from user behaviour to improve future suggestions:
 
 - liked / disliked suggestions
 - completed activities
 - skipped recommendations
 
-This improves future suggestions.
+No feedback capture or learning is currently wired up.
 
 ## Schema (TypeScript)
 
-```
-export type Recommendation = {
-  id: string;
+Actual shape from [`packages/types/index.ts`](../packages/types/index.ts):
 
+```ts
+export type Activity = {
+  slug: string;
   title: string;
-  description?: string;
+  imageUrl: string;
 
-  category: string;
+  type: ActivityType;
+  related_types?: ActivityType[];
+  field: ActivityField;
 
-  tags: string[];
+  estimated_time: string;
 
-  reason?: string;
+  description?: PortableTextBlock[];
+  tips?: ActivityTip[];           // { key: string; description: string }
+  instructions?: ActivityInstruction[]; // { title: string; description?: string }
 
-  budget_level: "low" | "medium" | "high";
-  social_level: "solo" | "small_group" | "social";
-  energy_type: "relaxed" | "focused" | "active";
-
-  difficulty: "easy" | "medium" | "hard";
-
-  location_type: "indoor" | "outdoor" | "online" | "local";
-
-  estimated_time?: string;
-
-  cost_min?: number;
-  cost_max?: number;
-
-  image_url?: string;
-
-  created_at?: string;
+  // YET TO IMPLEMENT
+  // budget_level?: "low" | "medium" | "high";
+  // social_level?: "solo" | "small_group" | "social";
+  // energy_type?: "relaxed" | "focused" | "active";
+  // difficulty?: "easy" | "medium" | "hard";
+  // location_type?: "indoor" | "outdoor" | "online" | "local";
+  // cost_min?: number;
+  // cost_max?: number;
 };
 ```
 
 ## Example Data
 
-```
+Reflects the current Sanity `activity` schema in [`apps/sanity/schemaTypes/activity.ts`](../apps/sanity/schemaTypes/activity.ts):
+
+```json
 {
   "slug": "build-a-guitar-pedalboard",
   "title": "Build a Guitar Pedalboard",
-  "description": "Design and assemble a custom effects pedalboard for your guitar setup.",
-  "category": "Music",
-  "tags": ["music", "creative", "hands-on", "solo"],
-  "reason": "You enjoy music deeply and tend to focus on creative, detail-oriented projects.",
-  "budget_level": "medium",
-  "social_level": "solo",
-  "energy_type": "focused",
-  "difficulty": "medium",
-  "location_type": "indoor",
+  "imageUrl": "https://example.com/pedalboard.jpg",
+  "type": "Constructive",
+  "related_types": ["Creative", "Skill-based"],
+  "field": "Music",
   "estimated_time": "One weekend",
-  "cost_min": 100,
-  "cost_max": 400,
-  "image_url": "https://example.com/pedalboard.jpg"
+  "description": [
+    {
+      "_type": "block",
+      "children": [
+        { "_type": "span", "text": "Design and assemble a custom effects pedalboard for your guitar setup." }
+      ]
+    }
+  ],
+  "tips": [
+    { "key": "abc12345", "description": "Start with a small board — you can always upgrade later." }
+  ],
+  "instructions": [
+    { "title": "Plan your signal chain", "description": "Sketch the order of pedals before buying anything." },
+    { "title": "Pick a board size", "description": "Measure your pedals and leave room for cables." }
+  ]
+
+  // YET TO IMPLEMENT
+  // "budget_level": "medium",
+  // "social_level": "solo",
+  // "energy_type": "focused",
+  // "difficulty": "medium",
+  // "location_type": "indoor",
+  // "cost_min": 100,
+  // "cost_max": 400
 }
 ```

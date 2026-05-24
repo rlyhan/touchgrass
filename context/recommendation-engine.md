@@ -103,7 +103,8 @@ Each pattern type belongs to a group that intersects two OCEAN traits, with a hi
 
 ## Outputs
 
-- 3 recommendations that are the best match based on an algorithm that checks against scores from personality inputs
+- `getRecommendations` returns the top 3 best-match recommendations (`ScoredRecommendation[]`) after scoring and diversification.
+- `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity (`ScoredActivityType[]`), independent of any specific recommendation list.
 
 ---
 
@@ -125,7 +126,7 @@ Done by `getOCEANScores`.
 
 ### 2. Compute the user's pattern strengths
 
-A **pattern type** is a combination of two OCEAN traits at high/low levels (e.g. `1-HH` = high Extraversion + high Agreeableness). There are 10 trait pairs × 4 H/L combinations = 40 pattern types, declared in `patternTypes`.
+A **pattern type** is a combination of two OCEAN traits at high/low levels (e.g. `1-HH` = high Extraversion + high Agreeableness). There are 10 trait pairs × 4 H/L combinations = 40 pattern types, declared in `PATTERN_TYPES`.
 
 For each pattern, we compute how strongly the user fits it:
 
@@ -138,11 +139,11 @@ Result: `Record<PatternTypeId, number>` where each value is in `[0, 1]`. Done by
 
 ### 3. Score each recommendation
 
-Every recommendation has a primary `type` (an `ActivityType`) and optional `related_types`. The map `ActivityTypePatterns` associates each `ActivityType` with the pattern types that best express it (typically 3 per activity type).
+Every recommendation has a primary `type` (an `ActivityType`) and optional `related_types`. The map `ACTIVITY_TYPE_PATTERNS` associates each `ActivityType` with the pattern types that best express it (typically 3 per activity type).
 
 For each recommendation:
 
-1. **Primary affinity** — look up `ActivityTypePatterns[recommendation.type]` and average the user's pattern strengths across those pattern IDs.
+1. **Primary affinity** — look up `ACTIVITY_TYPE_PATTERNS[recommendation.type]` and average the user's pattern strengths across those pattern IDs.
 2. **Secondary affinity** — flatten the pattern IDs from every entry in `related_types` and average the user's strengths across that combined list.
 3. **Base score** —
    - if there are no secondary patterns: `base = primary`
@@ -187,10 +188,6 @@ The +0.1 boost is applied only to `sortScore` (used for ordering) — the origin
 - **Pass 2 — Activity-type diversification** (always runs): walk the remaining high-sortScore pool (Top ∪ Middle with `sortScore ≥ 0.6`) and pick the first recommendation for each previously-unseen activity type.
 
 Remaining recommendations are appended in bucket order (Top → Middle → Bottom), sorted by `sortScore` descending within each bucket. The final list is stripped back to `ScoredRecommendation[]` (bucket metadata discarded).
-
-### Inputs not yet wired in
-
-- **Human-curated `patternTypes`** on each recommendation — the field exists but the algorithm currently only reads from `ActivityTypePatterns` via `type` / `related_types`.
 
 ---
 
