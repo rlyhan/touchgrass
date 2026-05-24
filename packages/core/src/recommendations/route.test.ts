@@ -5,7 +5,12 @@ import { after, before, beforeEach, mock, test } from "node:test"
 
 import type { Request } from "express"
 
-import type { Activity } from "@touchgrass/types"
+import type {
+  Activity,
+  PatternTypeId,
+  RecommendationsResponse,
+} from "@touchgrass/types"
+import { PATTERN_TYPES } from "@touchgrass/types/constants"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
 import { createApp } from "../app.js"
@@ -87,7 +92,7 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
   const res = await fetch(`${baseUrl}/recommendations`)
 
   assert.equal(res.status, 200)
-  const body = (await res.json()) as { recommendations: Activity[] }
+  const body = (await res.json()) as RecommendationsResponse
   assert.ok(Array.isArray(body.recommendations))
   assert.ok(body.recommendations.length > 0)
   for (const rec of body.recommendations) {
@@ -97,6 +102,33 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
 
   assert.equal(getProfileByAuthUserId.mock.callCount(), 1)
   assert.equal(getProfileByAuthUserId.mock.calls[0]?.arguments[0], AUTH_USER_ID)
+})
+
+test("GET /recommendations includes a dominantPatternId on every recommendation", async () => {
+  const res = await fetch(`${baseUrl}/recommendations`)
+  const body = (await res.json()) as RecommendationsResponse
+
+  const validIds = new Set<PatternTypeId>(PATTERN_TYPES.map((p) => p.id))
+  for (const rec of body.recommendations) {
+    assert.ok(
+      rec.dominantPatternId === null || validIds.has(rec.dominantPatternId),
+      `expected valid pattern id or null, got ${rec.dominantPatternId}`,
+    )
+  }
+})
+
+test("GET /recommendations includes patternWeights for all 40 patterns in [0, 1]", async () => {
+  const res = await fetch(`${baseUrl}/recommendations`)
+  const body = (await res.json()) as RecommendationsResponse
+
+  assert.equal(Object.keys(body.patternWeights).length, 40)
+  for (const pattern of PATTERN_TYPES) {
+    const weight = body.patternWeights[pattern.id]
+    assert.ok(
+      typeof weight === "number" && weight >= 0 && weight <= 1,
+      `expected weight in [0,1] for ${pattern.id}, got ${weight}`,
+    )
+  }
 })
 
 test("GET /recommendations returns 401 when there is no session", async () => {
