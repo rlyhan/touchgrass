@@ -1,5 +1,5 @@
-import type { Activity, PatternTypeId } from "@touchgrass/types"
-import { ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants"
+import type { Activity, PatternTypeId } from "./index.js"
+import { ACTIVITY_TYPE_PATTERNS } from "./constants.js"
 
 // Minimum user weight required to claim the user "scored highly" for a pattern.
 // Below this, dominant-pattern resolution returns null so the UI hides the match

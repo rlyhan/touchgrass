@@ -3,7 +3,7 @@ import { test } from "node:test"
 
 import type { Activity, PatternTypeId } from "@touchgrass/types"
 
-import { MIN_DOMINANT_WEIGHT, getDominantPatternId } from "./dominant-pattern.js"
+import { MIN_DOMINANT_WEIGHT, getDominantPatternId } from "@touchgrass/types/dominant-pattern"
 
 const weights = (overrides: Partial<Record<PatternTypeId, number>>) =>
   overrides as Record<PatternTypeId, number>
