@@ -1,7 +1,11 @@
-import type { Activity } from "@touchgrass/types"
+import type { Activity, RecommendationsResponse } from "@touchgrass/types"
 
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
+import {
+  setCachedDominantPattern,
+  setCachedPatternWeights,
+} from "@/lib/patterns/cache"
 
 const activityCache = new Map<string, Activity>()
 
@@ -27,9 +31,15 @@ export async function fetchRecommendations(): Promise<Activity[]> {
     throw new Error(`Failed to fetch recommendations (${response.status})`)
   }
 
-  const body = (await response.json()) as { recommendations: Activity[] }
+  const body = (await response.json()) as RecommendationsResponse
+  if (body.patternWeights) {
+    setCachedPatternWeights(body.patternWeights)
+  }
   const activities = body.recommendations ?? []
-  activities.forEach((a) => activityCache.set(a.slug, a))
+  activities.forEach((rec) => {
+    activityCache.set(rec.slug, rec)
+    setCachedDominantPattern(rec.slug, rec.dominantPatternId ?? null)
+  })
   return activities
 }
 
