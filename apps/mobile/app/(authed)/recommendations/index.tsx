@@ -71,7 +71,7 @@ export default function RecommendationsPage() {
           {status === "loading" ? (
             <ActivityIndicator
               size="large"
-              color="#10b981"
+              color="#E0AE85"
               className="mt-10"
             />
           ) : (
@@ -85,11 +85,11 @@ export default function RecommendationsPage() {
               <Pressable
                 onPress={handleSignOut}
                 disabled={signingOut}
-                className="mt-6 py-3"
+                className="mt-6 rounded-full border border-gray-300 px-5 py-2"
                 accessibilityRole="button"
                 accessibilityLabel="Sign out"
               >
-                <Text className="text-sm font-medium text-gray-500">
+                <Text className="text-sm font-medium text-gray-700">
                   {signingOut ? "Signing out..." : "Sign out"}
                 </Text>
               </Pressable>
@@ -108,27 +108,27 @@ export default function RecommendationsPage() {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={5}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 32, paddingBottom: 32 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 32 }}
         ListHeaderComponent={
           <>
             <View className="items-center">
               <GrassLogo />
             </View>
-            <Text className="mb-6 mt-8 text-3xl font-bold tracking-tight text-gray-900">
+            <Text className="mb-8 mt-12 text-3xl font-bold tracking-tight text-gray-900">
               You might be great at...
             </Text>
           </>
         }
         ListFooterComponent={
-          <View className="mt-10 items-center">
+          <View className="mt-12 items-center">
             <Pressable
               onPress={handleSignOut}
               disabled={signingOut}
-              className="py-3"
+              className="rounded-full border border-gray-300 px-5 py-2"
               accessibilityRole="button"
               accessibilityLabel="Sign out"
             >
-              <Text className="text-sm font-medium text-gray-500">
+              <Text className="text-sm font-medium text-gray-700">
                 {signingOut ? "Signing out..." : "Sign out"}
               </Text>
             </Pressable>

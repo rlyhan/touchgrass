@@ -112,8 +112,8 @@ export default function ActivityDetailPage() {
         />
 
         {activity.description && activity.description.length > 0 ? (
-          <View className="mt-6">
-            <Text className="mb-3 text-lg font-semibold text-gray-900">
+          <View className="mt-10">
+            <Text className="mb-4 text-2xl font-semibold text-gray-900">
               About this activity
             </Text>
             <PortableText blocks={activity.description} />
@@ -121,7 +121,7 @@ export default function ActivityDetailPage() {
         ) : null}
 
         {activity.tips && activity.tips.length > 0 ? (
-          <View className="mt-6 gap-3">
+          <View className="mt-10 gap-3">
             {activity.tips.map((tip) => (
               <View
                 key={tip.key}
@@ -139,22 +139,22 @@ export default function ActivityDetailPage() {
         ) : null}
 
         {activity.instructions && activity.instructions.length > 0 ? (
-          <View className="mt-6">
-            <Text className="mb-3 text-lg font-semibold text-gray-900">
+          <View className="mt-10">
+            <Text className="mb-5 text-2xl font-semibold text-gray-900">
               Instructions
             </Text>
             {activity.instructions.map((step, idx) => (
               <View
                 key={`${idx}-${step.title}`}
-                className="mb-4 flex-row items-start"
+                className="mb-5 flex-row items-start"
               >
-                <View className="mr-3 h-7 w-7 items-center justify-center rounded-full bg-emerald-500">
-                  <Text className="text-sm font-semibold text-white">
+                <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-emerald-500">
+                  <Text className="text-base font-semibold text-white">
                     {idx + 1}
                   </Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="mb-1 text-base font-semibold text-gray-900">
+                  <Text className="mb-1 text-xl font-semibold text-gray-900">
                     {step.title}
                   </Text>
                   {step.description ? (

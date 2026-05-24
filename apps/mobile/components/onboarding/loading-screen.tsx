@@ -21,7 +21,7 @@ export function OnboardingLoadingView({ status, onRetry, errorMessage }: Props) 
           <>
             <ActivityIndicator
               size="large"
-              color="#10b981"
+              color="#E0AE85"
               className="mt-10"
             />
             <Text className="mt-8 text-center text-xl font-semibold text-gray-900">
