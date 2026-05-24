@@ -6,11 +6,12 @@ After successful sign-in on iPhone Safari, the authed layout saw a null session 
 
 ### Infra (`vercel.json`)
 
-- Added Vercel rewrites that transparently proxy `/api/*`, `/profiles`, `/recommendations`, `/activities/:slug`, and `/health` from the Vercel domain to the Render API. The browser now talks only to `touchgrass-mobile.vercel.app`, so the `Set-Cookie` returned by better-auth is scoped to the Vercel origin and treated as first-party by Safari. Render still hosts the backend unchanged; the proxy is purely a same-origin shim for the web client.
+- Added a Vercel rewrite that transparently proxies `/_api/*` from the Vercel domain to the Render API server-side (`/_api/api/auth/sign-in` → `https://touchgrass-api-81dp.onrender.com/api/auth/sign-in`, etc). The browser now talks only to `touchgrass-mobile.vercel.app`, so the `Set-Cookie` returned by better-auth is scoped to the Vercel origin and treated as first-party by Safari. Render still hosts the backend unchanged; the proxy is purely a same-origin shim for the web client.
+- Chose `/_api` (rather than proxying bare paths like `/recommendations` directly) because `app.json` sets `"web": { "output": "static" }`, so Expo Router emits a static HTML file per route. Vercel checks the filesystem before rewrites, and the static `recommendations.html` would otherwise win — making `fetch("/recommendations")` return HTML and break the recommendations screen. `/_api/*` does not collide with any Expo route.
 
 ### Mobile (`apps/mobile`)
 
-- Updated `EXPO_PUBLIC_API_BASE_URL` in `.env.production` from the Render URL to `https://touchgrass-mobile.vercel.app` so the web JS bundle calls the proxy. EAS native builds still inject the Render URL directly via `eas.json` — native has no ITP constraint and is unaffected. Local dev is also unaffected because `.env.production` only loads when `NODE_ENV=production`.
+- Updated `EXPO_PUBLIC_API_BASE_URL` in `.env.production` from the Render URL to `https://touchgrass-mobile.vercel.app/_api` so the web JS bundle hits the proxy prefix. EAS native builds still inject the Render URL directly via `eas.json` — native has no ITP constraint and is unaffected. Local dev is also unaffected because `.env.production` only loads when `NODE_ENV=production`.
 
 ## [1.0.5] - 2026-05-24 — Fix: Sanity-Only Activities Returning 404
 
