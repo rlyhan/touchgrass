@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0] - 2026-05-24 — Fix: RecommendationCard Shadow Missing on Web
+
+The card shadow was applied with `Platform.select`, whose `default` branch (web) returned an empty object. On desktop browsers the cards rendered flat with no depth.
+
+### Mobile (`apps/mobile`)
+
+- Populated the `default` branch of `Platform.select` in `RecommendationCard` with a CSS `boxShadow` property (`0px 4px 8px rgba(0,0,0,0.12)`), which React Native Web applies as a native CSS box shadow. iOS and Android shadow behaviour is unchanged.
+
 ## 2026-05-24 — Fix: Correct API Base URL in EAS Build Profiles
 
 The `preview` and `production` build profiles in `eas.json` pointed at `https://touchgrass-api.onrender.com`, but the actual deployed API is `https://touchgrass-api-81dp.onrender.com`. Internal distribution builds would have hit a dead host.

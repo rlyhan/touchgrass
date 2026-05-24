@@ -20,7 +20,7 @@ const cardShadow = Platform.select({
     shadowRadius: 8,
   },
   android: { elevation: 3 },
-  default: {},
+  default: { boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.12)" } as object,
 })
 
 interface RecommendationCardProps {
