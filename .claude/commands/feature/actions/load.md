@@ -1,9 +1,19 @@
 # Load Action
 
-1. Open current-feature.md and read the summary
+1. Open `@context/current-feature.md`
 
-2. Update current-feature.md:
-   - Write requirements as bullet points under ## Requirements
-   - Write any additional notes/context under ## Notes
+2. Define or update:
+   - `# Feature Name`
+   - `## Parent Branch` (optional)
+   - `## Summary`
+   - `## Requirements`
+   - `## Notes`
 
-3. Confirm spec loaded and show the feature summary
+3. Convert the summary into actionable implementation requirements.
+
+4. Preserve existing parent-branch context unless intentionally changing it.
+
+5. Confirm the feature has been loaded and summarize:
+   - feature name,
+   - parent branch (if any),
+   - core requirements.

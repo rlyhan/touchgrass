@@ -8,9 +8,12 @@ A mobile application to help users discover new hobbies, activities, and experie
 
 Read the following to get full project context before making changes:
 
-* context/project-overview.md
-* context/workflow.md
 * context/current-feature.md
+* context/conding-standards.md
+* context/documentation.md
+* context/project-overview.md
+* context/recommendation-engine.md
+* context/workflow.md
 
 Always read context files before implementing features.
 
@@ -93,17 +96,45 @@ npm run lint
 
 ## Stack
 
+### Mobile (`apps/mobile`)
+
 * React Native
 * Expo (SDK 54)
 * Expo Router (file-based routing)
 * TypeScript
 * NativeWind v4 (TailwindCSS for React Native)
 * react-native-svg
-* lucide-react-native (icons)
-* expo-image, expo-linear-gradient
-* react-native-safe-area-context
+* react-native-gesture-handler
+* react-native-screens
 * react-native-reanimated
+* react-native-safe-area-context
+* lucide-react-native, @expo/vector-icons (icons)
+* expo-image, expo-linear-gradient
+* expo-haptics, expo-secure-store, expo-network
+* @react-native-async-storage/async-storage
+* @react-native-community/slider
+* @react-navigation/native, bottom-tabs, elements (used alongside Expo Router for tab nav)
+* better-auth + @better-auth/expo (auth)
+* react-hook-form (forms)
+* Storybook (`@storybook/react-native`) — component development
+* Jest / jest-expo — testing
 * ESLint
+
+### Backend (`packages/core`)
+
+* Node.js + Express v5
+* TypeScript (tsx runner)
+* Better Auth — auth framework
+* Drizzle ORM + drizzle-kit — ORM and migrations
+* Neon (`@neondatabase/serverless`) — PostgreSQL
+* Zod — request validation
+* express-rate-limit
+* @sanity/client — Sanity content queries
+
+### CMS (`apps/sanity`)
+
+* Sanity v5 + Sanity Studio
+* @sanity/vision (GROQ query explorer)
 
 ---
 

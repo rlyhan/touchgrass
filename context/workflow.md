@@ -1,25 +1,59 @@
 ## Workflow
 
-This is the common workflow that we will use for every single feature/fix:
+This is the standard workflow for every feature, fix, refactor, or infrastructure change.
 
-1. **Document** - Document the current feature in @context/current-feature.md, replacing what was originally there
-2. **Branch** - Create new branch for feature, fix, etc, from main or a parent branch if listed in current-feature.md
-3. **Implement** - Implement the feature/fix that I created in @context/current-feature.md
-4. **Test** - Verify it works in the browser. Run `npm run build` and fix any errors
-5. **Iterate** - Iterate and change things if needed
-6. **Log** If build passes and everything works, update CHANGELOG.md with the completed feature/fix
-7. **Commit** - Only after build passes and everything works
-8. **Merge** - Merge to parent branch or main
-9. **Delete Branch** - Delete branch after merge
-10. **Review** - Review AI-generated code periodically and on demand.
+1. **Branch**
+   - Create a new branch from `main` or the parent branch listed in `@context/current-feature.md`.
+   - Use descriptive branch names:
+     - `feature/[feature-name]`
+     - `fix/[fix-name]`
+     - `refactor/[refactor-name]`
+     - `chore/[task-name]`
 
-## Branching
+2. **Document**
+   - Define the feature/fix in `@context/current-feature.md`.
+   - Convert requirements into actionable implementation tasks before coding.
 
-We will create a new branch for every feature/fix. Name branch **feature/[feature]** or **fix[fix]**, etc. Ask to delete the branch once merged.
+3. **Sync**
+   - Pull/rebase the latest parent or `main` branch before implementation.
+
+4. **Implement**
+   - Implement requirements incrementally.
+   - Prefer one commit per meaningful change, especially for large features.
+   - Keep commits focused and scoped to a single concern.
+
+5. **Review**
+   - Continuously review AI-generated code for:
+     - correctness,
+     - readability,
+     - architectural consistency,
+     - unintended side effects,
+     - duplication or unnecessary complexity.
+
+6. **Test**
+   - Verify functionality manually.
+   - Run relevant validation commands (`npm run build`, tests, lint, typecheck, etc).
+   - Resolve all errors before merge.
+
+7. **Refine**
+   - Refactor or simplify implementation if architectural drift, duplication, or unnecessary complexity emerged during development.
+
+8. **Log**
+   - Once the feature/fix is complete and there is no parent branch:
+     - Update `CHANGELOG.md` using the documented format
+     - Update `package.json` and lockfile versions following semantic versioning rules
+     - Clear `@context/current-feature.md`
+
+9. **Merge**
+   - Merge into the parent branch or `main`.
+
+10. **Delete Branch**
+   - Delete the branch after merge.
+
 
 ## Commits
 
-- Ask before committing (don't auto-commit)
-- Use conventional commit messages (feat:, fix:, chore:, etc.)
-- Keep commits focused (one feature/fix per commit)
-- Never put "Generated With Claude" in the commit messages
+- Ask before committing (never auto-commit).
+- Use conventional commit messages (`feat:`, `fix:`, `refactor:`, `chore:`, etc).
+- Keep commits focused and atomic.
+- Never include AI attribution in commit messages (e.g. "Generated with Claude").

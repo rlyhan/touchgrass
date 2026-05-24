@@ -1,40 +1,37 @@
 ---
 name: feature
-description: Manage current feature workflow - start, review, explain or complete
-argument-hint: load|load-sub|start|start-sub|review|explain|complete|complete-sub
+description: Manage the feature workflow from specification to merge
+argument-hint: load|start|review|explain|complete
 ---
 
 # Feature Workflow
 
-Manages the full lifecycle of a feature from spec to merge.
+Manages the full lifecycle of a feature, fix, refactor, or infrastructure task.
 
 ## Working File
 
 @context/current-feature.md
 
-### File Structure
+## File Structure
 
-current-feature.md has these sections:
+`current-feature.md` contains:
 
-- `## Summary` - Summary of what the feature entails
-- `## Requirements` - Bullet points of specific goals the feature must achieve
-- `## Notes` - Additional context, constraints, or details from summary
+- `# Feature Name` — Human-readable feature/fix title
+- `## Parent Branch` — Optional parent branch for stacked feature development
+- `## Summary` — Overview of the feature/fix
+- `## Requirements` — Specific implementation goals
+- `## Notes` — Additional context, constraints, or architectural notes
 
-## Task
-
-Execute the requested action: $ARGUMENTS
+## Actions
 
 | Action | Description |
-|--------|-------------|
-| `load` | Define feature requirements and notes in current-feature.md |
-| `load-sub` | Define subfeature requirements, log parent branch context |
-| `start` | Create feature branch and begin implementation |
-| `start-sub` | Validate or create parent branch, create child branch, begin implementation |
-| `review` | Check goals met, code quality |
-| `explain` | Document what changed and why |
-| `complete` | Commit, push, merge to main, reset current-feature.md |
-| `complete-sub` | Commit, push, merge to parent branch, restore parent feature context |
+|---|---|
+| `load` | Define or update the current feature requirements |
+| `start` | Create/switch to the feature branch and begin implementation |
+| `review` | Review implementation quality and requirement completion |
+| `explain` | Summarize what changed and why |
+| `complete` | Finalize, merge, version, changelog, and reset workflow state |
 
-See [actions/](actions/) for detailed instructions.
+See `actions/` for detailed action instructions.
 
-If no action provided, explain the available options.
+If no action is provided, explain the available actions.

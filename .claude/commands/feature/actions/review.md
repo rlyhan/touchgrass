@@ -1,10 +1,21 @@
 # Review Action
 
-1. Read current-feature.md to understand the requirements
-2. Review all code changes made for this feature
-3. Check for:
-   - ✅ Requirements met
-   - ❌ Requirements missing or incomplete
-   - ⚠️ Code quality issues or bugs
-   - 🚫 Scope creep (code beyond requirements)
-4. Final verdict: Ready to complete or needs changes
+1. Review the implementation against all requirements in `current-feature.md`.
+
+2. Check for:
+   - correctness,
+   - architectural consistency,
+   - unnecessary complexity,
+   - duplication,
+   - readability,
+   - unintended side effects.
+
+3. Verify:
+   - manual functionality testing,
+   - build/lint/typecheck/test status,
+   - changelog/versioning readiness if feature completion is near.
+
+4. Summarize:
+   - completed requirements,
+   - issues found,
+   - recommended refinements.
