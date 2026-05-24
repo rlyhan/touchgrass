@@ -2,6 +2,7 @@ import { Redirect, type Href } from "expo-router"
 import { ActivityIndicator, View } from "react-native"
 
 import { useSession } from "@/lib/auth/client"
+import { colors } from "@/lib/theme/colors"
 
 export default function Index() {
   const { data: session, isPending } = useSession()
@@ -9,7 +10,7 @@ export default function Index() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator color="#10b981" />
+        <ActivityIndicator color={colors.emerald[500]} />
       </View>
     )
   }

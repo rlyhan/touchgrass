@@ -17,6 +17,7 @@ import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
+import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
@@ -64,7 +65,7 @@ export default function ActivityDetailPage() {
     return (
       <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#10b981" />
+          <ActivityIndicator size="large" color={colors.emerald[500]} />
         </View>
       </SafeAreaView>
     )
@@ -94,7 +95,7 @@ export default function ActivityDetailPage() {
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <ArrowLeft size={20} color="#111827" />
+          <ArrowLeft size={20} color={colors.gray[900]} />
         </Pressable>
       </View>
 
@@ -126,9 +127,9 @@ export default function ActivityDetailPage() {
               <View
                 key={tip.key}
                 className="flex-row items-start rounded-2xl p-4"
-                style={{ backgroundColor: "#FFF3E0" }}
+                style={{ backgroundColor: colors.warm.bg }}
               >
-                <Lightbulb size={18} color="#C2692A" style={{ marginTop: 2, marginRight: 10 }} />
+                <Lightbulb size={18} color={colors.warm.accent} style={{ marginTop: 2, marginRight: 10 }} />
                 <Text className="flex-1 leading-relaxed text-gray-800">
                   <Text className="font-semibold text-gray-900">Tip: </Text>
                   {tip.description}

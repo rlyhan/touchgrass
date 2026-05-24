@@ -1,6 +1,8 @@
 import RNSlider from "@react-native-community/slider"
 import { Text, View } from "react-native"
 
+import { colors } from "@/lib/theme/colors"
+
 type Props = {
   value: number
   onChange: (value: number) => void
@@ -54,9 +56,9 @@ export function Slider({
         step={step}
         value={value}
         onValueChange={onChange}
-        minimumTrackTintColor="#10b981"
-        maximumTrackTintColor="#e5e7eb"
-        thumbTintColor="#10b981"
+        minimumTrackTintColor={colors.emerald[500]}
+        maximumTrackTintColor={colors.gray[200]}
+        thumbTintColor={colors.emerald[500]}
         style={{ width: "100%", height: 36 }}
       />
       {hasAnchors ? (

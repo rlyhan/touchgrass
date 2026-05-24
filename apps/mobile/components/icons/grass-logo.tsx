@@ -1,11 +1,13 @@
 import { Path, Svg } from "react-native-svg"
 
+import { colors } from "@/lib/theme/colors"
+
 type Props = {
   size?: number
   color?: string
 }
 
-export function GrassLogo({ size = 48, color = "#10b981" }: Props) {
+export function GrassLogo({ size = 48, color = colors.emerald[500] }: Props) {
   return (
     <Svg width={size} height={size} viewBox="189 189 520 520">
       <Path

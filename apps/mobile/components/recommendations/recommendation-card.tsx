@@ -8,12 +8,13 @@ import {
   getActivityTypeIcon,
   getFieldIcon,
 } from "@/lib/icons"
+import { colors } from "@/lib/theme/colors"
 
 // iOS clips shadows on a View with `overflow: hidden`, so the shadow needs to
 // live on an outer wrapper while the clipped/rounded content sits inside.
 const cardShadow = Platform.select({
   ios: {
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
@@ -52,7 +53,7 @@ export function RecommendationCard({
           style={isLarge ? { aspectRatio: 4 / 3 } : { height: 160 }}
         >
           {imageError ? (
-            <View style={{ width: "100%", height: "100%", backgroundColor: "#d1fae5" }} />
+            <View style={{ width: "100%", height: "100%", backgroundColor: colors.emerald[100] }} />
           ) : (
             <Image
               source={{ uri: imageUrl }}
@@ -81,16 +82,16 @@ export function RecommendationCard({
 
         <View className="flex-row flex-wrap gap-x-5 gap-y-2 px-4 py-3">
           <View className="flex-row items-center gap-2">
-            <TypeIcon size={16} color="#4b5563" />
+            <TypeIcon size={16} color={colors.gray[600]} />
             <Text className="text-sm text-gray-600">{type}</Text>
           </View>
           <View className="flex-row items-center gap-2">
-            <FieldIcon size={16} color="#4b5563" />
+            <FieldIcon size={16} color={colors.gray[600]} />
             <Text className="text-sm text-gray-600">{field}</Text>
           </View>
           {estimatedTime ? (
             <View className="flex-row items-center gap-2">
-              <TimeIcon size={16} color="#4b5563" />
+              <TimeIcon size={16} color={colors.gray[600]} />
               <Text className="text-sm text-gray-600">{estimatedTime}</Text>
             </View>
           ) : null}

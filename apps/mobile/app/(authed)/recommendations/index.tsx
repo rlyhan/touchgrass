@@ -11,6 +11,7 @@ import {
   fetchRecommendations,
   ProfileNotFoundError,
 } from "@/lib/recommendations/api"
+import { colors } from "@/lib/theme/colors"
 import { useAsyncData } from "@/lib/use-async-data"
 import type { Activity } from "@touchgrass/types"
 
@@ -71,7 +72,7 @@ export default function RecommendationsPage() {
           {status === "loading" ? (
             <ActivityIndicator
               size="large"
-              color="#E0AE85"
+              color={colors.warm.spinner}
               className="mt-10"
             />
           ) : (

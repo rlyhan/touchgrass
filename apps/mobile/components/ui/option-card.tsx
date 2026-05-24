@@ -1,6 +1,8 @@
 import { Pressable, Text, View } from "react-native"
 import { Check } from "lucide-react-native"
 
+import { colors } from "@/lib/theme/colors"
+
 type Props = {
   label: string
   selected: boolean
@@ -27,7 +29,7 @@ export function OptionCard({ label, selected, onPress }: Props) {
             : "border-gray-300 bg-white"
         }`}
       >
-        {selected ? <Check size={14} color="#ffffff" strokeWidth={3} /> : null}
+        {selected ? <Check size={14} color={colors.white} strokeWidth={3} /> : null}
       </View>
       <Text
         className={`flex-1 text-base ${

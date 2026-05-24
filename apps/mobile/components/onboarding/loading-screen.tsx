@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { PrimaryButton } from "@/components/ui/primary-button"
+import { colors } from "@/lib/theme/colors"
 
 export type OnboardingLoadingStatus = "loading" | "error"
 
@@ -21,7 +22,7 @@ export function OnboardingLoadingView({ status, onRetry, errorMessage }: Props) 
           <>
             <ActivityIndicator
               size="large"
-              color="#E0AE85"
+              color={colors.warm.spinner}
               className="mt-10"
             />
             <Text className="mt-8 text-center text-xl font-semibold text-gray-900">

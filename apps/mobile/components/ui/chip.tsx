@@ -1,6 +1,8 @@
 import { Pressable, Text, View } from "react-native"
 import type { LucideIcon } from "lucide-react-native"
 
+import { colors } from "@/lib/theme/colors"
+
 type Props = {
   label: string
   selected: boolean
@@ -22,7 +24,7 @@ export function Chip({ label, selected, onPress, icon: Icon }: Props) {
       }`}
     >
       {Icon ? (
-        <Icon size={16} color={selected ? "#059669" : "#4b5563"} />
+        <Icon size={16} color={selected ? colors.emerald[600] : colors.gray[600]} />
       ) : null}
       <Text
         className={`text-sm font-medium ${
