@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Desktop web: render as a centered mobile-width column */
+@media screen and (min-width: 768px) {
+  html,
+  body {
+    height: 100%;
+    background-color: #e5e7eb;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  #root {
+    max-width: 430px;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.05),
+      0 20px 60px rgba(0, 0, 0, 0.2);
+  }
+}

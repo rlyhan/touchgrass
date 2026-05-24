@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-05-24 — Fix: Constrain Web App to Mobile Width on Desktop
+
+The Vercel-hosted web build rendered full-width on desktop, making it look unstyled. A CSS media query now restricts the layout to a centred 430 px column on viewports ≥ 768 px wide.
+
+**Mobile (`apps/mobile`)**
+
+- **`global.css` desktop media query.** On wide viewports `body` becomes a flex container centred horizontally with an `#e5e7eb` background; `#root` caps at `max-width: 430px` with a soft `box-shadow`. Mobile viewports (< 768 px) are unaffected — the column fills the screen naturally.
+- Verified the media query survives Tailwind/NativeWind compilation and that the Expo Router static export uses `id="root"`, confirming selector correctness.
+
 ## 2026-05-24 — Refactor: Centralise Inline Hex Colours into a Theme Module
 
 Colour values used as JS props (ActivityIndicator `color`, lucide icon `color`, SVG `fill`, inline style `backgroundColor`, etc.) were previously hardcoded hex strings scattered across the mobile app, with the same value (e.g. `#10b981`) duplicated in six files. This pulls them into a single typed source of truth.
