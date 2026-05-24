@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-05-24 — Fix: Post-Deploy UI Polish
+
+Visual cleanup pass on issues observed once the app was running on real devices. The loading spinner blended into the green logo, the RecommendationCard's "hovering" shadow never rendered in Expo Go on iPhone, and the dashboard and activity detail screens needed more deliberate spacing and typographic hierarchy.
+
+**Mobile (`apps/mobile`)**
+
+- **Loading spinner colour changed from emerald-500 to a warm tan (`#E0AE85`).** The previous green matched the logo exactly, so spinner and logo read as a single shape. The new tan sits midway between the Tip background and accent and contrasts cleanly against the green.
+- **`RecommendationCard` iOS shadow restored.** The card had `shadow-sm` on the same `View` as `overflow: hidden`, and iOS clips shadows on clipped views. Split into an outer shadow wrapper + inner clipped/rounded content, and added explicit `shadowColor` / `shadowOffset` / `shadowOpacity` / `shadowRadius` (Android keeps `elevation`). Metadata row spacing bumped from `gap-3` to `gap-x-5 gap-y-2` so each item is visually distinct.
+- **Recommendations dashboard spacing rebalanced.** Logo→heading `mt-8` → `mt-12`, heading→list `mb-6` → `mb-8`, footer `mt-10` → `mt-12`. The "Sign out" link is now a bordered pill (`border-gray-300`, `rounded-full px-5 py-2`) with `gray-700` text — reads as a button without competing with primary CTAs.
+- **Activity detail typography and rhythm.** Section headings (`About this activity`, `Instructions`) `text-lg` → `text-2xl`; individual instruction titles `text-base` → `text-xl`; step number badge `h-7 w-7`/`text-sm` → `h-8 w-8`/`text-base`; inter-section spacing `mt-6` → `mt-10`.
+
 ## 2026-05-23 — Fix: Blank Screen in Expo Go After `eas update`
 
 Every `eas update` build loaded as a blank white screen in Expo Go (worked fine locally). Root cause was a stale Metro cache: `lib/config.ts` had been bundled before `EXPO_PUBLIC_API_BASE_URL` was set, so it still threw at module load — crashing the import chain before any UI mounted. With no `ErrorBoundary` in place the crash was silent.
