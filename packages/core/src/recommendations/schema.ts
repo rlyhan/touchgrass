@@ -34,6 +34,11 @@ export const sanityActivitySchema = z.object({
 
 // Full Activity contract — used to validate Sanity-only documents before they
 // are surfaced to clients (mocks have already been type-checked at build time).
+//
+// Sanity returns `null` for unset fields; Zod's `.optional()` only accepts
+// `undefined`, so we use `.nullish().transform(v => v ?? undefined)` on every
+// optional array field so that null values are coerced to undefined instead of
+// failing validation.
 export const activitySchema: z.ZodType<Activity> = z.object({
   slug: z.string().min(1),
   title: z.string().min(1),
@@ -41,10 +46,20 @@ export const activitySchema: z.ZodType<Activity> = z.object({
   type: z.enum(ACTIVITY_TYPES),
   field: z.enum(ACTIVITY_FIELDS),
   estimated_time: z.string().min(1),
-  related_types: z.array(z.enum(ACTIVITY_TYPES)).optional(),
-  description: z.array(z.unknown()).optional() as z.ZodType<
-    Activity["description"]
-  >,
-  tips: z.array(activityTipSchema).optional(),
-  instructions: z.array(activityInstructionSchema).optional(),
-})
+  related_types: z
+    .array(z.enum(ACTIVITY_TYPES))
+    .nullish()
+    .transform((v) => v ?? undefined),
+  description: z
+    .array(z.unknown())
+    .nullish()
+    .transform((v) => v ?? undefined) as z.ZodType<Activity["description"]>,
+  tips: z
+    .array(activityTipSchema)
+    .nullish()
+    .transform((v) => v ?? undefined),
+  instructions: z
+    .array(activityInstructionSchema)
+    .nullish()
+    .transform((v) => v ?? undefined),
+}) as z.ZodType<Activity>

@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.5] - 2026-05-24 — Fix: Sanity-Only Activities Returning 404
+
+Sanity-only activities (no corresponding mock entry) were silently dropped during source validation, causing any request to `/activities/:slug` for those items to return 404. The fix makes optional array fields in `activitySchema` tolerant of `null` values returned by Sanity.
+
+### Backend (`packages/core`)
+
+- Fixed `activitySchema` to accept `null` for optional array fields (`tips`, `instructions`, `related_types`, `description`) by using `.nullish().transform(v => v ?? undefined)` instead of `.optional()`. Sanity returns `null` for unset document fields; Zod's `.optional()` rejects `null`, causing documents like `shoot-a-60-second-short-film` to fail validation and be excluded from the activity list.
+- Added a regression test covering the case where a Sanity-only activity has `null` optional fields, asserting it is included in the result with those fields resolved to `undefined`.
+
 ## [1.0.4] - 2026-05-24 — Chore: Expand Mock Recommendation Data as Sanity Fallback
 
 Mock data expanded to include `description`, `instructions`, and new Unsplash image URLs in order to have sufficient coverage for recommendations across users as fallback while Sanity CMS data catches up.

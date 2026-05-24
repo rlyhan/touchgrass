@@ -97,6 +97,32 @@ test("null instructions from Sanity fall through to the mock's value", async () 
   assert.deepEqual(matched.instructions, target.instructions)
 })
 
+test("Sanity-only activities with null optional fields are included (not dropped)", async () => {
+  // Sanity returns null for unset fields; .optional() only accepts undefined,
+  // so without the nullish→undefined transform these would fail activitySchema
+  // and be silently dropped, producing a 404 on the detail route.
+  const sanityOnly = {
+    slug: "shoot-a-60-second-short-film",
+    title: "Shoot a 60-Second Short Film",
+    imageUrl: "https://cdn.sanity.io/images/example.jpg",
+    type: "Creative",
+    field: "Film",
+    estimated_time: "An afternoon",
+    tips: null,
+    instructions: null,
+    related_types: null,
+  } as unknown as SanityActivity
+
+  const result = await createRecommendationLoader(async () => [sanityOnly])()
+
+  const matched = result.find((r) => r.slug === "shoot-a-60-second-short-film")
+  assert.ok(matched, "Sanity-only activity with null optional fields should not be dropped")
+  assert.equal(matched.title, "Shoot a 60-Second Short Film")
+  assert.equal(matched.tips, undefined)
+  assert.equal(matched.instructions, undefined)
+  assert.equal(matched.related_types, undefined)
+})
+
 test("Sanity-only activities missing required Activity fields are dropped", async () => {
   // Only title + slug — missing imageUrl, type, field, estimated_time.
   const incomplete: SanityActivity = {
