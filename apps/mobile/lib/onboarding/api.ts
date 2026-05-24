@@ -1,5 +1,5 @@
 import { authedFetch } from "@/lib/auth/fetch"
-import { API_BASE_URL } from "@/lib/config"
+import { apiUrl } from "@/lib/config"
 
 import type { OnboardingFormValues } from "./types"
 
@@ -17,7 +17,7 @@ export type CreateProfileResponse = {
 export async function createProfile(
   values: OnboardingFormValues,
 ): Promise<CreateProfileResponse> {
-  const response = await authedFetch(`${API_BASE_URL}/profiles`, {
+  const response = await authedFetch(apiUrl("/profiles"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

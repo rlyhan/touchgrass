@@ -4,14 +4,16 @@
 
 After successful sign-in on iPhone Safari, the authed layout saw a null session and redirected back to onboarding. Safari's Intelligent Tracking Prevention blocks the better-auth session cookie because the web client (`touchgrass-mobile.vercel.app`) and the API (`touchgrass-api-81dp.onrender.com`) are on different registrable domains, making the cookie cross-site. Desktop browsers were permissive enough to accept the `SameSite=None; Secure` cookie, masking the bug.
 
+The web client now talks only to the Vercel domain; Vercel proxies everything to Render server-side. Cookies are scoped to `touchgrass-mobile.vercel.app` and treated as first-party by Safari. Render still hosts the backend unchanged.
+
 ### Infra (`vercel.json`)
 
-- Added a Vercel rewrite that transparently proxies `/_api/*` from the Vercel domain to the Render API server-side (`/_api/api/auth/sign-in` → `https://touchgrass-api-81dp.onrender.com/api/auth/sign-in`, etc). The browser now talks only to `touchgrass-mobile.vercel.app`, so the `Set-Cookie` returned by better-auth is scoped to the Vercel origin and treated as first-party by Safari. Render still hosts the backend unchanged; the proxy is purely a same-origin shim for the web client.
-- Chose `/_api` (rather than proxying bare paths like `/recommendations` directly) because `app.json` sets `"web": { "output": "static" }`, so Expo Router emits a static HTML file per route. Vercel checks the filesystem before rewrites, and the static `recommendations.html` would otherwise win — making `fetch("/recommendations")` return HTML and break the recommendations screen. `/_api/*` does not collide with any Expo route.
+- Added two Vercel rewrites that transparently proxy to Render: `/api/:path*` (used by better-auth's client, which always appends `/api/auth/*` to its baseURL) and `/_api/:path*` for the bespoke routes (`/profiles`, `/recommendations`, `/activities/:slug`). The split exists because `app.json` sets `"web": { "output": "static" }`: Expo Router emits a static HTML file per route, Vercel checks the filesystem before rewrites, and bare paths like `/recommendations` would otherwise be served as HTML. `/api/*` and `/_api/*` collide with no Expo route so the rewrites always fire.
 
 ### Mobile (`apps/mobile`)
 
-- Updated `EXPO_PUBLIC_API_BASE_URL` in `.env.production` from the Render URL to `https://touchgrass-mobile.vercel.app/_api` so the web JS bundle hits the proxy prefix. EAS native builds still inject the Render URL directly via `eas.json` — native has no ITP constraint and is unaffected. Local dev is also unaffected because `.env.production` only loads when `NODE_ENV=production`.
+- `lib/config.ts` now resolves `API_BASE_URL` from `window.location.origin` at runtime on web (production) instead of `EXPO_PUBLIC_API_BASE_URL`. This sidesteps a Vercel-specific footgun where dashboard env vars silently override `.env.production` — Expo's dotenv won't replace values already present in `process.env`. Native and local dev continue to read the env var (EAS injects from `eas.json`; dev falls back to `localhost:3000`).
+- Added an `apiUrl(path)` helper in `lib/config.ts` that prepends `/_api` on web prod so non-auth fetches hit the proxy prefix that avoids Expo's static-export collision. Native and dev hit the backend directly with no prefix. `lib/onboarding/api.ts` and `lib/recommendations/api.ts` now route through `apiUrl()`; the auth client keeps using `API_BASE_URL` bare so better-auth's `withPath` correctly appends `/api/auth` (it skips appending when the baseURL already has a path, which is why earlier attempts at a `/_api` baseURL routed auth calls to non-existent endpoints on Render).
 
 ## [1.0.5] - 2026-05-24 — Fix: Sanity-Only Activities Returning 404
 

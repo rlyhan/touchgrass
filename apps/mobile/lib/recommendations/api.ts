@@ -1,7 +1,7 @@
 import type { Activity } from "@touchgrass/types"
 
 import { authedFetch } from "@/lib/auth/fetch"
-import { API_BASE_URL } from "@/lib/config"
+import { apiUrl } from "@/lib/config"
 
 const activityCache = new Map<string, Activity>()
 
@@ -17,7 +17,7 @@ export class ProfileNotFoundError extends Error {
 }
 
 export async function fetchRecommendations(): Promise<Activity[]> {
-  const response = await authedFetch(`${API_BASE_URL}/recommendations`)
+  const response = await authedFetch(apiUrl("/recommendations"))
 
   if (response.status === 404) {
     throw new ProfileNotFoundError()
@@ -35,7 +35,7 @@ export async function fetchRecommendations(): Promise<Activity[]> {
 
 export async function fetchActivityBySlug(slug: string): Promise<Activity | null> {
   const response = await authedFetch(
-    `${API_BASE_URL}/activities/${encodeURIComponent(slug)}`,
+    apiUrl(`/activities/${encodeURIComponent(slug)}`),
   )
 
   if (response.status === 404) return null
