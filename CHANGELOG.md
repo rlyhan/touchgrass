@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3] - 2026-05-24 — Fix: Scope Mobile Production API URL to Production Builds
+
+`apps/mobile/.env` was unconditionally loaded by Expo across every environment, so the Render production URL it defined overrode the `__DEV__` fallback in `lib/config.ts` even during local dev. The Vercel web build (`expo export`) and EAS native builds need the production URL, but `expo start` should resolve to the local API. Conflating "production build config" with "always-loaded config" masked local backend changes — most recently the 1.0.2 trusted-origins fix had no effect on dev sign-in because requests were still being routed at Render.
+
+### Mobile (`apps/mobile`)
+
+- Renamed `apps/mobile/.env` to `apps/mobile/.env.production`. Expo's dotenv loader only reads `.env.production` when `NODE_ENV=production`, which is the case during `expo export` (Vercel) but not during `expo start` (local dev). Local dev now correctly falls back to `http://localhost:3000` via `lib/config.ts`, while Vercel web builds continue to receive the Render URL. EAS native builds are unaffected — they inject the URL via the `env` block in `eas.json`. Note: `EXPO_PUBLIC_*` values are inlined at bundle time, so Metro must be restarted with `--clear` after the file change for the new resolution to take effect locally.
+
 ## [1.0.2] - 2026-05-24 — Fix: Invalid Origin Error When Signing In From Expo Go
 
 Sign-in from Expo Go on the iOS simulator returned `INVALID_ORIGIN` from better-auth. The `@better-auth/expo` client sets the request origin to `Linking.createURL("", { scheme })`, which resolves to an `exp://…` URL inside Expo Go (only resolving to `touchgrass://` in dev/standalone builds). The expo plugin's built-in `exp://` allowlist is gated on `NODE_ENV === "development"`, which our `tsx watch` dev script does not set — so the scheme was never trusted in local development.
