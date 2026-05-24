@@ -25,6 +25,7 @@ test("resolveTrustedOrigins includes dev origins outside production", () => {
 
   assert.ok(origins.includes("touchgrass://"))
   assert.ok(origins.includes("http://localhost:8081"))
+  assert.ok(origins.includes("exp://"))
 })
 
 test("resolveTrustedOrigins throws in production when no https origin is configured", () => {

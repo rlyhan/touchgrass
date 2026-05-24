@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.2] - 2026-05-24 — Fix: Invalid Origin Error When Signing In From Expo Go
+
+Sign-in from Expo Go on the iOS simulator returned `INVALID_ORIGIN` from better-auth. The `@better-auth/expo` client sets the request origin to `Linking.createURL("", { scheme })`, which resolves to an `exp://…` URL inside Expo Go (only resolving to `touchgrass://` in dev/standalone builds). The expo plugin's built-in `exp://` allowlist is gated on `NODE_ENV === "development"`, which our `tsx watch` dev script does not set — so the scheme was never trusted in local development.
+
+### Backend (`packages/core`)
+
+- Added `exp://` to `DEV_TRUSTED_ORIGINS` in `trusted-origins.ts` so Expo Go's origin header is accepted in local development independent of `NODE_ENV`. `matchesOriginPattern` falls back to `startsWith` for non-http(s) schemes, so the prefix covers every `exp://host:port/...` variant.
+- Updated `trusted-origins.test.ts` to assert the new entry.
+
 ## [1.0.1] - 2026-05-24 — Fix: Back Button Missing During Onboarding
 
 `OnboardingScreenShell` had no back button; steps 2–5 were forward-only. On iOS, cold-starting into a mid-onboarding screen with an empty history stack would crash with an unhandled `GO_BACK` action.
