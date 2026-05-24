@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.6] - 2026-05-24 — Fix: iPhone Safari Sign-In Redirecting to Onboarding
+
+After successful sign-in on iPhone Safari, the authed layout saw a null session and redirected back to onboarding. Safari's Intelligent Tracking Prevention blocks the better-auth session cookie because the web client (`touchgrass-mobile.vercel.app`) and the API (`touchgrass-api-81dp.onrender.com`) are on different registrable domains, making the cookie cross-site. Desktop browsers were permissive enough to accept the `SameSite=None; Secure` cookie, masking the bug.
+
+### Infra (`vercel.json`)
+
+- Added Vercel rewrites that transparently proxy `/api/*`, `/profiles`, `/recommendations`, `/activities/:slug`, and `/health` from the Vercel domain to the Render API. The browser now talks only to `touchgrass-mobile.vercel.app`, so the `Set-Cookie` returned by better-auth is scoped to the Vercel origin and treated as first-party by Safari. Render still hosts the backend unchanged; the proxy is purely a same-origin shim for the web client.
+
+### Mobile (`apps/mobile`)
+
+- Updated `EXPO_PUBLIC_API_BASE_URL` in `.env.production` from the Render URL to `https://touchgrass-mobile.vercel.app` so the web JS bundle calls the proxy. EAS native builds still inject the Render URL directly via `eas.json` — native has no ITP constraint and is unaffected. Local dev is also unaffected because `.env.production` only loads when `NODE_ENV=production`.
+
 ## [1.0.5] - 2026-05-24 — Fix: Sanity-Only Activities Returning 404
 
 Sanity-only activities (no corresponding mock entry) were silently dropped during source validation, causing any request to `/activities/:slug` for those items to return 404. The fix makes optional array fields in `activitySchema` tolerant of `null` values returned by Sanity.
