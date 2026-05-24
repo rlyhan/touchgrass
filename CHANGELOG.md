@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-24 — Fix: Correct API Base URL in EAS Build Profiles
+
+The `preview` and `production` build profiles in `eas.json` pointed at `https://touchgrass-api.onrender.com`, but the actual deployed API is `https://touchgrass-api-81dp.onrender.com`. Internal distribution builds would have hit a dead host.
+
+### Mobile (`apps/mobile`)
+
+- Updated `EXPO_PUBLIC_API_BASE_URL` in the `preview` and `production` profiles of `eas.json` to the correct Render hostname.
+
 ## 2026-05-24 — Fix: Constrain Web App to Mobile Width on Desktop
 
 The Vercel-hosted web build rendered full-width on desktop, making it look unstyled. A CSS media query now restricts the layout to a centred 430 px column on viewports ≥ 768 px wide.

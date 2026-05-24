@@ -19,13 +19,13 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://touchgrass-api.onrender.com"
+        "EXPO_PUBLIC_API_BASE_URL": "https://touchgrass-api-81dp.onrender.com"
       }
     },
     "production": {
       "channel": "production",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://touchgrass-api.onrender.com"
+        "EXPO_PUBLIC_API_BASE_URL": "https://touchgrass-api-81dp.onrender.com"
       }
     }
   },
