@@ -23,7 +23,7 @@ Prefer:
 Use the following format:
 
 ```md
-## YYYY-MM-DD — Type: Summary
+## [Version] - YYYY-MM-DD — Type: Summary
 
 Short 1–2 sentence overview describing the outcome, capability, fix, or architectural change.
 
@@ -38,6 +38,19 @@ Short 1–2 sentence overview describing the outcome, capability, fix, or archit
 - Additional scoped changes.
 ```
 
+Example:
+
+```md
+## [0.8.0] - 2026-05-22 - Feat: Recommendation Detail
+
+### Added
+
+- Added optional activity tips with CMS, backend, and mobile support.
+- Added ordered activity instructions with step-based UI rendering.
+- Added Sanity CMS integration for activity content.
+- Added recommendation detail screens with cached activity loading and async content hydration.
+
+```md
 
 ## Versioning
 

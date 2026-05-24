@@ -4,534 +4,446 @@
 
 The Vercel-hosted web build rendered full-width on desktop, making it look unstyled. A CSS media query now restricts the layout to a centred 430 px column on viewports ≥ 768 px wide.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- **`global.css` desktop media query.** On wide viewports `body` becomes a flex container centred horizontally with an `#e5e7eb` background; `#root` caps at `max-width: 430px` with a soft `box-shadow`. Mobile viewports (< 768 px) are unaffected — the column fills the screen naturally.
-- Verified the media query survives Tailwind/NativeWind compilation and that the Expo Router static export uses `id="root"`, confirming selector correctness.
+- Added a desktop media query to `global.css` that centres the layout at `max-width: 430px` on viewports ≥ 768 px; mobile viewports are unaffected.
 
 ## 2026-05-24 — Refactor: Centralise Inline Hex Colours into a Theme Module
 
-Colour values used as JS props (ActivityIndicator `color`, lucide icon `color`, SVG `fill`, inline style `backgroundColor`, etc.) were previously hardcoded hex strings scattered across the mobile app, with the same value (e.g. `#10b981`) duplicated in six files. This pulls them into a single typed source of truth.
+Hardcoded hex strings passed as JS props were duplicated across up to six files. A single typed `colors` module now serves as the source of truth for all non-className colour values.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- **New `lib/theme/colors.ts`.** Exports a `colors` object (`as const`) organised into the warm Tip palette (`bg` / `spinner` / `accent`), Tailwind-aligned shade scales (`emerald` / `gray` / `red`), and standalone `white` / `black`.
-- **Migrated 12 consumer files** to import `colors` and reference named keys instead of raw hex literals — `app/_layout.tsx`, `app/index.tsx`, `app/(authed)/_layout.tsx`, `app/(authed)/recommendations/index.tsx`, `app/(authed)/activities/[slug].tsx`, `components/icons/grass-logo.tsx`, `components/onboarding/loading-screen.tsx`, `components/recommendations/recommendation-card.tsx`, `components/ui/chip.tsx`, `components/ui/option-card.tsx`, `components/ui/slider.tsx`, `components/ui/text-field.tsx`.
-- **NativeWind className-based styling unchanged** — this change only touches values that were already being passed as raw hex through JS props.
+- Added `lib/theme/colors.ts` exporting a typed `colors` object with Tip palette, Tailwind-aligned shade scales, and standalone white/black entries.
+- Migrated 12 consumer files to reference named colour keys instead of raw hex literals.
 
 ## 2026-05-24 — Fix: Post-Deploy UI Polish
 
-Visual cleanup pass on issues observed once the app was running on real devices. The loading spinner blended into the green logo, the RecommendationCard's "hovering" shadow never rendered in Expo Go on iPhone, and the dashboard and activity detail screens needed more deliberate spacing and typographic hierarchy.
+Visual cleanup pass on issues observed on real devices — spinner/logo contrast, missing iOS card shadows, and loose spacing and typography across the dashboard and activity detail screens.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- **Loading spinner colour changed from emerald-500 to a warm tan (`#E0AE85`).** The previous green matched the logo exactly, so spinner and logo read as a single shape. The new tan sits midway between the Tip background and accent and contrasts cleanly against the green.
-- **`RecommendationCard` iOS shadow restored.** The card had `shadow-sm` on the same `View` as `overflow: hidden`, and iOS clips shadows on clipped views. Split into an outer shadow wrapper + inner clipped/rounded content, and added explicit `shadowColor` / `shadowOffset` / `shadowOpacity` / `shadowRadius` (Android keeps `elevation`). Metadata row spacing bumped from `gap-3` to `gap-x-5 gap-y-2` so each item is visually distinct.
-- **Recommendations dashboard spacing rebalanced.** Logo→heading `mt-8` → `mt-12`, heading→list `mb-6` → `mb-8`, footer `mt-10` → `mt-12`. The "Sign out" link is now a bordered pill (`border-gray-300`, `rounded-full px-5 py-2`) with `gray-700` text — reads as a button without competing with primary CTAs.
-- **Activity detail typography and rhythm.** Section headings (`About this activity`, `Instructions`) `text-lg` → `text-2xl`; individual instruction titles `text-base` → `text-xl`; step number badge `h-7 w-7`/`text-sm` → `h-8 w-8`/`text-base`; inter-section spacing `mt-6` → `mt-10`.
+- Changed loading spinner colour from emerald-500 to warm tan (`#E0AE85`) so it reads distinctly against the green logo.
+- Restored `RecommendationCard` iOS shadow by separating the shadow wrapper from the `overflow: hidden` content view; added explicit shadow props for both platforms.
+- Rebalanced recommendations dashboard spacing and restyled the "Sign out" link as a bordered pill.
+- Increased activity detail section heading sizes, instruction title sizes, step badge dimensions, and inter-section spacing.
 
 ## 2026-05-23 — Fix: Blank Screen in Expo Go After `eas update`
 
-Every `eas update` build loaded as a blank white screen in Expo Go (worked fine locally). Root cause was a stale Metro cache: `lib/config.ts` had been bundled before `EXPO_PUBLIC_API_BASE_URL` was set, so it still threw at module load — crashing the import chain before any UI mounted. With no `ErrorBoundary` in place the crash was silent.
+Every `eas update` build loaded as a blank white screen in Expo Go due to a stale Metro cache bundling `lib/config.ts` before `EXPO_PUBLIC_API_BASE_URL` was set. With no error boundary in place the crash was silent.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- **Added `ErrorBoundary` export to `_layout.tsx`.** Expo Router renders this named export instead of crashing silently, surfacing the actual error message and stack trace in production.
-- **New `apps/mobile/.env` with `EXPO_PUBLIC_API_BASE_URL`.** Expo reads `.env` automatically during bundling, ensuring the value is reliably inlined after a cache clear.
-- **Disabled `reactCompiler` experiment in `app.json`.** Its compiled output can produce Hermes bytecode incompatible with Expo Go; re-enable when targeting a custom dev client.
+- Added an `ErrorBoundary` export to `_layout.tsx` so Expo Router surfaces crashes in production instead of showing a blank screen.
+- Added `apps/mobile/.env` with `EXPO_PUBLIC_API_BASE_URL` so the value is reliably inlined after a Metro cache clear.
+- Disabled the `reactCompiler` experiment in `app.json` to avoid Hermes bytecode incompatibilities with Expo Go.
+- Run `eas update --clear-cache` (or delete `apps/mobile/.expo/`) whenever env-var-dependent code changes.
 
-**Workflow note:** run `eas update` with `--clear-cache` (or delete `apps/mobile/.expo/`) whenever env-var-dependent code changes, or Metro will bundle stale transforms.
+## 2026-05-23 — Refactor: Toggle Utility and Async Data Hook
 
-## 2026-05-23 — Refactor: Toggle Utility, Async Data Hook
+Extracted two shared utilities to eliminate duplicated array-toggle and async-fetch patterns in the onboarding and recommendations screens.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- Extracted a shared `toggleItem<T>` utility to replace duplicated include/filter array logic in the interests and motivation onboarding screens.
-- Extracted a `useAsyncData<T>` hook encapsulating the `status / data / useEffect` fetch pattern, replacing the manual state management in the recommendations screen.
+- Extracted a `toggleItem<T>` utility replacing duplicated include/filter array logic across onboarding screens.
+- Extracted a `useAsyncData<T>` hook replacing manual status/data/useEffect fetch state management in the recommendations screen.
 
 ## 2026-05-22 — Fix: Accessibility and Display Polish
 
-**Mobile (`apps/mobile`)**
+Corrected accessibility role misreports and disabled-state propagation across UI components, fixed Android elevation stacking on the activity detail header, and extracted a shared API base URL config.
 
-- `TextField` now forwards its `label` prop as `accessibilityLabel` on the underlying `TextInput`, so VoiceOver/TalkBack announces the field name instead of the generic "text field".
-- `OptionCard` `accessibilityRole` corrected from `radio` to `checkbox` — the component is used in multi-select contexts and was misreporting single-select semantics to assistive tech.
-- `PrimaryButton` now explicitly sets `accessibilityState={{ disabled }}`, making the disabled state reliable across platforms and test frameworks.
-- `SkipButton` and auth-flow `Link` components (`Sign in`, `Create an account`) now carry `accessibilityRole` and `accessibilityLabel`.
-- Back button on the activity detail screen increased from 40×40 pt to 44×44 pt (Apple HIG / Material minimum). Sign-out `Pressable` targets gained `py-3` padding for the same reason.
-- Activity detail header gets `elevation: 4` on Android so it correctly occludes `ScrollView` content that scrolls beneath it (`zIndex` alone has no effect without an elevation stacking context on Android).
-- Recommendation card metadata row changed from `gap-x-6 gap-y-2` to `gap-3` — axis-specific gap utilities are not reliably supported on `flex-wrap` rows in NativeWind v4.
-- `API_BASE_URL` extracted into `lib/config.ts` and imported by `lib/auth/client`, `lib/onboarding/api`, and `lib/recommendations/api`, removing three copies of the same env-var fallback expression.
+### Mobile (`apps/mobile`)
 
-## 2026-05-22 — Refactor: Centralize Error Handling, DRY Rate-Limiter Setup
+- Corrected `OptionCard` `accessibilityRole` from `radio` to `checkbox` to match its multi-select usage.
+- Added `accessibilityLabel` forwarding to `TextField`, `SkipButton`, and auth-flow links.
+- Added explicit `accessibilityState={{ disabled }}` to `PrimaryButton` for reliable cross-platform disabled reporting.
+- Increased back button and sign-out touch targets to meet Apple HIG / Material minimums.
+- Added `elevation: 4` to the activity detail header on Android to correctly occlude scrolled content.
+- Fixed recommendation card metadata row gap to use `gap-3` instead of axis-specific utilities unsupported on flex-wrap in NativeWind v4.
+- Extracted `API_BASE_URL` into `lib/config.ts`, removing three duplicate env-var fallback expressions.
 
-Cleanup pass on the backend-audit fixes below. With the global
-error-handler middleware in place, per-route `try/catch` blocks
-became redundant for the "log + 500" case. Rate-limiter configs
-also had a repeated shape worth factoring.
+## 2026-05-22 — Refactor: Centralize Error Handling and DRY Rate-Limiter Setup
 
-**Backend (`packages/core`)**
+Cleanup pass following the backend audit fixes. Per-route `try/catch` blocks became redundant given the global error-handler, and rate-limiter configs shared a repeated shape worth factoring out.
 
-- **Removed redundant `try/catch` from read-only handlers.** The
-  recommendations and activities handlers were doing
-  `try { ... } catch { console.error + 500 }` — exactly what the
-  global handler now does. Express 5 propagates async rejections
-  automatically, so the handlers just throw and the centralized
-  middleware logs + returns a generic `{ error: "Internal server
-  error" }` JSON 500.
-- **Narrowed onboarding handler's `try/catch` to `insertProfile`
-  only.** It still needs one for the Postgres `23505` →
-  HTTP 409 translation, but the outer wrap added during the audit
-  is now redundant. Non-`23505` errors are re-thrown to the global
-  handler.
-- **Extracted `createLimiter(windowMs, limit)` factory.** All three
-  rate-limiters shared the same `standardHeaders`, `legacyHeaders`,
-  and `message` config — only window and limit differed. Single
-  factory replaces ~15 lines of near-duplicate config.
-- **Extracted `maybeLimit(limiter)` helper.** Replaces the
-  `...(options.disableRateLimits ? [] : [limiter])` spread that was
-  repeated at every rate-limited route mount.
+### Backend (`packages/core`)
 
-## 2026-05-22 — Fix: Backend Audit (High-Severity Findings)
+- Removed redundant `try/catch` from read-only route handlers now covered by the global error middleware.
+- Narrowed the onboarding handler's `try/catch` to `insertProfile` only, re-throwing non-`23505` errors to the global handler.
+- Extracted a `createLimiter(windowMs, limit)` factory replacing ~15 lines of near-duplicate rate-limiter config.
+- Extracted a `maybeLimit(limiter)` helper replacing repeated conditional spreads at each rate-limited route mount.
 
-Addresses the four high-severity findings from the backend code audit.
-Each fix landed as its own commit on `fix/backend-audit`.
+## 2026-05-22 — Fix: Backend Audit High-Severity Findings
 
-**Backend (`packages/core`)**
+Addresses four high-severity findings from the backend code audit: authentication error leakage, missing global error handling, unthrottled read endpoints, and loose Sanity API version validation.
 
-- **Auth/profile lookup errors no longer leak as non-JSON 500s.**
-  Previously `getSessionUserId` (and `getProfileByAuthUserId` in the
-  onboarding handler) ran outside the route's `try/catch`. A
-  transient Neon or `better-auth` error during those calls would
-  fall through to Express's default error handler and return a
-  non-JSON 500. With the global error-handler middleware now in
-  place (see next bullet), any such error flows through the JSON
-  500 path. Route handlers also gained consistent `Promise<void>`
-  annotations.
-- **Global JSON error-handler and 404 middlewares.** Anything that
-  reaches the end of the middleware chain unhandled — an error
-  thrown from a handler or an undefined path — now goes through a
-  four-argument `(err, req, res, next)` handler that logs the error
-  and returns a generic `{ error: "Internal server error" }` JSON
-  500. Unknown routes return a JSON 404 instead of Express's default
-  HTML.
-- **Rate limit on the two authenticated read endpoints.** Added a
-  shared `readLimiter` (120 req/min per IP) on `GET /recommendations`
-  and `GET /activities/:slug`. Both routes touch `better-auth`'s
-  session table and Neon on every request, so an unthrottled loop
-  could exhaust the connection pool. Same `disableRateLimits` escape
-  hatch as the existing limiters.
-- **`SANITY_API_VERSION` must be a dated `YYYY-MM-DD` string.**
-  `readSanityConfigFromEnv` previously accepted any non-empty value.
-  A floating version like `"v1"` would silently change response
-  shape over time as Sanity evolves the API. Startup now fails fast
-  with a clear error if the variable is not a dated string.
+### Backend (`packages/core`)
+
+- Added a global JSON error-handler and 404 middleware so all unhandled errors return `{ error: "Internal server error" }` JSON 500s instead of Express's default HTML responses.
+- Moved `getSessionUserId` and `getProfileByAuthUserId` calls inside the error-handler scope to prevent non-JSON 500s on transient auth/DB failures.
+- Added a `readLimiter` (120 req/min per IP) to `GET /recommendations` and `GET /activities/:slug` to prevent connection pool exhaustion.
+- `readSanityConfigFromEnv` now requires `SANITY_API_VERSION` to be a `YYYY-MM-DD` string, failing fast on startup if not.
 
 ## 2026-05-22 — Fix: Cross-Site Auth Cookies for Vercel ↔ Render
 
-Fixes the bug where sign-in succeeded but `useSession()` immediately
-reported no user, bouncing the web client to `/onboarding/name` on every
-login.
+Fixes the bug where sign-in succeeded but `useSession()` immediately reported no user, bouncing the web client to `/onboarding/name` on every login.
 
-**Backend (`packages/core`)**
+### Backend (`packages/core`)
 
-- `betterAuth` config now sets `advanced.defaultCookieAttributes` to
-  `{ sameSite: "none", secure: true }`. With the web client hosted on
-  Vercel and the API on Render — a true cross-site setup — the
-  default `SameSite=Lax` meant the browser stored the session cookie
-  but refused to send it on cross-site fetch requests to
-  `/api/auth/get-session`, so the client thought the user was logged
-  out. `SameSite=None; Secure` allows the cookie to be sent on
-  cross-site fetches that include credentials.
+- Set `advanced.defaultCookieAttributes` to `{ sameSite: "none", secure: true }` in the `betterAuth` config so session cookies are sent on cross-site fetch requests between the Vercel web client and Render API.
 
 ## 2026-05-22 — Fix: Auth Rate Limiting Behind Render's Proxy
 
-Fixes the `429 Too Many Requests` lockout hit by all users sharing a
-single bucket after deploying the backend to Render. Two related
-changes:
+Fixes the `429 Too Many Requests` lockout hit by all users sharing a single rate-limit bucket after deploying the backend to Render.
 
-**Backend (`packages/core`)**
+### Backend (`packages/core`)
 
-- `createApp` now calls `app.set("trust proxy", 1)` so
-  `express-rate-limit` keys by the real client IP (from
-  `X-Forwarded-For`) instead of Render's load-balancer IP. Without
-  this, every visitor on the service shared one 20-req / 15-min
-  bucket — a single tester refreshing pages would lock out everyone
-  else.
-- The `authLimiter` is no longer mounted on the entire `/api/auth`
-  prefix. It now scopes only to mutation endpoints
-  (`/api/auth/sign-in`, `/api/auth/sign-up`,
-  `/api/auth/forget-password`) — the endpoints actually at risk of
-  brute force / credential stuffing. `GET /api/auth/get-session`,
-  which the client hits on every protected page load, is no longer
-  rate-limited.
+- Set `app.set("trust proxy", 1)` so `express-rate-limit` keys by the real client IP from `X-Forwarded-For` rather than Render's load-balancer IP.
+- Scoped `authLimiter` to mutation endpoints only (`sign-in`, `sign-up`, `forget-password`), removing the rate limit from `GET /api/auth/get-session`.
 
 ## 2026-05-22 — Chore: Deployment Configs for Render, Vercel, and EAS
 
-Adds infrastructure-as-code so the three deployable artifacts (Express
-backend, Expo web client, Expo mobile client) can be hosted on free tiers
-without per-environment manual setup. No runtime behavior changes.
+Adds infrastructure-as-code for the three deployable artifacts — Express backend, Expo web client, and Expo mobile client — with no runtime behavior changes.
 
-**Backend (`packages/core`)**
+### Backend (`packages/core`)
 
-- Added `start` script (`tsx src/index.ts`) so Render's free Web Service
-  can boot the app via `npm run start`.
-- Moved `tsx` from `devDependencies` to `dependencies` so it survives
-  production installs.
+- Added `start` script and moved `tsx` to `dependencies` for Render production installs.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- Added `vercel-build` script (`expo export --platform web --output-dir dist`)
-  invoked by Vercel during static web builds.
-- Added `runtimeVersion: { policy: "sdkVersion" }` to `app.json` so EAS
-  Update can target Expo Go testers without a custom dev client.
-- New `eas.json` with `development`, `preview`, and `production` build
-  profiles, each setting `EXPO_PUBLIC_API_BASE_URL` to the appropriate
-  backend URL (localhost for dev, Render URL for preview/production).
+- Added `vercel-build` script for Vercel static web export.
+- Added `runtimeVersion: { policy: "sdkVersion" }` to `app.json` for EAS Update compatibility with Expo Go.
+- Added `eas.json` with `development`, `preview`, and `production` build profiles.
 
-**Repo root**
+### Repo Root
 
-- New `render.yaml` blueprint declaring the `touchgrass-api` Web Service
-  on Render's free plan: monorepo-aware build (`npm install --workspaces
-  --include-workspace-root`), `/health` check, and placeholders for the
-  seven runtime env vars (DATABASE_URL, BETTER_AUTH_*, SANITY_*).
-- New `vercel.json` declaring the monorepo web build: installs the full
-  workspace, runs `vercel-build` in `@touchgrass/mobile`, serves
-  `apps/mobile/dist`.
+- Added `render.yaml` Render Web Service blueprint with monorepo-aware build and env var placeholders.
+- Added `vercel.json` for the monorepo web build targeting `apps/mobile/dist`.
 
 ## 2026-05-22 — Chore: Backend Audit Fixes
 
-Closes the Critical and High findings from the backend code audit. No
-public API changes.
+Closes the critical and high findings from the backend code audit. No public API changes.
 
-**Backend (`packages/core`)**
+### Backend (`packages/core`)
 
-- **Sanity client is injectable and env-driven.** Project ID, dataset, and API version are now read from `SANITY_PROJECT_ID` / `SANITY_DATASET` / `SANITY_API_VERSION` (added to `.env.local`). The client is constructed via a factory in `index.ts` instead of at module scope, so tests no longer hit the real project.
-- **Sanity responses are validated at runtime.** New `sanityActivitySchema` (partial) and `activitySchema` (full) Zod schemas. Malformed docs are dropped on fetch; Sanity-only docs missing required Activity fields are dropped before being served to clients.
-- **Profile `personality` jsonb is parsed in the DB layer.** `insertProfile` validates on write and `getProfileByAuthUserId` validates on read, so corrupted rows cannot reach handlers under a typed cast.
-- **Rate limiting on `/api/auth/*` and `POST /profiles`.** `express-rate-limit` mounted at 20 req / 15 min and 10 req / hour per IP respectively. `createApp` accepts `disableRateLimits` for tests.
-- **`GET /activities/:slug` validates the path param.** Slug must be lowercase alphanumeric with hyphens, 1–200 chars; returns 400 with sanitized errors otherwise.
-- **Production CORS requires an HTTPS origin.** `resolveTrustedOrigins` throws on boot if `BETTER_AUTH_TRUSTED_ORIGINS` lacks at least one `https://` entry when `NODE_ENV=production`. Dev localhost origins are excluded from production.
-- **Documented `profiles.auth_user_id` lookup-index design** in `db/schema.ts` — the UNIQUE constraint's auto-generated btree is the hot-path index.
+- Made the Sanity client injectable and env-driven, constructed via factory in `index.ts` rather than at module scope.
+- Added runtime Zod validation for Sanity responses; malformed or incomplete activity docs are dropped before being served.
+- Added runtime validation of `personality` jsonb in the DB layer on both read and write.
+- Added rate limiting on `/api/auth/*` (20 req / 15 min) and `POST /profiles` (10 req / hour) per IP.
+- Added path parameter validation for `GET /activities/:slug` with a 400 on invalid slugs.
+- Restricted production CORS to require at least one `https://` origin in `BETTER_AUTH_TRUSTED_ORIGINS`.
 
 ## 2026-05-22 — Feat: Activity Tips Field
 
-Adds an optional `tips` field to the Activity schema (max 3 per activity), giving editors a place to author short, glanceable hints. Tips render on the activity detail page as rounded callout cards with a pale orange-brown background and a lightbulb icon.
+Adds an optional `tips` field (max 3) to the Activity schema. Tips render on the activity detail page as callout cards with a warm background and lightbulb icon.
 
-**Sanity Studio (`apps/sanity`)**
+### Sanity Studio (`apps/sanity`)
 
-- New `tips` array field on the `activity` schema, capped at 3 items via `Rule.max(3)`. Each item is an inline `tip` object with a required `description` (plain text, 3-row textarea) and an auto-generated `key` (hidden, read-only, populated via the object's `initialValue`).
+- Added a `tips` array field to the `activity` schema, capped at 3 items via `Rule.max(3)`.
 
-**Types (`packages/types`)**
+### Types (`packages/types`)
 
-- New `ActivityTip` type (`{ key: string; description: string }`). `Activity` gains an optional `tips?: ActivityTip[]` field.
+- Added `ActivityTip` type and an optional `tips?: ActivityTip[]` field on `Activity`.
 
-**Backend (`packages/core`)**
+### Backend (`packages/core`)
 
-- GROQ query in `sanity-source.ts` updated to project the `tips` array alongside existing fields.
+- Updated the GROQ query in `sanity-source.ts` to project the `tips` array.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- Activity detail page renders a tips section below the description when the field is non-empty. Each tip displays as a rounded card with a pale orange-brown background (`#FFF3E0`), a lightbulb icon on the left, and the description prepended with **"Tip:"** in bold.
-- Three new `activity-detail.test.tsx` cases: renders each tip with "Tip:" prefix and a lightbulb icon when present, hides section when absent, hides section when empty array.
-- Two new Storybook stories: `WithTips` and `WithEverything` (description + instructions + tips).
+- Rendered tips on the activity detail page as warm-background callout cards with a lightbulb icon and bold "Tip:" prefix.
+- Added three tests and two Storybook stories (`WithTips`, `WithEverything`) for the tips section.
 
 ## 2026-05-22 — Feat: Activity Instructions Field
 
-Adds an optional ordered `instructions` field to the Activity schema, allowing editors to author step-by-step guidance for each activity. Instructions render on the activity detail page as a numbered list with emerald step-indicator circles.
+Adds an optional ordered `instructions` field to the Activity schema. Instructions render on the activity detail page as a numbered list with emerald step-indicator circles.
 
-**Sanity Studio (`apps/sanity`)**
+### Sanity Studio (`apps/sanity`)
 
-- New `instructions` array field on the `activity` schema. Each item is an inline object with a required `title` (string) and an optional `description` (plain text, 3-row textarea). Drag-to-reorder is enabled by default. Item preview shows the title so editors can identify steps while reordering.
+- Added an `instructions` array field to the `activity` schema with drag-to-reorder and title preview.
 
-**Types (`packages/types`)**
+### Types (`packages/types`)
 
-- New `ActivityInstruction` type (`{ title: string; description?: string }`). `Activity` gains an optional `instructions?: ActivityInstruction[]` field.
+- Added `ActivityInstruction` type and an optional `instructions?: ActivityInstruction[]` field on `Activity`.
 
-**Backend (`packages/core`)**
+### Backend (`packages/core`)
 
-- GROQ query in `sanity-source.ts` updated to project the `instructions` array alongside existing fields.
-- Two new `source.test.ts` cases: instructions from Sanity are merged onto a matching mock; a `null` instructions field falls through to `undefined`.
+- Updated the GROQ query in `sanity-source.ts` to project the `instructions` array.
+- Added two `source.test.ts` cases covering Sanity instruction merge and null fallback.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- Activity detail page renders an "Instructions" section when the field is non-empty. Each step shows a numbered emerald circle (1…N, positional) on the left, the step title, and the plain-text description below it.
-- Three new `activity-detail.test.tsx` cases: renders section + numbered items when instructions are present, hides section when absent, hides section when empty array.
-- Two new Storybook stories: `WithInstructions` and `WithDescriptionAndInstructions`.
+- Rendered instructions on the activity detail page as a numbered list with emerald step circles.
+- Added three tests and two Storybook stories (`WithInstructions`, `WithDescriptionAndInstructions`) for the instructions section.
 
 ## 2026-05-21 — Feat: Sanity CMS Integration
 
-Wires Sanity as the authoritative source for activity content, replacing the static mock dataset incrementally. Activities authored in the Sanity Studio flow into the app's recommendations and detail pages, with mocks serving as a fallback for any activity not yet migrated.
+Wires Sanity as the authoritative source for activity content, replacing the static mock dataset incrementally. Mocks serve as a fallback for any activity not yet in Sanity.
 
-**Sanity Studio (`apps/sanity`)**
+### Sanity Studio (`apps/sanity`)
 
-- New Sanity Studio app with an `activity` document schema covering title, slug, type, field, related types, image, estimated time, and a Portable Text description. The `related_types` field uses a custom multi-select input that excludes the already-selected primary type. Type and field dropdowns are alphabetically sorted. Validation requires title, slug, type, field, and at least one related type.
+- Added a Sanity Studio app with an `activity` document schema covering title, slug, type, field, related types, image, estimated time, and Portable Text description.
 
-**Backend (`packages/core`)**
+### Backend (`packages/core`)
 
-- Activities are now identified by a human-readable slug (replacing the old `rec_NNN` numeric id) so they can double as URL path segments.
-- A merge loader combines Sanity-fetched activities with the mock catalog: Sanity entries with a matching slug override the mock field-by-field (null Sanity fields fall through to the mock value), and Sanity-only entries are prepended. The mock list remains whole for any slug not yet in Sanity.
-- New `GET /activities/:slug` endpoint — requires auth, returns the merged activity on hit, 404 on miss. Backed by the same merge loader as the recommendations endpoint.
+- Replaced numeric `rec_NNN` ids with human-readable slugs usable as URL path segments.
+- Added a merge loader that overlays Sanity-fetched activities onto the mock catalog field-by-field, with Sanity-only entries prepended.
+- Added `GET /activities/:slug` — auth-required, returns the merged activity or 404.
 
-**Mobile (`apps/mobile`)**
+### Mobile (`apps/mobile`)
 
-- Activity detail moved from a query-string route (`/recommendations/detail?slug=`) to a dynamic path segment (`/activities/[slug]`), matching the backend endpoint shape.
-- Detail page shows a cached copy immediately if available and revalidates in the background; shows a spinner on a cold load. Back button falls back to `/recommendations` when navigated to directly (no stack history).
-- Editor-authored Portable Text description renders in the "About this activity" section; the section is hidden when the field is empty. The previous hardcoded AI-summary placeholder and its fetch stub are removed.
+- Moved activity detail from a query-string route to a dynamic path segment (`/activities/[slug]`), matching the backend shape.
+- Detail page serves a cached copy immediately and revalidates in the background; a spinner shows on cold load.
+- Removed the hardcoded AI-summary placeholder; editor-authored Portable Text description now renders in the "About this activity" section.
 
----
+## 2026-05-20 — Feat: Recommendation Detail Page
 
-## 2026-05-20 — Recommendation Detail Page
+New mobile screen that renders an activity's title, image, and metadata instantly from the dashboard cache, then async-loads extended content. `RecommendationCard` is reused as the hero via a new `size="large"` mode.
 
-New mobile screen at `(authed)/recommendations/detail?id=<rec_id>` that renders an activity's title/image/metadata instantly from the dashboard cache, then async-loads a placeholder AI summary and description. Reuses the existing `RecommendationCard` as the hero via a new `size="large"` mode so the list card and detail header can't drift in styling.
+### Mobile (`apps/mobile`)
 
-**Mobile (`apps/mobile`)**
+- Added `app/(authed)/recommendations/detail.tsx` with synchronous cache-first activity load and async extended content hydration.
+- Renamed `recommendations.tsx` to `recommendations/index.tsx`; each card now navigates to `/recommendations/detail?id=`.
+- Added `size="large"` prop to `RecommendationCard` for use as the detail hero.
+- Added in-memory `activityCache` and `getCachedActivity` to `lib/recommendations/api.ts`; added `fetchRecommendationDetail` stub.
 
-- `app/(authed)/recommendations/detail.tsx` (new) — Reads `?id=` via `useLocalSearchParams`, resolves the base `Activity` synchronously from `getCachedActivity(id)` (no spinner for title/image/metadata), and effects a `fetchRecommendationDetail(id)` call for the extended fields. Shows a small `ActivityIndicator` while extended data loads; on fetch rejection the extended section is hidden but the card and CTA remain. Back button calls `router.back()`; a "Start this activity" `PrimaryButton` is wired with a no-op handler.
-- `app/(authed)/recommendations/index.tsx` — Renamed from `app/(authed)/recommendations.tsx` so the route group can hold both `index` and `detail`. Each card is wrapped in a `Pressable` that pushes `/recommendations/detail?id=${rec.id}`.
-- `components/recommendations/recommendation-card.tsx` — Added `size?: "default" | "large"` prop. `large` switches the image container from a fixed `160` height to a 4:3 aspect ratio and bumps the title to `text-2xl font-bold`. The same component now serves both the dashboard list item and the detail hero so they can't drift visually.
-- `lib/recommendations/api.ts` — Added an in-memory `activityCache: Map<string, Activity>` populated inside `fetchRecommendations`; exposed `getCachedActivity(id)` for the detail screen. Added `fetchRecommendationDetail(id)` stub returning a `Pick<ActivityDetail, "aiSummary" | "description">` with mock copy — single-line swap to call `GET /recommendations/:id/detail` when the route lands (commented-out real call kept inline as a TODO).
+### Types (`packages/types`)
 
-**Types (`packages/types`)**
+- Added `ActivityDetail = Activity & { aiSummary: string; description: string }`.
 
-- `index.ts` — Added `ActivityDetail = Activity & { aiSummary: string; description: string }` so the detail-fetch response shape lives next to the existing `Activity` type.
+### Tests (`apps/mobile`)
 
-**Tests (`apps/mobile`)**
+- Added tests for the detail screen (6), recommendations index (6), and recommendation card (5).
 
-- `__tests__/recommendations-detail.test.tsx` (new) — 6 tests: missing id → not-found; unknown id (cache miss) → not-found; cached id with pending fetch → card visible + spinner; resolved fetch → AI summary + paragraphs rendered + spinner gone; rejected fetch → card + CTA remain, summary hidden; back button → `router.back()`.
-- `__tests__/recommendations-index.test.tsx` (new) — 6 tests covering the loading spinner, list render, card-press navigation to `/recommendations/detail?id=...`, `ProfileNotFoundError` redirect to onboarding, generic-error retry path, and sign-out flow.
-- `__tests__/recommendation-card.test.tsx` (new) — 5 tests: title/type/field render, optional estimated-time row presence/absence, `getActivityTypeIcon`/`getFieldIcon` lookup, and image-error fallback swap (drives `expo-image`'s `onError` via a `Pressable` mock).
+### Stories (`apps/mobile`)
 
-**Stories (`apps/mobile`)**
-
-- `components/recommendations/recommendation-detail-page.stories.tsx` (new) — Loaded / Loading / NotFound visual states for the detail screen.
-- `components/recommendations/recommendations-index-page.stories.tsx` (new) — Loaded / Loading / Error visual states for the dashboard.
-
----
+- Added Storybook stories for the detail screen (Loaded / Loading / NotFound) and recommendations index (Loaded / Loading / Error).
 
 ## 2026-05-19 — Fix: Preserve Primary Affinity When Secondary Affinities Exist
 
 Reworked the base-score formula so a strong primary pattern match is no longer diluted by the presence of `related_types`.
 
-**Algorithm (`packages/core`)**
+### Algorithm (`packages/core`)
 
-- `recommendation-algorithm.ts` — `calculateRecommendationBaseScore` now returns `primaryAffinity + secondaryAffinity * 0.2` when secondary patterns exist (previously `primary * 0.7 + secondary * 0.3`). Primary affinity is treated as the anchor; secondary affinity contributes a bonus (capped at +0.2) rather than displacing 30% of the primary signal. The no-secondary-patterns path still returns `primaryAffinity` unchanged. Removed `PRIMARY_WEIGHT`; renamed `SECONDARY_WEIGHT` from `0.3` to `0.2`. Base scores now have an arithmetic ceiling of 1.2, which is fine because scores are only used relative to each other for ranking.
+- Changed `calculateRecommendationBaseScore` to `primaryAffinity + secondaryAffinity * 0.2` (previously `primary * 0.7 + secondary * 0.3`), treating secondary affinity as a bonus rather than a displacement of primary signal.
 
-**Tests (`packages/core`)**
+### Tests (`packages/core`)
 
-- `recommendation-algorithm.test.ts` — Updated five `calculateRecommendationBaseScore` test expectations to match the new formula: primary-only ceiling (1.0), weighted blend (0.96), arithmetic ceiling (1.2), pooled secondary (1.1), and the all-zero floor (0.0).
+- Updated five `calculateRecommendationBaseScore` test expectations to match the new formula.
 
-**Docs (`context`)**
+### Docs (`context`)
 
-- `recommendation-engine.md` — Updated the Step 3 base-score description to the new formula and rationale, and refreshed surrounding sections (helpers path, motivation boost, diversify-and-order) to reflect the current pipeline.
+- Updated `recommendation-engine.md` to reflect the new base-score formula and pipeline.
 
----
-
-## 2026-05-19 — Test: getRecommendations Integration Coverage + Activity Pool Injection
+## 2026-05-19 — Test: getRecommendations Integration Coverage and Activity Pool Injection
 
 Expanded `getRecommendations` integration tests and decoupled the algorithm from its hardcoded activity source.
 
-**Tests (`packages/core`)**
+### Tests (`packages/core`)
 
-- `recommendation-algorithm.test.ts` — Four new `getRecommendations` integration tests: output has no duplicate activity types (diversification wired through); Art interest surfaces at least one Art-field rec (concrete positive assertion replacing the weaker count-monotonicity check); high-Openness/Extraversion user with `explore_creative` motivation and no interests surfaces creative-type recs (first test to exercise the motivation parameter end-to-end through `getRecommendations`); Art interest + `explore_creative` motivation together surface an Art-field creative-type rec. `creativeMotivation` hoisted to module level so it is shared by the `scoreRecommendation` and `getRecommendations` test sections.
+- Added four `getRecommendations` integration tests covering diversification, interest surfacing, motivation end-to-end, and combined interest + motivation behaviour.
 
-**Algorithm (`packages/core`)**
+### Algorithm (`packages/core`)
 
-- `recommendation-algorithm.ts` — `getRecommendations` now accepts an explicit `activities: Activity[]` parameter instead of importing `RECOMMENDATIONS` directly. Removes the module-level dependency on `@touchgrass/mocks/recommendations`, making the algorithm a pure function of its inputs and allowing the call site to swap in a DB-fetched catalog when the real endpoint arrives.
-- `recommendations/route.ts` — Imports `RECOMMENDATIONS` from `@touchgrass/mocks/recommendations` and passes it as the `activities` argument to `getRecommendations`.
+- `getRecommendations` now accepts an explicit `activities: Activity[]` parameter instead of importing `RECOMMENDATIONS` directly, making it a pure function of its inputs.
 
----
+## 2026-05-19 — Test: Unit Tests for calculateRecommendationBaseScore and scoreRecommendation
 
-## 2026-05-19 — Unit Tests: calculateRecommendationBaseScore & scoreRecommendation
+Added unit tests for the two private scoring functions, exported to make them directly testable.
 
-Added unit tests for the two private scoring functions, now exported.
+### Tests (`packages/core`)
 
-**Tests (`packages/core`)**
+- Added unit tests for `calculateRecommendationBaseScore` and `scoreRecommendation` covering edge cases, motivation boost application, and boost monotonicity.
 
-- `recommendation-algorithm.test.ts` — Unit tests for `calculateRecommendationBaseScore` (no related types, weighted blend, primary-only ceiling when secondary weights are missing, pooling across multiple related types, arithmetic floor/ceiling) and `scoreRecommendation` (score equals base score with no motivations, rec object identity, motivation boost applied, boost monotonicity).
+### Algorithm (`packages/core`)
 
-**Algorithm (`packages/core`)**
+- Exported `calculateRecommendationBaseScore` and `scoreRecommendation` for direct testability.
 
-- `recommendation-algorithm.ts` — Exported `calculateRecommendationBaseScore` and `scoreRecommendation` to make them testable.
+## 2026-05-19 — Feat: Recommendation Engine Interest-Aware Bucket Diversification
 
----
+Replaced the post-diversification interest boost with a bucket-based, interest-first diversification pipeline. Top slots now aim for one rec per user interest before activity-type diversity kicks in.
 
-## 2026-05-19 — Recommendation Engine: Interest-Aware Bucket Diversification
+### Algorithm (`packages/core`)
 
-Replaced the post-diversification interest boost with a bucket-based, interest-first diversification pipeline. The top recommendation slots now aim for one rec per user interest before activity-type diversity kicks in.
+- Added `helpers/diversify.ts` with `classifyBucket` (Top / Middle / Bottom) and `diversifyAndOrder` running two layered passes: interest-first slot filling, then activity-type deduplication across remaining high-score recs.
+- Replaced `getDiverseRecommendations` and `applyInterestBoost` with a single `diversifyAndOrder` call in `getRecommendations`.
 
-**Algorithm (`packages/core`)**
+### Types (`packages/types`)
 
-- `helpers/diversify.ts` (new) — `classifyBucket` assigns each scored rec to Top (`score >= 0.6` + field in interests), Middle (`score >= 0.6` + off-interest, OR `0.4 <= score < 0.6` + in-interest with a sort-only `+0.1` boost), or Bottom. `diversifyAndOrder` runs two layered passes: Pass 1 picks the highest-`sortScore` Top-bucket rec for each user interest (no type uniqueness inside the pass, so two interest fields may share an activity type — Pass 2 still avoids duplicating those types). Pass 2 walks the remaining `sortScore >= 0.6` pool (leftover Top ∪ Middle high-score) and picks one rec per previously-unseen activity type. Pass 1 is a no-op with 0 interests. After picks, remaining recs are appended in Top → Middle → Bottom order, each bucket sorted by `sortScore` desc. The `+0.1` boost is sort-only; the persisted `score` is never mutated.
-- `recommendation-algorithm.ts` — `getRecommendations` now calls `diversifyAndOrder(scored, interests).slice(0, MAX_RECOMMENDATIONS)` directly after scoring + motivation boost. Removed the old `getDiverseRecommendations` and `applyInterestBoost` helpers and the unused `MIN_PRIMARY_AFFINITY_FOR_STRONG_MATCH` (0.65) threshold — the new logic uses `TOP_BUCKET_MIN_SCORE = 0.6`.
+- Moved `ScoredRecommendation` and `ScoredActivityType` from `packages/core` into the shared types package.
 
-**Types (`packages/types`)**
+### Tests (`packages/core`)
 
-- `index.ts` — Moved `ScoredRecommendation` and `ScoredActivityType` out of `packages/core` into the shared types package.
+- Added `helpers/diversify.test.ts` with 14 unit tests covering bucket classification, ordering, score preservation, and interest/type-fill behaviour.
 
-**Tests (`packages/core`)**
+## 2026-05-16 — Fix: Motivation Boost Dead Adjacent Branch
 
-- `helpers/diversify.test.ts` (new) — 14 synthetic-data unit tests around `diversifyAndOrder` covering bucket placement, Top/Middle/Bottom ordering, Middle weighting competition (boost wins / boost insufficient), score preservation, one-per-interest behavior with type collision (2 interests), interest-pass-plus-type-fill (1 interest), and the 0-interest activity-type-only path.
-- `recommendation-algorithm.test.ts` — Trimmed to `getRecommendations` shape/integration tests plus the existing `getTopActivityTypes` tests; the diversification tests now live alongside `helpers/diversify.ts`.
+Reworked `calculateMotivationBoost` — the adjacent-pattern contribution was dead code because `getUserPatternWeights` always returns a complete record, so the exact-match early return was always taken.
 
----
+### Algorithm (`packages/core`)
 
-## 2026-05-16 — Motivation Boost: Fix Dead Adjacent Branch
+- `calculateMotivationBoost` now sums exact and adjacent contributions for every shared target pattern rather than early-returning on an exact match.
 
-Reworked `calculateMotivationBoost`. The previous implementation early-returned on an exact pattern lookup; because `getUserPatternWeights` returns a complete `Record<PatternTypeId, number>`, that branch was always taken in production and the adjacent-pattern contribution was dead code. The new logic computes both contributions for every shared target.
+### Tests (`packages/core`)
 
-**Algorithm (`packages/core`)**
+- Added a test for the exact + adjacent summation case; updated import to the renamed `getMotivationAndActivitySharedPatterns` helper.
 
-- `helpers/motivation.ts` — For each shared target pattern `calculateMotivationBoost` now sums `userWeight × EXACT` plus each adjacent neighbour's `userWeight × {STRONG_ADJACENT | WEAK_ADJACENT}` — so below-threshold weights still contribute proportionally without an explicit dampening factor. Renamed `getMotivationPatterns` → `getMotivationAndActivitySharedPatterns` and expanded the surrounding doc comments.
+## 2026-05-15 — Feat: Recommendation Engine Motivation Boost, Interest Boost, and Diversification
 
-**Tests (`packages/core`)**
+Three new scoring stages added to the recommendation pipeline — diversification, motivation boost, and interest boost — along with a fix to OCEAN score derivation from BFAS aspects.
 
-- `helpers/motivation.test.ts` — Added coverage for the exact + adjacent summation case for a single target; renamed import to match the renamed helper.
+### Algorithm (`packages/core`)
 
----
+- Added diversification (`getDiverseRecommendations`) to ensure no two results share the same primary `ActivityType`.
+- Added motivation boost using EXACT / STRONG_ADJACENT / WEAK_ADJACENT NEO pattern adjacency weights.
+- Added interest boost sorting interest-matching recs to the front before the final slice.
+- Split `helpers.ts` into `ocean.ts`, `patterns.ts`, and `motivation.ts`; fixed `getOCEANScores` to derive each trait from its true BFAS parent aspects.
 
-## 2026-05-15 — Recommendation Engine: Motivation Boost, Interest Boost & Diversification
+### Validation (`packages/core`)
 
-Three new scoring stages added to the recommendation pipeline, along with a fix to OCEAN score derivation.
+- Motivations array now requires `.min(1)`; submissions with no motivation selected are rejected.
 
-**Algorithm (`packages/core`)**
+### Types (`packages/types`)
 
-- `recommendation-algorithm.ts` — Diversification step (`getDiverseRecommendations`) ensures no two results share the same primary `ActivityType` (added 2026-05-11). Motivation boost applied before diversification: each recommendation's pattern-affinity score is multiplied by a boost factor derived from the user's selected motivations — EXACT match (1.0), STRONG_ADJACENT (0.65), or WEAK_ADJACENT (0.5) based on NEO pattern adjacency (shared `groupId` + polarity distance). Interest boost applied after diversification: candidates whose `ActivityType` matches any of the user's interest fields are sorted to the front before the final `MAX_RECOMMENDATIONS` slice.
-- `helpers/` — Split the single `helpers.ts` into `ocean.ts`, `patterns.ts`, and `motivation.ts` (re-exported from `helpers/index.ts`). `getOCEANScores` fixed to derive each OCEAN trait from its true BFAS parent aspects. `motivation.ts` exposes `calculateMotivationBoost`, which computes per-recommendation boost weights.
-- `recommendations/route.ts` — Passes `motivations` and `interests` from the user profile through to `getRecommendations`; `interests` is narrowed against `ACTIVITY_FIELDS` before passing.
+- Moved `Motivation` type from `packages/core` into the shared types package.
 
-**Validation (`packages/core`)**
+## 2026-05-10 — Feat: NEO Pattern Recommendation Scoring
 
-- `onboarding/schema.ts` — Motivations array now requires `.min(1)`; the backend rejects submissions with no motivation selected.
+Replaced per-trait OCEAN alignment scoring with a NEO pattern-strength model scoring each activity against the user's fit across 40 IPIP-NEO pattern types.
 
-**Types (`packages/types`)**
+### Types (`packages/types`)
 
-- `Motivation` type moved from `packages/core` into `packages/types` for shared access.
+- Added `OCEANScores`, `TraitLevel`, `PatternTypeId`, `PatternGroup`, and `PatternType`.
+- Replaced `ACTIVITY_TYPE_BFAS_MAPPING` with `patternGroups`, `patternTypes`, and `ActivityTypePatterns` in `constants.ts`.
 
----
+### Backend (`packages/core`)
 
-## 2026-05-10 — NEO Pattern Recommendation Scoring
+- Added `lib/helpers.ts` with `getOCEANScores`, `calculatePatternStrength`, `getUserPatternStrengths`, and `calculateActivityPatternAffinity`.
+- Rewrote `getRecommendations` to score via BFAS → OCEAN → pattern strengths, using a `0.7 * primary + 0.3 * secondary` affinity formula.
+- Added 8 unit tests for the new helpers.
 
-Replaced the per-trait OCEAN alignment scoring in the recommendation engine with a NEO pattern-strength model that scores each activity against the user's fit across the 40 IPIP-NEO pattern types (10 OCEAN trait pairs × HH/HL/LH/LL combinations).
+### Mocks (`packages/mocks`)
 
-**Types (`packages/types`)**
+- Corrected `rec_072` activity type from `Creative` to `Performative` and removed duplicate `related_types` entry.
 
-- `index.ts` — Added `OCEANScores`, `TraitLevel`, `PatternTypeId` (40-id union), `PatternGroup`, `PatternType`. Added optional `patternTypes?: PatternTypeId[]` field on `Recommendation` for human-curated overrides (declared, not yet read by the algorithm).
-- `constants.ts` — Removed the old `ACTIVITY_TYPE_BFAS_MAPPING`. Added `patternGroups` (10 trait-pair groups), `patternTypes` (40 named patterns with H/L definitions), and `ActivityTypePatterns` (each `ActivityType` → 3 pattern IDs that best express it).
+### Docs (`context`)
 
-**Server (`packages/core`)**
+- Updated `recommendation-engine.md` with the IPIP-NEO pattern catalog and four-stage algorithm flow.
 
-- `lib/helpers.ts` (new) — `getOCEANScores` collapses BFAS aspects into their parent OCEAN traits by averaging. `calculatePatternStrength` scores how well a user's OCEAN scores fit a pattern's H/L spec (each trait → `score/100` for H or `1 - score/100` for L, then averaged). `getUserPatternStrengths` runs that across all 40 patterns. `calculateActivityPatternAffinity` averages the user's strengths across a list of pattern IDs (returns 0 for empty input).
-- `lib/recommendation-algorithm.ts` — Rewrote `getRecommendations`. Now: BFAS → OCEAN → pattern strengths; for each recommendation, primary affinity (over `ActivityTypePatterns[type]`) and secondary affinity (over the union of patterns from `related_types`). Final score is `0.7 * primary + 0.3 * secondary`, falling back to primary alone when `related_types` is absent (so an empty secondary list doesn't drag the score toward zero). Sorts highest → lowest, returns top 3.
-- `lib/helpers.test.ts` (new) — 8 unit tests covering `getOCEANScores` averaging, `calculatePatternStrength` H/L matching including 0/100 boundaries, and `calculateActivityPatternAffinity` (empty list, multi-pattern average, missing-key handling).
+## 2026-05-08 — Fix: Frontend Code Audit Findings
 
-**Mocks (`packages/mocks`)**
+Resolved issues surfaced by a frontend audit: null-safety on API responses, broken image fallback, missing accessibility attributes, `ScrollView` on a dynamic list, silent profile-creation errors, and localhost env-var leak.
 
-- `recommendations.ts` — `rec_072` (TikTok choreography) retyped from `Creative` to `Performative` and its `related_types` updated to remove the duplicate that previously had its own `type` listed as a related type.
+### Mobile (`apps/mobile`)
 
-**Docs (`context`)**
+- Added null guard (`?? []`) on `body.recommendations` to prevent runtime crash on malformed API responses.
+- Added `onError` fallback to `expo-image` in `RecommendationCard`; set explicit image height to prevent layout shift.
+- Added `accessibilityRole` and `accessibilityLabel` to `PrimaryButton`, `Chip`, and `OptionCard`.
+- Replaced `ScrollView + .map()` with `FlatList` in the recommendations screen; added `signingOut` loading state for sign-out buttons.
+- Classified profile-creation errors (network vs. server) and surfaced a specific message in the loading screen.
+- Gated `localhost` fallback for `EXPO_PUBLIC_API_BASE_URL` on `__DEV__`; production builds throw if the variable is unset.
 
-- `recommendation-engine.md` — Added BFAS aspect breakdown, full IPIP-NEO pattern group catalog, and a four-stage Algorithm Flow section (BFAS→OCEAN, pattern strengths, primary/secondary scoring with the 0.7/0.3 split, sort & return top 3) with notes on inputs not yet wired in (motivation, interests, curated `patternTypes`).
+## 2026-05-08 — Fix: Backend Security and Validation Findings
 
-## 2026-05-08 — Frontend Code Audit Fixes
+Resolved five issues surfaced by a backend audit: CORS wildcard, missing env guard, unvalidated jsonb, duplicate-profile 500, and raw Zod errors in responses.
 
-Issues surfaced by a frontend audit: null-safety, broken image fallback, missing accessibility, ScrollView on dynamic list, silent profile-creation errors, localhost env-var leak, sign-out race, and image layout shift.
+### Backend (`packages/core`)
 
-**Mobile (`apps/mobile`)**
+- Replaced CORS `origin: true` with an explicit `trustedOrigins` allowlist shared between `cors` middleware and `betterAuth`.
+- Added a startup guard for `BETTER_AUTH_URL`, matching the existing guard for `BETTER_AUTH_SECRET`.
+- Added runtime `bfasScoresSchema` validation of `personality` jsonb after DB fetch.
+- `POST /profiles` now pre-checks for an existing profile and returns 409; a second 409 path handles the `23505` race condition.
+- Zod validation errors on `POST /profiles` are mapped to `{ path, message }` pairs before being sent.
 
-- `lib/recommendations/api.ts` — `body.recommendations ?? []` guards against a malformed API response where the key is absent, preventing a runtime crash on `.map()`.
-- `components/recommendations/recommendation-card.tsx` — Added `onError` handler to `expo-image`; broken or missing image URLs now render an emerald placeholder `View` instead of a broken slot. Image `height` changed from `"100%"` to the explicit `160` to prevent layout shift on load.
-- `components/ui/primary-button.tsx` — `Pressable` now carries `accessibilityRole="button"` and `accessibilityLabel={label}`.
-- `components/ui/chip.tsx` — `Pressable` now carries `accessibilityRole="togglebutton"`, `accessibilityLabel`, and `accessibilityState={{ selected }}`.
-- `components/ui/option-card.tsx` — `Pressable` now carries `accessibilityRole="radio"`, `accessibilityLabel`, and `accessibilityState={{ checked: selected }}`.
-- `app/(authed)/recommendations.tsx` — Replaced `ScrollView` + `.map()` with `FlatList` (`keyExtractor`, stable `renderItem` via `useCallback`, `ItemSeparatorComponent`, `ListHeaderComponent`, `ListFooterComponent`, `initialNumToRender={5}`). Added `signingOut` state — both sign-out buttons disable and show "Signing out..." while the request is in flight; both carry `accessibilityRole="button"` and `accessibilityLabel="Sign out"`.
-- `components/onboarding/loading-screen.tsx` / `app/onboarding/loading.tsx` — Profile creation errors are now classified (network `TypeError` vs server error) and a specific message is passed down to `OnboardingLoadingView` instead of the generic fallback.
-- `lib/auth/client.ts`, `lib/onboarding/api.ts`, `lib/recommendations/api.ts` — `EXPO_PUBLIC_API_BASE_URL` fallback to `localhost:3000` is now gated on `__DEV__`; production builds throw immediately if the variable is unset.
+## 2026-05-08 — Fix: Authed Route Group and Sign-In Race
 
-## 2026-05-08 — Backend Security & Validation Fixes
+Locks down `/recommendations` behind a session gate and fixes a race that bounced freshly signed-in users back to the onboarding flow.
 
-Five issues surfaced by a backend audit: CORS wildcard, missing env guard, unvalidated jsonb, duplicate-profile 500, and raw Zod errors in responses.
+### Mobile (`apps/mobile`)
 
-**Server (`packages/core`)**
+- Added `app/(authed)/_layout.tsx` with a session gate that redirects unauthenticated users to `/onboarding/name` and renders a spinner while the session is pending.
+- `app/sign-in.tsx` now awaits `useSession().refetch()` after `signIn.email()` before navigating, preventing a stale-session bounce to onboarding.
+- Added Jest setup and a first integration test (`authed-layout.test.tsx`) covering the gate's three states.
 
-- CORS `origin: true` replaced with an explicit `trustedOrigins` allowlist. The same array is now shared between `cors` middleware and `betterAuth` via a named export from `auth.ts`, so the two can't diverge.
-- Added a startup guard for `BETTER_AUTH_URL` — the server now throws on boot if the variable is unset, matching the existing guard for `BETTER_AUTH_SECRET`.
-- `personality` jsonb is now parsed with `bfasScoresSchema` at runtime after the DB fetch, before being passed to the recommendation algorithm. Previously the ORM's compile-time `.$type<T>()` cast provided no runtime protection; malformed rows silently produced wrong scores.
-- `POST /profiles` now pre-checks for an existing profile and returns 409 instead of letting the DB unique constraint surface as a 500. A second 409 path in the catch block handles the `23505` race condition for simultaneous requests.
-- Zod validation errors on `POST /profiles` are now mapped to `{ path, message }` pairs before being sent — internal fields (`code`, `expected`, `origin`) are stripped from the response.
-- Added `app.test.ts` with four CORS tests (trusted/untrusted origin, simple and preflight). Added tests for malformed `personality` (500), duplicate profile (409), race-condition `23505` (409), and sanitized 400 error shape.
+## 2026-05-08 — Feat: Better Auth (Email and Password)
 
-## 2026-05-08 — Authed Route Group & Sign-In Race Fix
+Added Better Auth as the auth layer with sign-up, sign-in, sign-out, persisted sessions, and a session-driven API.
 
-Locks down `/recommendations` so signed-out users can only ever see the onboarding flow, and fixes a race that bounced freshly-signed-in users back to onboarding instead of into the app.
+### Backend (`packages/core`)
 
-**Mobile (`apps/mobile`)**
+- Configured `better-auth` with the Drizzle adapter; email/password auth enabled with an 8-char minimum.
+- Added `getSessionUserId(req)` helper injected into route handlers for testable session lookup.
+- Replaced the `users` table with `profiles` and a one-to-one `auth_user_id` FK to the Better Auth `user` table.
+- `POST /profiles` and `GET /recommendations` now require a valid session; return 401 unauthenticated or 404 on missing profile.
+- Added a single migration creating the four Better Auth tables and the `profiles` schema.
 
-- New `app/(authed)/` route group with a `_layout.tsx` that reads `useSession()` and `<Redirect>`s to `/onboarding/name` when there is no session, renders an `ActivityIndicator` while pending, and otherwise renders a `Stack`. Moved `app/recommendations.tsx` into the group (URL is unchanged because parens-prefixed groups don't appear in the path). Future authed routes drop into the group to inherit the gate.
-- `app/sign-in.tsx` now awaits `useSession().refetch()` after a successful `signIn.email()` before navigating. Without this, `router.replace("/recommendations")` could fire before Better Auth's `$sessionSignal`-triggered refetch had updated the session atom, so the new `(authed)` gate read a stale `{data: null}` on first render and bounced the user back to `/onboarding/name`.
-- Added Jest setup (`jest-expo` preset, `@testing-library/react-native`, `react-test-renderer`, `@types/jest`) plus a `test` script and Jest config in `apps/mobile/package.json`. First integration test (`__tests__/authed-layout.test.tsx`) covers the gate's three states: pending, signed-out → redirect, signed-in → render `Stack`.
+### Mobile (`apps/mobile`)
 
-## 2026-05-08 — Better Auth (Email + Password)
+- Added `lib/auth/client.ts` with native (`expo-secure-store`) and web (`credentials: "include"`) auth configurations.
+- Added `lib/auth/fetch.ts` `authedFetch` helper attaching session credentials for both platforms.
+- Extended the onboarding name screen with email, password, and confirm-password fields with inline validation and error handling.
+- Added `app/sign-in.tsx` for returning users.
+- `app/index.tsx` routes signed-in users to `/recommendations` and everyone else to `/onboarding/name`.
 
-Added Better Auth as the auth layer. Sign-up / sign-in / sign-out, persisted sessions, and a session-driven API.
+## 2026-05-04 — Refactor: Move Shared Types Into `@touchgrass/types`
 
-**Server (`packages/core`)**
+Moved mobile-private activity, field, and Big Five personality types into a shared workspace package for use across the monorepo.
 
-- `better-auth` configured with the Drizzle adapter against the existing Neon DB; email/password enabled (8-char minimum). Handler mounted at `/api/auth/{*splat}` on the Express app, before `express.json()`. CORS now permits credentials.
-- New `getSessionUserId(req)` helper reads the Better Auth session via `auth.api.getSession`. Injected as a dep into route handlers so tests can mock it.
-- `users` table replaced by `profiles`, with a new `auth_user_id` (text, NOT NULL, UNIQUE, FK to `user(id)` ON DELETE CASCADE) one-to-one with the auth user.
-- Session-driven endpoints: `POST /profiles` requires a session and stamps `authUserId` from it; `GET /recommendations` requires a session and looks up the profile by `authUserId`. 401 unauthenticated, 404 if signed in but no profile yet.
-- Single `0001_better_auth_and_profiles.sql` migration creates the four Better Auth tables (`user`, `session`, `account`, `verification`), renames `users` → `profiles`, and adds the `auth_user_id` column with its FK and unique constraint.
-- `npm test` now loads `--env-file=../../.env.local` because `app.ts` transitively imports `db/client.ts` (via auth) at module load.
+### Types (`packages/types`)
 
-**Mobile (`apps/mobile`)**
+- Moved `apps/mobile/lib/types.ts` to `packages/types/index.ts`; exposed via `main` and `types` in `package.json` with no build step required.
 
-- Installed `better-auth`, `@better-auth/expo`, `expo-secure-store`, and `expo-network`.
-- `lib/auth/client.ts` — Better Auth client. On native, uses `expoClient` plugin with `expo-secure-store` for token persistence. On web, skips the plugin and relies on `credentials: "include"` so the browser handles cookies natively.
-- `lib/auth/fetch.ts` — `authedFetch` helper that attaches the session cookie via `authClient.getCookie()` on native and uses `credentials: "include"` on web. Used by both API helpers.
-- Onboarding name screen extended with email, password, and confirm-password fields. Email-format / password-length / passwords-match validation. `signUp.email()` wrapped in try/catch — server errors surfaced inline ("User already exists. Use another email."), transport errors caught with a generic "Couldn't reach the server" message. Added a "Sign in" link for returning users.
-- New `app/sign-in.tsx` for returning users — same try/catch pattern around `signIn.email()`, links back to account creation.
-- `app/index.tsx` reads `useSession()` and routes signed-in users to `/recommendations`, everyone else to `/onboarding/name`, with a spinner during the initial session check.
-- "Sign out" button on `/recommendations` (both ready and error states) routes back through `/`.
+### Mobile (`apps/mobile`)
 
-## 2026-05-04 — Move Shared Types Into `@touchgrass/types`
+- Replaced five `@/lib/types` import sites with `@touchgrass/types`.
 
-- Moved `apps/mobile/lib/types.ts` into `packages/types/index.ts` so the activity, field, and Big Five personality types are now shared workspace exports rather than mobile-private. The previously empty `packages/types/` stub now has real contents.
-- Updated `packages/types/package.json` to expose `index.ts` directly via `main` and `types` (no build step — Metro and TypeScript resolve the source file).
-- Added `@touchgrass/types: "*"` as a dependency of `@touchgrass/mobile`; npm linked it as a workspace symlink under `node_modules/@touchgrass/types`.
-- Switched all five import sites in the mobile app from `@/lib/types` to `@touchgrass/types`: `app/onboarding/interests.tsx`, `app/onboarding/personality.tsx`, `lib/onboarding-context.tsx`, `lib/icons.ts`, `lib/recommendations.ts`. Lint and `tsc --noEmit` both pass.
+## 2026-05-04 — Chore: Monorepo Restructure
 
-## 2026-05-04 — Monorepo Restructure
+Converted the repo to an npm-workspace monorepo with `apps/*` and `packages/*`. All source files were moved with `git mv`; no app code was modified.
 
-- Converted the repo to an npm-workspace monorepo with `apps/*` and `packages/*`. The Expo project now lives at `apps/mobile/` (renamed to `@touchgrass/mobile`); `apps/web/`, `packages/core/`, and `packages/types/` are stub workspaces (each contains only a minimal `package.json`) reserved for the future web app, microservice, and shared schemas.
-- Root `package.json` is now a workspace manifest with no dependencies; it exposes proxy scripts (`start`, `ios`, `android`, `web`, `lint`, `storybook[:ios|:android|:web]`) that delegate to `@touchgrass/mobile`, so the same dev commands keep working from the repo root.
-- Updated `apps/mobile/metro.config.js` for monorepo support: `watchFolders` covers the workspace root and `resolver.nodeModulesPaths` resolves both the project's and the hoisted root `node_modules`. Hierarchical lookup is left enabled so Metro can find nested deps like `react-native-reanimated`'s private `semver@7`.
-- Updated `.gitignore` so the storybook auto-generated file and Expo's native-folder patterns still match under the new layout (`**/.storybook/storybook.requires.ts`, `**/ios`, `**/android`).
-- All source files were moved with `git mv` so history is preserved as renames; no app code was modified.
+### Repo Root
 
-## 2026-05-03 — Storybook for React Native
+- Root `package.json` is now a workspace manifest with proxy scripts delegating to `@touchgrass/mobile`.
+- Updated `metro.config.js` for monorepo `watchFolders` and `nodeModulesPaths`.
+- Updated `.gitignore` for Storybook auto-generated files and Expo native folder patterns under the new layout.
+- Created stub workspaces: `apps/web/`, `packages/core/`, `packages/types/`.
 
-- Installed `@storybook/react-native` v10 with on-device addons (controls, actions, backgrounds, notes) and `@react-native-async-storage/async-storage` for state persistence.
-- Added `.storybook/` config (`main.ts`, `preview.tsx`, `index.ts`); preview decorator wraps stories with `SafeAreaProvider` and imports `global.css` so NativeWind classes apply.
-- Wrapped Metro with `withStorybook`, gated by `EXPO_PUBLIC_STORYBOOK=true`. Added a custom `index.js` entry that swaps between `expo-router/entry` (default) and the Storybook UI based on the same env flag.
-- Added `npm run storybook[:ios|:android|:web]` scripts and a `storybook-env.d.ts` triple-slash reference for `require.context` types.
-- Authored stories for every existing component: `GrassLogo`, `OnboardingProgress`, `OnboardingScreenShell`, `SkipButton`, `RecommendationCard`, `Chip`/`ChipGroup`, `FieldRow`, `OptionCard`, `PrimaryButton`, `Slider`, `TextField`.
-- Gitignored the auto-generated `.storybook/storybook.requires.ts`.
+## 2026-05-03 — Feat: Storybook for React Native
 
-## 2026-04-30 — Onboarding Phase 2 - Form Submission
+Added Storybook (`@storybook/react-native` v10) with on-device addons and stories for every existing UI component.
 
-- Migrated the onboarding flow to React Hook Form: `OnboardingProvider` now wraps a `FormProvider`, and each screen consumes the form via a `useOnboardingForm()` hook (`useFormContext`).
-- Wired up validation across screens: name (Screen 1), birthdate / height / gender / build / location / employment (Screen 2), all five Big Five scores (Screen 4), and ≥1 motivation (Screen 5). Screen 3 (Interests) remains optional.
-- Added `app/onboarding/loading.tsx` — a post-submission loading screen with a spinner, the message "Let's see what your next thing could be!", and a 2 s delay (in lieu of the recommendation algorithm) before redirecting to the recommendations view.
-- Added `react-hook-form` as a dependency.
+### Mobile (`apps/mobile`)
 
-## 2026-04-30 — Recommendations Config
+- Configured Storybook with `withStorybook` Metro wrapper, gated by `EXPO_PUBLIC_STORYBOOK=true`.
+- Added `storybook[:ios|:android|:web]` scripts and a `storybook-env.d.ts` reference for `require.context` types.
+- Authored stories for all existing components: `GrassLogo`, `OnboardingProgress`, `OnboardingScreenShell`, `SkipButton`, `RecommendationCard`, `Chip`/`ChipGroup`, `FieldRow`, `OptionCard`, `PrimaryButton`, `Slider`, `TextField`.
 
-- Extracted recommendation mock data out of `app/recommendations.tsx` into a typed config at `lib/recommendations.ts`, exporting a `Recommendation` type and a `RECOMMENDATIONS` array.
-- Expanded the mock dataset to 100 entries spanning all 10 activity types and all 20 fields, covering 100 unique type/field combinations with varied estimated times.
-- Added an optional `related_types?: ActivityType[]` field to the `Recommendation` type, initialised to an empty array on every entry.
+## 2026-04-30 — Feat: Onboarding Phase 2 — Form Submission
 
-## 2026-04-26 — Recommendation Card Icons
+Migrated the onboarding flow to React Hook Form with end-to-end validation and a post-submission loading screen.
 
-- Added a coherent icon lookup system (`lib/icons.ts`) that maps each recommendation `type` (Constructive, Active, Artistic, Intellectual, Outdoorsy, Social, Reflective, Creative, Adventurous, Professional) and `field` (Music, Martial Arts, Literature, Cooking, Photography, Gaming, Fitness, Coding, Science, Nature, Film, Theater, Visual Art, Writing, Dance, Cycling, Hiking, Travel, Wellness, Astronomy) to a meaningful lucide icon, with fallbacks for unknown labels.
-- Updated `RecommendationCard` to render the looked-up icons for `type` and `field`.
-- Added optional `estimatedTime` prop to `RecommendationCard`, always rendered with a clock icon.
+### Mobile (`apps/mobile`)
+
+- Migrated `OnboardingProvider` to wrap a `FormProvider`; each screen now consumes the form via `useOnboardingForm()`.
+- Added field validation across all five onboarding screens; Interests screen remains optional.
+- Added `app/onboarding/loading.tsx` post-submission screen with spinner and redirect to recommendations.
+
+## 2026-04-30 — Feat: Recommendations Config
+
+Extracted recommendation mock data into a typed config and expanded the dataset to 100 entries covering all activity type and field combinations.
+
+### Mobile (`apps/mobile`)
+
+- Extracted `RECOMMENDATIONS` array and `Recommendation` type into `lib/recommendations.ts`.
+- Expanded mock dataset to 100 entries spanning all 10 activity types and 20 fields.
+- Added optional `related_types?: ActivityType[]` field to the `Recommendation` type.
+
+## 2026-04-26 — Feat: Recommendation Card Icons
+
+Added an icon lookup system mapping activity types and fields to lucide icons, and updated `RecommendationCard` to render type, field, and estimated-time icons.
+
+### Mobile (`apps/mobile`)
+
+- Added `lib/icons.ts` mapping all 10 activity types and 20 fields to lucide icons with fallbacks.
+- Updated `RecommendationCard` to render type and field icons.
+- Added optional `estimatedTime` prop to `RecommendationCard`, rendered with a clock icon.
