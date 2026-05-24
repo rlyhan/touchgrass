@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.7] - 2026-05-25 — Chore: Keep-Warm Cron For Render Free Tier
+
+The Render API spins down after ~15 minutes of inactivity on the free plan, causing 30–60 second cold starts that manifested as an indefinite loading spinner on first visit (`useSession` waiting on `/api/auth/get-session`).
+
+### Infra (`.github/workflows`)
+
+- Added `keep-warm.yml` — a GitHub Actions cron that pings `https://touchgrass-api-81dp.onrender.com/health` every 10 minutes via `workflow_dispatch` and `schedule`. GitHub's scheduler is best-effort and frequently delayed 5–15 minutes under load, so 10 min cadence gives margin against Render's 15 min idle window. When the project graduates to a paid Render tier this workflow can be deleted.
+
 ## [1.0.6] - 2026-05-24 — Fix: iPhone Safari Sign-In Redirecting to Onboarding
 
 After successful sign-in on iPhone Safari, the authed layout saw a null session and redirected back to onboarding. Safari's Intelligent Tracking Prevention blocks the better-auth session cookie because the web client (`touchgrass-mobile.vercel.app`) and the API (`touchgrass-api-81dp.onrender.com`) are on different registrable domains, making the cookie cross-site. Desktop browsers were permissive enough to accept the `SameSite=None; Secure` cookie, masking the bug.
