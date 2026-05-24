@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-05-24 — Refactor: Centralise Inline Hex Colours into a Theme Module
+
+Colour values used as JS props (ActivityIndicator `color`, lucide icon `color`, SVG `fill`, inline style `backgroundColor`, etc.) were previously hardcoded hex strings scattered across the mobile app, with the same value (e.g. `#10b981`) duplicated in six files. This pulls them into a single typed source of truth.
+
+**Mobile (`apps/mobile`)**
+
+- **New `lib/theme/colors.ts`.** Exports a `colors` object (`as const`) organised into the warm Tip palette (`bg` / `spinner` / `accent`), Tailwind-aligned shade scales (`emerald` / `gray` / `red`), and standalone `white` / `black`.
+- **Migrated 12 consumer files** to import `colors` and reference named keys instead of raw hex literals — `app/_layout.tsx`, `app/index.tsx`, `app/(authed)/_layout.tsx`, `app/(authed)/recommendations/index.tsx`, `app/(authed)/activities/[slug].tsx`, `components/icons/grass-logo.tsx`, `components/onboarding/loading-screen.tsx`, `components/recommendations/recommendation-card.tsx`, `components/ui/chip.tsx`, `components/ui/option-card.tsx`, `components/ui/slider.tsx`, `components/ui/text-field.tsx`.
+- **NativeWind className-based styling unchanged** — this change only touches values that were already being passed as raw hex through JS props.
+
 ## 2026-05-24 — Fix: Post-Deploy UI Polish
 
 Visual cleanup pass on issues observed once the app was running on real devices. The loading spinner blended into the green logo, the RecommendationCard's "hovering" shadow never rendered in Expo Go on iPhone, and the dashboard and activity detail screens needed more deliberate spacing and typographic hierarchy.
