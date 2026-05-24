@@ -44,9 +44,16 @@ rationale for their matches.
 2. Determine, for each returned recommendation, the **dominant pattern** —
    the pattern ID from `ACTIVITY_TYPE_PATTERNS[rec.type] ∪
    related_types→patterns` with the highest user pattern weight.
-   - Surface as `dominantPatternId: PatternTypeId` on each recommendation in
-     the response (extend `ScoredRecommendation` or the response DTO; do not
-     mutate the `Activity` type).
+   - Only set `dominantPatternId` if that highest weight is **≥ 0.6**;
+     otherwise return `null`. The user-facing copy ("You were matched
+     because you scored highly as a…") would be misleading for sub-0.6
+     matches, so the UI must hide the accordion in that case.
+   - Surface as `dominantPatternId: PatternTypeId | null` on each
+     recommendation in the response (extend `ScoredRecommendation` or the
+     response DTO; do not mutate the `Activity` type).
+   - Threshold lives as an exported constant in the shared helper
+     (e.g. `MIN_DOMINANT_WEIGHT = 0.6`) so backend + mobile use the same
+     value.
 3. Add unit tests in `recommendation-algorithm.test.ts` (or a new sibling
    test file) covering:
    - Top-3 pattern selection from `getUserPatternWeights`.

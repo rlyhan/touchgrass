@@ -1,14 +1,20 @@
 import type { Activity, PatternTypeId } from "@touchgrass/types"
 import { ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants"
 
+// Minimum user weight required to claim the user "scored highly" for a pattern.
+// Below this, dominant-pattern resolution returns null so the UI hides the match
+// rationale rather than overclaiming.
+export const MIN_DOMINANT_WEIGHT = 0.6
+
 /*
  * Returns the pattern ID with the highest user weight from the activity's
- * primary + related patterns, or null if none resolve. Ties resolve by
- * pattern ID string sort for determinism.
+ * primary + related patterns, or null if none meet `minWeight`. Ties resolve
+ * by pattern ID string sort for determinism.
  */
 export function getDominantPatternId(
     userPatternWeights: Record<PatternTypeId, number>,
     activity: Pick<Activity, "type" | "related_types">,
+    minWeight: number = MIN_DOMINANT_WEIGHT,
 ): PatternTypeId | null {
     const primary = ACTIVITY_TYPE_PATTERNS[activity.type] ?? []
     const secondary = (activity.related_types ?? []).flatMap(
@@ -26,5 +32,7 @@ export function getDominantPatternId(
             bestWeight = weight
         }
     }
+
+    if (best === null || bestWeight < minWeight) return null
     return best
 }

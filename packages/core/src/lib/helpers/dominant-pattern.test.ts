@@ -3,7 +3,7 @@ import { test } from "node:test"
 
 import type { Activity, PatternTypeId } from "@touchgrass/types"
 
-import { getDominantPatternId } from "./dominant-pattern.js"
+import { MIN_DOMINANT_WEIGHT, getDominantPatternId } from "./dominant-pattern.js"
 
 const weights = (overrides: Partial<Record<PatternTypeId, number>>) =>
   overrides as Record<PatternTypeId, number>
@@ -33,18 +33,19 @@ test("considers patterns from related_types when picking the dominant pattern", 
 })
 
 test("treats missing pattern weights as 0", () => {
-  // Only 4-HH has a weight; the rest default to 0 and lose to it
+  // Only 4-HH has a (passing) weight; the rest default to 0 and lose to it
   const result = getDominantPatternId(
-    weights({ "4-HH": 0.1 }),
+    weights({ "4-HH": 0.8 }),
     activity("Creative"),
   )
   assert.equal(result, "4-HH")
 })
 
 test("breaks ties by pattern ID string sort for determinism", () => {
-  // All tied at 0.5 → '4-HH' < '7-LH' < '9-HH' lexicographically
+  // All tied at 0.7 (above the 0.6 threshold) →
+  // '4-HH' < '7-LH' < '9-HH' lexicographically
   const result = getDominantPatternId(
-    weights({ "4-HH": 0.5, "9-HH": 0.5, "7-LH": 0.5 }),
+    weights({ "4-HH": 0.7, "9-HH": 0.7, "7-LH": 0.7 }),
     activity("Creative"),
   )
   assert.equal(result, "4-HH")
@@ -60,16 +61,33 @@ test("deduplicates patterns appearing in both primary and related sets", () => {
   assert.equal(result, "4-LH")
 })
 
+test("returns null when no candidate pattern meets the default 0.6 threshold", () => {
+  // All weights below 0.6 → no pattern qualifies as a "strong" match
+  const result = getDominantPatternId(
+    weights({ "4-HH": 0.5, "9-HH": 0.4, "7-LH": 0.59 }),
+    activity("Creative"),
+  )
+  assert.equal(result, null)
+})
+
+test("returns the top pattern exactly at the 0.6 threshold (inclusive)", () => {
+  // Boundary: weight === MIN_DOMINANT_WEIGHT must qualify
+  const result = getDominantPatternId(
+    weights({ "4-HH": MIN_DOMINANT_WEIGHT, "9-HH": 0.1, "7-LH": 0.1 }),
+    activity("Creative"),
+  )
+  assert.equal(result, "4-HH")
+})
+
+test("respects a custom minWeight when provided", () => {
+  // With minWeight=0.9, only 0.95 qualifies; without it 0.5 would too
+  const w = weights({ "4-HH": 0.5, "9-HH": 0.95, "7-LH": 0.5 })
+  assert.equal(getDominantPatternId(w, activity("Creative"), 0.9), "9-HH")
+  // Lowering the threshold to 0 returns the absolute max
+  assert.equal(getDominantPatternId(w, activity("Creative"), 0), "9-HH")
+})
+
 test("returns null when the activity has no resolvable patterns", () => {
-  // ACTIVITY_TYPE_PATTERNS has entries for every ActivityType, but if we
-  // somehow get an empty candidate set (e.g. an activity type with [] patterns
-  // and no related_types), we return null. Simulate by mocking nothing —
-  // realistically this is defensive against future schema drift.
-  const empty = { type: "Creative" as Activity["type"], related_types: [] }
-  // Real data still resolves Creative; this confirms null path:
-  // we test the empty-candidates branch by giving an unknown type cast.
   const fakeType = { type: "__missing__" as Activity["type"], related_types: undefined }
   assert.equal(getDominantPatternId(weights({}), fakeType), null)
-  // And the real Creative type still returns something:
-  assert.notEqual(getDominantPatternId(weights({}), empty), null)
 })
