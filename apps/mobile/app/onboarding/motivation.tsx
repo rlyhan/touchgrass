@@ -20,6 +20,7 @@ export default function MotivationScreen() {
     <OnboardingScreenShell
       step={5}
       totalSteps={5}
+      backHref="/onboarding/personality"
       title="Why are you looking for a new hobby/activity?"
       footer={
         <PrimaryButton

@@ -33,6 +33,7 @@ export default function PersonalityScreen() {
     <OnboardingScreenShell
       step={4}
       totalSteps={5}
+      backHref="/onboarding/interests"
       title="How would you describe your personality?"
       subtitle="These traits are based off the Big Five Aspect Scale (BFAS)."
       footer={<PrimaryButton label="Continue" onPress={goNext} />}

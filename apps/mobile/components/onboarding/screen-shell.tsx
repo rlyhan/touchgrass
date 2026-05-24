@@ -1,8 +1,11 @@
+import { router, type Href } from "expo-router"
+import { ChevronLeft } from "lucide-react-native"
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
   type ViewStyle,
 } from "react-native"
@@ -10,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { OnboardingProgress } from "@/components/onboarding/progress"
+import { colors } from "@/lib/theme/colors"
 
 type ScreenShellProps = {
   step: number
@@ -19,6 +23,7 @@ type ScreenShellProps = {
   children: React.ReactNode
   footer: React.ReactNode
   contentStyle?: ViewStyle
+  backHref?: Href
 }
 
 export function OnboardingScreenShell({
@@ -29,6 +34,7 @@ export function OnboardingScreenShell({
   children,
   footer,
   contentStyle,
+  backHref,
 }: ScreenShellProps) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
@@ -36,7 +42,20 @@ export function OnboardingScreenShell({
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View className="items-center px-5 pt-4">
+        <View className="relative items-center justify-center px-5 pt-4">
+          {step > 1 && backHref && (
+            <TouchableOpacity
+              onPress={() =>
+                router.canGoBack() ? router.back() : router.replace(backHref)
+              }
+              className="absolute left-5"
+              accessibilityLabel="Go back"
+              accessibilityRole="button"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <ChevronLeft size={24} color={colors.gray[600]} />
+            </TouchableOpacity>
+          )}
           <GrassLogo />
         </View>
         <View className="px-5 pt-4">

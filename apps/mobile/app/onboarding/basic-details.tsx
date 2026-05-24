@@ -47,6 +47,7 @@ export default function BasicDetailsScreen() {
     <OnboardingScreenShell
       step={2}
       totalSteps={5}
+      backHref="/onboarding/name"
       title="Tell us some basic info about yourself."
       footer={
         <PrimaryButton

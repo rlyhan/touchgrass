@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1] - 2026-05-24 — Fix: Back Button Missing During Onboarding
+
+`OnboardingScreenShell` had no back button; steps 2–5 were forward-only. On iOS, cold-starting into a mid-onboarding screen with an empty history stack would crash with an unhandled `GO_BACK` action.
+
+### Mobile (`apps/mobile`)
+
+- Added a `backHref` prop to `OnboardingScreenShell`; renders a `ChevronLeft` back button when `step > 1`, keeping the logo centred via absolute positioning.
+- Back navigation calls `router.back()` when a history stack exists and falls back to `router.replace(backHref)` on cold start, eliminating the `GO_BACK` crash.
+- Wired `backHref` on all four non-first onboarding screens: `basic-details`, `interests`, `personality`, and `motivation`.
+
 ## [1.0.0] - 2026-05-24 — Fix: RecommendationCard Shadow Missing on Web
 
 The card shadow was applied with `Platform.select`, whose `default` branch (web) returned an empty object. On desktop browsers the cards rendered flat with no depth.

@@ -25,6 +25,7 @@ export default function InterestsScreen() {
     <OnboardingScreenShell
       step={3}
       totalSteps={5}
+      backHref="/onboarding/basic-details"
       title="Pick a few things you're interested in."
       subtitle="Don't worry if you can't think of anything right now."
       footer={
