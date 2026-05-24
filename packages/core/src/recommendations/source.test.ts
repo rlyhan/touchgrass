@@ -81,7 +81,7 @@ test("instructions from Sanity are merged onto a matching mock", async () => {
   assert.deepEqual(matched.instructions, override.instructions)
 })
 
-test("null instructions from Sanity fall through to undefined (no mock instructions)", async () => {
+test("null instructions from Sanity fall through to the mock's value", async () => {
   const target = RECOMMENDATIONS[0]
   assert.ok(target, "expected at least one mock")
   const partial = {
@@ -94,7 +94,7 @@ test("null instructions from Sanity fall through to undefined (no mock instructi
 
   const matched = result.find((r) => r.slug === target.slug)
   assert.ok(matched)
-  assert.equal(matched.instructions, undefined)
+  assert.deepEqual(matched.instructions, target.instructions)
 })
 
 test("Sanity-only activities missing required Activity fields are dropped", async () => {

@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.4] - 2026-05-24 — Chore: Expand Mock Recommendation Data as Sanity Fallback
+
+Mock data expanded to include `description`, `instructions`, and new Unsplash image URLs in order to have sufficient coverage for recommendations across users as fallback while Sanity CMS data catches up.
+
+### Shared (`packages/mocks`)
+
+- Added a `pt(...paragraphs)` helper that wraps plain strings into the `PortableTextBlock[]` shape `Activity.description` expects, so future mock descriptions stay one-liners instead of hand-written Sanity block JSON.
+- Populated `description` and `instructions` for every activity in `RECOMMENDATIONS`, giving each category enough content to render the activity detail screen end-to-end without Sanity.
+
+### Backend (`packages/core`)
+
+- Added tests for the `pt` helper and updated an existing source test whose assertion was tied to the now-removed assumption that mocks had no `instructions`.
+
 ## [1.0.3] - 2026-05-24 — Fix: Scope Mobile Production API URL to Production Builds
 
 `apps/mobile/.env` was unconditionally loaded by Expo across every environment, so the Render production URL it defined overrode the `__DEV__` fallback in `lib/config.ts` even during local dev. The Vercel web build (`expo export`) and EAS native builds need the production URL, but `expo start` should resolve to the local API. Conflating "production build config" with "always-loaded config" masked local backend changes — most recently the 1.0.2 trusted-origins fix had no effect on dev sign-in because requests were still being routed at Render.
