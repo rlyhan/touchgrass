@@ -8,7 +8,10 @@ import { TopPatternsSection } from "@/components/patterns/top-patterns-section"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { signOut } from "@/lib/auth/client"
-import { getCachedPatternWeights } from "@/lib/patterns/cache"
+import {
+  clearPatternWeightsCache,
+  getCachedPatternWeights,
+} from "@/lib/patterns/cache"
 import {
   fetchRecommendations,
   ProfileNotFoundError,
@@ -42,6 +45,8 @@ export default function RecommendationsPage() {
   const handleSignOut = useCallback(async () => {
     setSigningOut(true)
     await signOut()
+    // Drop cached pattern weights so the next user doesn't inherit them.
+    clearPatternWeightsCache()
     router.replace("/sign-in" as Href)
   }, [])
 
