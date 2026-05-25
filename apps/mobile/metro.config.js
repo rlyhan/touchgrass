@@ -14,6 +14,23 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
 ];
 
+// Workspace TS packages (e.g. @touchgrass/types) use NodeNext-style explicit
+// .js extensions on relative imports for the core API runtime. Metro doesn't
+// rewrite those to .ts the way tsx does, so strip the .js and retry.
+const defaultResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName.startsWith(".") && moduleName.endsWith(".js")) {
+    try {
+      return context.resolveRequest(context, moduleName.slice(0, -3), platform);
+    } catch {
+      // Fall through to the default resolver below.
+    }
+  }
+  return defaultResolveRequest
+    ? defaultResolveRequest(context, moduleName, platform)
+    : context.resolveRequest(context, moduleName, platform);
+};
+
 const storybookEnabled = process.env.EXPO_PUBLIC_STORYBOOK === "true";
 
 const configWithStorybook = withStorybook(config, {
