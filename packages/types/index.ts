@@ -226,3 +226,18 @@ export type ScoredActivityType = {
   type: ActivityType
   score: number
 }
+
+export type UserPatternWeights = Record<PatternTypeId, number>
+
+export type RecommendedActivity = Activity & {
+  dominantPatternId: PatternTypeId | null
+}
+
+export type RecommendationsResponse = {
+  recommendations: RecommendedActivity[]
+  patternWeights: UserPatternWeights
+}
+
+export type PatternWeightsResponse = {
+  patternWeights: UserPatternWeights
+}

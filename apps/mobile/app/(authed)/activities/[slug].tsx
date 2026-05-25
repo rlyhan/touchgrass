@@ -10,15 +10,40 @@ import {
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
+import { PatternMatchAccordion } from "@/components/patterns/pattern-match-accordion"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
+import { resolveDominantPattern } from "@/lib/patterns/cache"
+import { usePatternWeights } from "@/lib/patterns/use-pattern-weights"
 import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
+import { PATTERN_TYPES } from "@touchgrass/types/constants"
+
+const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
+
+function PatternMatch({ activity }: { activity: Activity }) {
+  // Hook ensures pattern weights are fetched if not already cached so direct
+  // entries (deep links, refresh) still resolve a dominant pattern.
+  const { weights } = usePatternWeights()
+  // Resolve via the shared cache: returns cached dominant for dashboard-sourced
+  // activities, or computes from weights for direct entries. Threshold-gated.
+  const dominantId = weights ? resolveDominantPattern(activity) : null
+  const pattern = dominantId ? PATTERN_BY_ID[dominantId] : null
+  if (!pattern) return null
+  return (
+    <View className="mt-5">
+      <PatternMatchAccordion
+        patternName={pattern.name}
+        shortDescription={pattern.shortDescription}
+      />
+    </View>
+  )
+}
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
 
@@ -111,6 +136,8 @@ export default function ActivityDetailPage() {
           estimatedTime={activity.estimated_time}
           size="large"
         />
+
+        <PatternMatch activity={activity} />
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">

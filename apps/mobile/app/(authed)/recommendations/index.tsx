@@ -4,9 +4,14 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
+import { TopPatternsSection } from "@/components/patterns/top-patterns-section"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { signOut } from "@/lib/auth/client"
+import {
+  clearPatternWeightsCache,
+  getCachedPatternWeights,
+} from "@/lib/patterns/cache"
 import {
   fetchRecommendations,
   ProfileNotFoundError,
@@ -40,6 +45,8 @@ export default function RecommendationsPage() {
   const handleSignOut = useCallback(async () => {
     setSigningOut(true)
     await signOut()
+    // Drop cached pattern weights so the next user doesn't inherit them.
+    clearPatternWeightsCache()
     router.replace("/sign-in" as Href)
   }, [])
 
@@ -115,7 +122,15 @@ export default function RecommendationsPage() {
             <View className="items-center">
               <GrassLogo />
             </View>
-            <Text className="mb-8 mt-12 text-3xl font-bold tracking-tight text-gray-900">
+            {(() => {
+              const weights = getCachedPatternWeights()
+              return weights ? (
+                <View className="mt-10">
+                  <TopPatternsSection patternWeights={weights} />
+                </View>
+              ) : null
+            })()}
+            <Text className="mb-8 mt-4 text-3xl font-bold tracking-tight text-gray-900">
               You might be great at...
             </Text>
           </>

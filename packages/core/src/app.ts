@@ -22,8 +22,15 @@ import {
   type GetRecommendationsDeps,
   getRecommendationsHandler,
 } from "./recommendations/route.js"
+import {
+  type GetPatternWeightsDeps,
+  getPatternWeightsHandler,
+} from "./patterns/route.js"
 
-export type AppDeps = CreateProfileDeps & GetRecommendationsDeps & GetActivityDeps
+export type AppDeps = CreateProfileDeps &
+  GetRecommendationsDeps &
+  GetActivityDeps &
+  GetPatternWeightsDeps
 
 export type AppOptions = {
   disableRateLimits?: boolean
@@ -72,6 +79,7 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
 
   app.post("/profiles", ...maybeLimit(profileLimiter), createProfileHandler(deps))
   app.get("/recommendations", ...maybeLimit(readLimiter), getRecommendationsHandler(deps))
+  app.get("/pattern-weights", ...maybeLimit(readLimiter), getPatternWeightsHandler(deps))
   app.get("/activities/:slug", ...maybeLimit(readLimiter), getActivityHandler(deps))
 
   app.use((_req: Request, res: Response) => {

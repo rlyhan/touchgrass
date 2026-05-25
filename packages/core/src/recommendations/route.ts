@@ -1,9 +1,18 @@
 import type { Request, Response } from "express"
 
-import type { ActivityField, Motivation } from "@touchgrass/types"
+import type {
+  ActivityField,
+  Motivation,
+  RecommendationsResponse,
+} from "@touchgrass/types"
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendation-algorithm.js"
+import {
+  getDominantPatternId,
+  getOCEANScores,
+  getUserPatternWeights,
+} from "../lib/helpers/index.js"
 import type { LoadRecommendations } from "./source.js"
 
 export type GetRecommendationsDeps = {
@@ -36,12 +45,18 @@ export function getRecommendationsHandler({
     const interests = profile.interests.filter((i): i is ActivityField =>
       (ACTIVITY_FIELDS as readonly string[]).includes(i),
     )
-    const recommendations = getRecommendations(
-      personality,
-      motivations,
-      interests,
-      await loadRecommendations(),
-    ).map((s) => s.rec)
-    res.status(200).json({ recommendations })
+    const patternWeights = getUserPatternWeights(getOCEANScores(personality))
+    const recommendations: RecommendationsResponse["recommendations"] =
+      getRecommendations(
+        personality,
+        motivations,
+        interests,
+        await loadRecommendations(),
+      ).map((s) => ({
+        ...s.rec,
+        dominantPatternId: getDominantPatternId(patternWeights, s.rec),
+      }))
+    const body: RecommendationsResponse = { recommendations, patternWeights }
+    res.status(200).json(body)
   }
 }

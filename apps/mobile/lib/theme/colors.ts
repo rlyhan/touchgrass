@@ -13,10 +13,12 @@ export const colors = {
   // Tailwind-aligned values reused as raw hex in JS props
   emerald: {
     100: "#D1FAE5",
+    300: "#6EE7B7",
     500: "#10B981",
     600: "#059669",
   },
   gray: {
+    100: "#F3F4F6",
     200: "#E5E7EB",
     400: "#9CA3AF",
     500: "#6B7280",
