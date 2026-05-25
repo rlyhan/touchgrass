@@ -131,7 +131,7 @@ export default function RecommendationsPage() {
               ) : null
             })()}
             <Text className="mb-8 mt-4 text-3xl font-bold tracking-tight text-gray-900">
-              You might be great at...
+              Your recommendations
             </Text>
           </>
         }

@@ -42,7 +42,7 @@ function LoadedState() {
               <GrassLogo />
             </View>
             <Text className="mb-6 mt-8 text-3xl font-bold tracking-tight text-gray-900">
-              You might be great at...
+              Your recommendations
             </Text>
           </>
         }

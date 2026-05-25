@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.1] - 2026-05-25 — Feat: Update UI messaging
+
+Improved messaging on dashboard and activity patterns for coherence.
+
+### Mobile (`apps/mobile`)
+
+- 'You could be great at...' messaging changed to 'Your recommendations'.
+
+### Shared types (`packages/types`)
+
+- Pattern type short descriptions improved to more positive framing.
+
 ## [1.1.0] - 2026-05-25 — Feat: Surface Pattern Alignments In Mobile App
 
 Surfaces each user's NEO pattern type alignments in the mobile app so users (especially those who skipped interests) can see the personality-based rationale for their matches. The recommendations dashboard now shows the top three matching patterns as animated rings; the activity detail screen explains the per-activity match via a collapsible accordion.
