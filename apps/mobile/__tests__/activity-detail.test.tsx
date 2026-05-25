@@ -21,6 +21,17 @@ jest.mock("@/lib/recommendations/api", () => ({
   fetchActivityBySlug: jest.fn(),
 }))
 
+// ── pattern weights ───────────────────────────────────────────────────────────
+// Stub out the patterns cache + hook so the accordion stays hidden by default
+// (no weights resolved). Individual tests can override these to exercise the
+// match copy.
+jest.mock("@/lib/patterns/cache", () => ({
+  resolveDominantPattern: jest.fn(() => null),
+}))
+jest.mock("@/lib/patterns/use-pattern-weights", () => ({
+  usePatternWeights: jest.fn(() => ({ weights: undefined, status: "loading" })),
+}))
+
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("react-native-safe-area-context", () => {
   const { View } = require("react-native")
@@ -50,6 +61,7 @@ jest.mock("lucide-react-native", () => {
   return {
     ArrowLeft: (p: object) => <View {...p} />,
     Lightbulb: (p: object) => <View testID="lightbulb-icon" {...p} />,
+    ChevronDown: (p: object) => <View testID="chevron-down" {...p} />,
   }
 })
 
@@ -297,6 +309,70 @@ describe("ActivityDetailPage", () => {
 
       expect(mockReplace).toHaveBeenCalledWith("/recommendations")
       expect(mockBack).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("pattern-match accordion", () => {
+    const mockResolveDominantPattern = jest.mocked(
+      require("@/lib/patterns/cache").resolveDominantPattern,
+    )
+    const mockUsePatternWeights = jest.mocked(
+      require("@/lib/patterns/use-pattern-weights").usePatternWeights,
+    )
+
+    beforeEach(() => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
+      mockGetCachedActivity.mockReturnValue(ACTIVITY)
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
+    })
+
+    it("hides the accordion when no dominant pattern resolves", () => {
+      mockUsePatternWeights.mockReturnValue({
+        weights: { "4-HH": 0.5 },
+        status: "ready",
+      })
+      mockResolveDominantPattern.mockReturnValue(null)
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByText(/You were matched/)).toBeNull()
+    })
+
+    it("hides the accordion while pattern weights are still loading", () => {
+      mockUsePatternWeights.mockReturnValue({
+        weights: undefined,
+        status: "loading",
+      })
+      render(<ActivityDetailPage />)
+      expect(screen.queryByText(/You were matched/)).toBeNull()
+    })
+
+    it("renders the match copy and reveals the short description on expand", () => {
+      mockUsePatternWeights.mockReturnValue({
+        weights: { "4-HH": 0.9 },
+        status: "ready",
+      })
+      // 4-HH → Enchanting Visionary
+      mockResolveDominantPattern.mockReturnValue("4-HH")
+      render(<ActivityDetailPage />)
+
+      const trigger = screen.getByRole("button", {
+        name: "Expand pattern details",
+      })
+      expect(
+        screen.getByText(/You were matched because you scored highly as a/),
+      ).toBeTruthy()
+      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+      const expectedDescription =
+        require("@touchgrass/types/constants").PATTERN_TYPES.find(
+          (p: { id: string }) => p.id === "4-HH",
+        ).shortDescription
+      expect(screen.queryByText(expectedDescription)).toBeNull()
+      expect(screen.getByText("See more")).toBeTruthy()
+
+      fireEvent.press(trigger)
+
+      expect(screen.getByText(expectedDescription)).toBeTruthy()
+      expect(screen.getByText("See less")).toBeTruthy()
     })
   })
 })
