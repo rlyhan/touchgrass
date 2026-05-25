@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.1.0] - 2026-05-25 — Feat: Surface Pattern Alignments In Mobile App
+
+Surfaces each user's NEO pattern type alignments in the mobile app so users (especially those who skipped interests) can see the personality-based rationale for their matches. The recommendations dashboard now shows the top three matching patterns as animated rings; the activity detail screen explains the per-activity match via a collapsible accordion.
+
+### Shared types (`packages/types`)
+
+- Added `dominant-pattern.ts` exporting `getDominantPatternId` and the `MIN_DOMINANT_WEIGHT = 0.6` threshold via a new `@touchgrass/types/dominant-pattern` subpath. Resolves the pattern with the highest user weight from an activity's primary + `related_types` patterns, returns `null` when no candidate meets the threshold so the "you scored highly" copy isn't shown for weak matches. Lives in `packages/types` so backend and mobile share one implementation.
+- Added response DTOs `RecommendedActivity`, `RecommendationsResponse`, `PatternWeightsResponse`, and `UserPatternWeights`.
+
+### Backend (`packages/core`)
+
+- `GET /recommendations` now returns `patternWeights: Record<PatternTypeId, number>` plus `dominantPatternId` on each recommendation, computed via the shared helper.
+- Added `GET /pattern-weights` — a lightweight endpoint that returns only the user's pattern weights, used by activity-detail cold-loads (deep links, refresh) to avoid refetching the full recommendations list when populating the accordion.
+- Unit tests for dominant-pattern resolution (primary + related, dedup, tie-break, threshold gating) plus endpoint tests for `/pattern-weights`.
+
+### Mobile (`apps/mobile`)
+
+- Added a top-patterns section above the recommendations list — three animated circular progress rings (`react-native-svg` + `react-native-reanimated`) showing the user's top three patterns by weight with their percentage. Tapping a ring expands an inline grey detail box with the pattern's name and short description; the previously-tapped ring fades to a paler emerald while non-selected rings dim, and a second tap (or selecting another ring) cross-fades back.
+- Added a pattern-match accordion on the activity detail screen. Default copy: "You were matched because you scored highly as a {patternName}." with a "See more" affordance; expanding reveals the pattern's short description. Hidden entirely when no pattern meets the 0.6 threshold for that activity, so the rationale never overclaims.
+- Pattern weights are sourced from a module-level cache shared across screens. Recommendations populates the cache on dashboard load; activity-detail reads from the cache for instant resolution, or refetches via `/pattern-weights` on cold deep-links. The cache is cleared on sign-out so the next user doesn't inherit prior weights.
+- Metro resolver now strips `.js` extensions on relative imports for workspace TS packages so `@touchgrass/types/dominant-pattern.js` (NodeNext-style) resolves under Metro, which doesn't rewrite extensions the way `tsx` does.
+
 ## [1.0.7] - 2026-05-25 — Chore: Keep-Warm Cron For Render Free Tier
 
 The Render API spins down after ~15 minutes of inactivity on the free plan, causing 30–60 second cold starts that manifested as an indefinite loading spinner on first visit (`useSession` waiting on `/api/auth/get-session`).
