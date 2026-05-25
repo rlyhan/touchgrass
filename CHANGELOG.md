@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2] - 2026-05-25 — Fix: Recommendations fail on Expo Go (physical device)
+
+### Mobile (`apps/mobile`)
+
+- Fixed "Couldn't load your recommendations" error when running on a physical device via Expo Go. The API base URL was hardcoded to `http://localhost:3000` in dev mode, which resolves to the device itself rather than the dev machine. The URL is now derived from `Constants.expoGoConfig.debuggerHost` so the correct LAN IP is used on real devices; the simulator is unaffected (continues to resolve via `127.0.0.1`).
+
 ## [1.1.1] - 2026-05-25 — Feat: Update UI messaging
 
 Improved messaging on dashboard and activity patterns for coherence.
