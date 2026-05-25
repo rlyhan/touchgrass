@@ -15,20 +15,13 @@
 
 4. Stage changes and create focused conventional commits.
 
-5. Push the branch to origin.
+5. If `## Parent Branch` exists,
+   - push branch to origin
+   - merge branch into parent branch
+   - checkout parent branch
 
-6. Merge:
-   - into the parent branch if `## Parent Branch` exists,
-   - otherwise into `main`.
-
-7. If merging into `main`:
-   - update `CHANGELOG.md`,
+6. If no parent branch,
+   - update `CHANGELOG.md` following structure provided in @/context/documentation.md
    - update `package.json` and lockfile versions using semantic versioning rules,
    - clear `current-feature.md`.
-
-8. If merging into a parent branch:
-   - preserve the feature context for continued work.
-
-9. Switch back to the merge target branch.
-
-10. Ask whether the merged branch should be deleted.
+   - push branch to origin
