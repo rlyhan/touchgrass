@@ -71,7 +71,15 @@ import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
 
-const ACTIVITY = RECOMMENDATIONS[0]
+// Strip description/instructions/tips so each section's empty-state can be
+// asserted independently; the section-present cases construct their own
+// fixtures below.
+const ACTIVITY: Activity = {
+  ...RECOMMENDATIONS[0],
+  description: undefined,
+  instructions: undefined,
+  tips: undefined,
+}
 const ACTIVITY_WITH_DESCRIPTION: Activity = {
   ...ACTIVITY,
   description: [
