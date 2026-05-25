@@ -49,7 +49,14 @@ export function TopPatternsSection({ patternWeights }: Props) {
   const displayed = displayedId !== null ? PATTERN_BY_ID[displayedId] : null
 
   useEffect(() => {
-    if (selectedId !== null) setDisplayedId(selectedId)
+    if (selectedId !== null) {
+      setDisplayedId(selectedId)
+      return
+    }
+    // Collapse: keep the previous content mounted for the duration of the
+    // animation so it can fade out, then unmount it.
+    const timeout = setTimeout(() => setDisplayedId(null), ANIMATION_DURATION)
+    return () => clearTimeout(timeout)
   }, [selectedId])
 
   useEffect(() => {

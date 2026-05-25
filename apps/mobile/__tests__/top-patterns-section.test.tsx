@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 // Replace the animated ring with a simple text stub so we don't have to render
 // the SVG or run the reanimated animation in tests.
@@ -61,17 +61,27 @@ describe("TopPatternsSection", () => {
   })
 
   it("hides the description when the selected ring is tapped again", () => {
-    const weights = makeWeights({ "4-HH": 0.95 })
-    render(<TopPatternsSection patternWeights={weights} />)
-    const pattern = PATTERN_TYPES.find((p) => p.id === "4-HH")!
+    jest.useFakeTimers()
+    try {
+      const weights = makeWeights({ "4-HH": 0.95 })
+      render(<TopPatternsSection patternWeights={weights} />)
+      const pattern = PATTERN_TYPES.find((p) => p.id === "4-HH")!
 
-    fireEvent.press(
-      screen.getByRole("button", { name: `Show details for ${pattern.name}` }),
-    )
-    fireEvent.press(
-      screen.getByRole("button", { name: `Hide details for ${pattern.name}` }),
-    )
-    expect(screen.queryByText(pattern.shortDescription)).toBeNull()
+      fireEvent.press(
+        screen.getByRole("button", { name: `Show details for ${pattern.name}` }),
+      )
+      fireEvent.press(
+        screen.getByRole("button", { name: `Hide details for ${pattern.name}` }),
+      )
+      // Content is kept mounted during the collapse animation so it can fade
+      // out; advance past the animation duration to let it unmount.
+      act(() => {
+        jest.runAllTimers()
+      })
+      expect(screen.queryByText(pattern.shortDescription)).toBeNull()
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("switches the description when a different ring is tapped", () => {
