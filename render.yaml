@@ -6,7 +6,7 @@ services:
     region: oregon
     branch: main
     rootDir: .
-    buildCommand: npm install --workspaces --include-workspace-root
+    buildCommand: npm install --workspace=@touchgrass/core --workspace=@touchgrass/types --workspace=@touchgrass/mocks --include-workspace-root && npm run build --workspace=@touchgrass/core
     startCommand: npm run start --workspace=@touchgrass/core
     healthCheckPath: /health
     envVars:

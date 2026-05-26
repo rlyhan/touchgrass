@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.3] - 2026-05-26 — Chore: Prebuild API to reduce Render cold-start time
+
+The production API now ships as a single esbuild-bundled JS file instead of being transpiled by `tsx` at boot, cutting application-level startup cost. Render's build step also skips the mobile, sanity, and web workspaces entirely.
+
+### Backend (`packages/core`)
+
+- Added `build` script driven by `esbuild.config.mjs` — bundles `src/index.ts` into `dist/index.js`, inlining `@touchgrass/types` and `@touchgrass/mocks` and externalizing `node_modules` deps. `start` now runs `node dist/index.js` directly; `dev` continues to use `tsx watch`, so the local workflow is unchanged.
+
+### Infra (`render.yaml`)
+
+- Narrowed `buildCommand`'s `npm install` to only the workspaces the API needs (`@touchgrass/core`, `@touchgrass/types`, `@touchgrass/mocks`) — `apps/mobile`, `apps/sanity`, and `apps/web` are excluded, cutting install time and image footprint.
+- `buildCommand` now also runs `npm run build --workspace=@touchgrass/core` to produce the bundle before `start`.
+
 ## [1.1.2] - 2026-05-25 — Fix: Recommendations fail on Expo Go (physical device)
 
 ### Mobile (`apps/mobile`)
