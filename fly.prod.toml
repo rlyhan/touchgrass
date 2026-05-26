@@ -1,0 +1,52 @@
+# Fly.io config for the touchgrass API — production environment.
+#
+# First-time setup:
+#   brew install flyctl
+#   fly auth login
+#   fly apps create touchgrass-api-prod
+#   fly secrets set \
+#     DATABASE_URL="..." \
+#     BETTER_AUTH_SECRET="..." \
+#     BETTER_AUTH_URL="https://touchgrass-api-prod.fly.dev" \
+#     BETTER_AUTH_TRUSTED_ORIGINS="exp+touchgrass://,https://touchgrass-mobile.vercel.app" \
+#     SANITY_PROJECT_ID="..." \
+#     SANITY_DATASET="..." \
+#     SANITY_API_VERSION="..." \
+#     --app touchgrass-api-prod
+#
+# Deploy:
+#   fly deploy --config fly.prod.toml
+#
+# Scale to 1 machine (Fly defaults to 2):
+#   fly scale count 1 --app touchgrass-api-prod
+#
+# After deploying, update EXPO_PUBLIC_API_BASE_URL in:
+#   - Vercel prod project environment variables → https://touchgrass-api-prod.fly.dev
+#   - EAS "production" environment → https://touchgrass-api-prod.fly.dev
+# Then trigger a manual redeploy on Vercel and push an EAS production update.
+
+app = "touchgrass-api-prod"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # "suspend" freezes the machine's memory to disk rather than doing a full
+  # shutdown — machines resume in ~1–3 s vs a cold Node boot.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    path = "/health"
+    method = "GET"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

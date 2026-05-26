@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.2.1] - 2026-05-26 — Fix: Web auth broken by third-party cookie blocking
+
+Browsers block cookies set by `touchgrass-api.fly.dev` when the page is served from `touchgrass-mobile.vercel.app` (third-party cookie restriction), so cookie-based session tracking failed on web. Replaced it with bearer token auth: the server now accepts `Authorization: Bearer <token>` headers via better-auth's `bearer` plugin, and the web client stores the session token in `localStorage` and attaches it on every request. Native (Expo) flow is unchanged and continues to use the existing ExpoClient + SecureStore cookie storage.
+
+### API (`packages/core`)
+
+- Enabled better-auth's `bearer` plugin in `src/auth.ts` so `auth.api.getSession()` (used by `auth-session.ts` and the `/api/auth/*` handler) accepts session tokens from the `Authorization: Bearer` header in addition to cookies.
+
+### Mobile (`apps/mobile`)
+
+- Added `lib/auth/token-store.ts` — SSR-safe `localStorage` helpers (`getStoredToken`, `setStoredToken`, `clearStoredToken`) for web bearer token persistence.
+- Updated `lib/auth/client.ts` — `signIn.email` and `signUp.email` are wrapped on web to store the token synchronously before callers make subsequent requests (e.g. `refetch()`). The `onRequest` hook attaches `Authorization: Bearer` on every auth-client request; `onSuccess` clears the token on sign-out; `onError` clears it on 401. Native flow (ExpoClient + SecureStore) is unchanged.
+- Updated `lib/auth/fetch.ts` — `authedFetch` on web now reads the stored token and attaches `Authorization: Bearer` so non-auth API calls (`/profiles`, `/recommendations`, etc.) are also authenticated.
+
+## [1.2.0] - 2026-05-26 — Chore: Fly.io QA environment and direct API routing
+
+Introduces a Fly.io QA environment and removes the Vercel proxy layer so all clients call the API directly via `EXPO_PUBLIC_API_BASE_URL`. This enables QA and prod Vercel deployments to target independent APIs without sharing a `vercel.json` rewrite destination.
+
+### Infra (`fly.toml`)
+
+- Added Fly.io configuration for the `touchgrass-api-qa` app (`sjc` region, `shared-cpu-1x`, 256 MB). Machine suspension (`auto_stop_machines = "suspend"`) is used in place of full shutdown, giving ~1–3 s resume latency vs ~4 s cold boot and ~32 s on Render free tier.
+- `min_machines_running = 0` keeps the QA environment free when idle.
+
+### Mobile (`apps/mobile`)
+
+- Removed proxy-based URL resolution for web prod builds. `resolveBaseUrl()` now resolves `EXPO_PUBLIC_API_BASE_URL` first on all platforms; the `window.location.origin` fallback and `/_api` path prefix (which depended on Vercel rewrites) are removed.
+- `EXPO_PUBLIC_API_BASE_URL` is now required in all non-dev builds, including web.
+
+### Infra (`vercel.json`)
+
+- Removed `/api` and `/_api` proxy rewrites. Each Vercel project (QA, prod) sets its own `EXPO_PUBLIC_API_BASE_URL` env var to point directly at the appropriate Fly API.
+
 ## [1.1.3] - 2026-05-26 — Chore: Prebuild API to reduce Render cold-start time
 
 The production API now ships as a single esbuild-bundled JS file instead of being transpiled by `tsx` at boot, cutting application-level startup cost. Render's build step also skips the mobile, sanity, and web workspaces entirely.
