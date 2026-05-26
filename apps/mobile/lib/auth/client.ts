@@ -16,7 +16,6 @@ export const authClient = createAuthClient({
   baseURL: API_BASE_URL,
   fetchOptions: isWeb
     ? {
-        credentials: "include",
         onRequest: (ctx) => {
           const token = getStoredToken()
           if (token) {

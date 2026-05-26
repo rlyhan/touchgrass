@@ -13,7 +13,7 @@ export function authedFetch(
     if (token) {
       headers.set("Authorization", `Bearer ${token}`)
     }
-    return fetch(input, { ...init, credentials: "include", headers })
+    return fetch(input, { ...init, headers })
   }
   const cookie = authClient.getCookie()
   const headers = new Headers(init.headers)
