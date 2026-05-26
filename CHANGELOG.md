@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.1] - 2026-05-26 — Fix: Web auth broken by third-party cookie blocking
+
+Browsers block cookies set by `touchgrass-api.fly.dev` when the page is served from `touchgrass-mobile.vercel.app` (third-party cookie restriction). Replaced cookie-based session tracking on web with bearer token auth — the token returned by better-auth's sign-in response is now stored in `localStorage` and attached as `Authorization: Bearer` on all subsequent requests.
+
+### Mobile (`apps/mobile`)
+
+- Added `lib/auth/token-store.ts` — SSR-safe `localStorage` helpers (`getStoredToken`, `setStoredToken`, `clearStoredToken`) for web bearer token persistence.
+- Updated `lib/auth/client.ts` — `signIn.email` and `signUp.email` are wrapped on web to store the token synchronously before callers make subsequent requests (e.g. `refetch()`). The `onRequest` hook attaches `Authorization: Bearer` on every auth-client request; `onSuccess` clears the token on sign-out; `onError` clears it on 401. Native flow (ExpoClient + SecureStore) is unchanged.
+- Updated `lib/auth/fetch.ts` — `authedFetch` on web now reads the stored token and attaches `Authorization: Bearer` so non-auth API calls (`/profiles`, `/recommendations`, etc.) are also authenticated.
+
 ## [1.2.0] - 2026-05-26 — Chore: Fly.io QA environment and direct API routing
 
 Introduces a Fly.io QA environment and removes the Vercel proxy layer so all clients call the API directly via `EXPO_PUBLIC_API_BASE_URL`. This enables QA and prod Vercel deployments to target independent APIs without sharing a `vercel.json` rewrite destination.
