@@ -119,13 +119,25 @@ DATABASE_URL='<prod url>' npm run db:migrate --workspace=@touchgrass/core
 
 | Artifact | Host | Config |
 |---|---|---|
-| API (`packages/core`) | [Render](https://render.com) free Web Service | `render.yaml` |
-| Web client (`apps/mobile`) | [Vercel](https://vercel.com) | `vercel.json` |
+| API — prod (`packages/core`) | [Fly.io](https://fly.io) | `fly.prod.toml` |
+| API — QA (`packages/core`) | [Fly.io](https://fly.io) | `fly.toml` |
+| Web client — prod (`apps/mobile`) | [Vercel](https://vercel.com) (`main` branch) | `vercel.json` |
+| Web client — QA (`apps/mobile`) | [Vercel](https://vercel.com) (`qa` branch) | `vercel.json` |
 | Mobile (Expo Go) | EAS Update | `apps/mobile/eas.json` |
 
-**Render** reads `render.yaml` automatically when you connect the repo. Set the seven env vars listed above in the Render dashboard (add `BETTER_AUTH_TRUSTED_ORIGINS` once the Vercel URL is known).
+**Fly.io** — each environment is a separate Fly app. See the header comments in `fly.prod.toml` and `fly.toml` for first-time setup steps. Deploy with:
 
-**Vercel** reads `vercel.json` from the repo root. Set `EXPO_PUBLIC_API_BASE_URL` to your Render service URL in the Vercel project settings.
+```bash
+fly deploy --config fly.prod.toml   # production
+fly deploy                          # QA (fly.toml)
+```
+
+**Vercel** — two separate Vercel projects share `vercel.json` for build config. Each project sets its own `EXPO_PUBLIC_API_BASE_URL` env var pointing at the appropriate Fly app. The web client calls the API directly — no proxy layer.
+
+| Vercel project | Branch | `EXPO_PUBLIC_API_BASE_URL` |
+|---|---|---|
+| `touchgrass-mobile` (prod) | `main` | `https://touchgrass-api-prod.fly.dev` |
+| `touchgrass-mobile-qa` (QA) | `qa` | `https://touchgrass-api-qa.fly.dev` |
 
 **EAS Update** (Expo Go testers):
 
@@ -134,8 +146,14 @@ cd apps/mobile
 eas login
 eas init          # first time only — writes projectId to app.json
 eas update:configure  # first time only — writes updates.url to app.json
-EXPO_PUBLIC_API_BASE_URL=https://<render-url>.onrender.com \
+
+# QA / preview testers
+EXPO_PUBLIC_API_BASE_URL=https://touchgrass-api-qa.fly.dev \
   eas update --branch preview --message "description"
+
+# Production
+EXPO_PUBLIC_API_BASE_URL=https://touchgrass-api-prod.fly.dev \
+  eas update --branch production --message "description"
 ```
 
 ---
