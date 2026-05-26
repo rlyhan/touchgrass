@@ -4,5 +4,15 @@
   "buildCommand": "npm run vercel-build --workspace=@touchgrass/mobile",
   "outputDirectory": "apps/mobile/dist",
   "framework": null,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://touchgrass-api-81dp.onrender.com/api/:path*"
+    },
+    {
+      "source": "/_api/:path*",
+      "destination": "https://touchgrass-api-81dp.onrender.com/:path*"
+    }
+  ]
 }
