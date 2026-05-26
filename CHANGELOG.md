@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.2] - 2026-05-27 — Chore: Clean up post-Fly migration leftovers
+
+Removes stale Render-era infrastructure and dead options left over from the Vercel-proxy auth model. No functional change for end users; mobile preview/production builds now correctly target the Fly APIs and CI is leaner.
+
+### Mobile (`apps/mobile`)
+
+- `eas.json`: `preview` now sets `EXPO_PUBLIC_API_BASE_URL=https://touchgrass-api-qa.fly.dev` and `production` sets `https://touchgrass-api-prod.fly.dev`. Both were still pointing at the deprecated Render URL, so Expo Go preview and production builds were hitting the wrong backend.
+- Removed `credentials: "include"` from web `fetchOptions` in `lib/auth/client.ts` and from `authedFetch` in `lib/auth/fetch.ts`. Bearer tokens now carry the session on web, and third-party cookies are blocked anyway, so the flag was dead weight.
+
+### Infra (`.github/workflows`)
+
+- Deleted `keep-warm.yml`. The cron existed to mitigate Render's ~15 min idle shutdown; Fly's `auto_stop_machines = "suspend"` resumes machines in ~1–3 s, so the ping is no longer useful.
+
 ## [1.2.1] - 2026-05-26 — Fix: Web auth broken by third-party cookie blocking
 
 Browsers block cookies set by `touchgrass-api.fly.dev` when the page is served from `touchgrass-mobile.vercel.app` (third-party cookie restriction), so cookie-based session tracking failed on web. Replaced it with bearer token auth: the server now accepts `Authorization: Bearer <token>` headers via better-auth's `bearer` plugin, and the web client stores the session token in `localStorage` and attaches it on every request. Native (Expo) flow is unchanged and continues to use the existing ExpoClient + SecureStore cookie storage.
