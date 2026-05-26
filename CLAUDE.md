@@ -142,14 +142,27 @@ npm run lint
 
 | File | Purpose |
 |---|---|
-| `render.yaml` | Render Web Service blueprint for `packages/core` |
-| `vercel.json` | Vercel static build config — runs `apps/mobile` web export |
+| `fly.prod.toml` | Fly.io config for production API (`touchgrass-api-prod`) |
+| `fly.toml` | Fly.io config for QA API (`touchgrass-api-qa`) |
+| `vercel.json` | Vercel build config — shared by both prod and QA Vercel projects |
 | `apps/mobile/eas.json` | EAS build/update profiles (`development`, `preview`, `production`) |
 
 Deployed services:
-- **API** → Render (`https://touchgrass-api-81dp.onrender.com`)
-- **Web client** → Vercel (`https://touchgrass-mobile.vercel.app`)
-- **Mobile (Expo Go)** → EAS Update, `preview` branch
+- **API (prod)** → Fly.io (`https://touchgrass-api-prod.fly.dev`)
+- **API (QA)** → Fly.io (`https://touchgrass-api-qa.fly.dev`)
+- **Web client (prod)** → Vercel, `main` branch (`https://touchgrass-mobile.vercel.app`)
+- **Web client (QA)** → Vercel, `qa` branch (`https://touchgrass-mobile-qa.vercel.app`)
+- **Mobile (Expo Go)** → EAS Update, `preview` branch (QA) / `production` branch
+
+## QA workflow
+
+The `qa` branch is the integration branch for testing before merging to `main`.
+
+- Feature branches merge into `qa` first
+- Vercel QA (`touchgrass-mobile-qa.vercel.app`) auto-deploys from `qa`
+- Fly QA (`touchgrass-api-qa.fly.dev`) is deployed manually with `fly deploy`
+- Both use `EXPO_PUBLIC_API_BASE_URL` to point directly at their respective Fly app — no proxy
+- Once QA is validated, open a PR from `qa → main`
 
 ---
 
