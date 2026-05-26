@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.2.0] - 2026-05-26 — Chore: Fly.io QA environment and direct API routing
+
+Introduces a Fly.io QA environment and removes the Vercel proxy layer so all clients call the API directly via `EXPO_PUBLIC_API_BASE_URL`. This enables QA and prod Vercel deployments to target independent APIs without sharing a `vercel.json` rewrite destination.
+
+### Infra (`fly.toml`)
+
+- Added Fly.io configuration for the `touchgrass-api-qa` app (`sjc` region, `shared-cpu-1x`, 256 MB). Machine suspension (`auto_stop_machines = "suspend"`) is used in place of full shutdown, giving ~1–3 s resume latency vs ~4 s cold boot and ~32 s on Render free tier.
+- `min_machines_running = 0` keeps the QA environment free when idle.
+
+### Mobile (`apps/mobile`)
+
+- Removed proxy-based URL resolution for web prod builds. `resolveBaseUrl()` now resolves `EXPO_PUBLIC_API_BASE_URL` first on all platforms; the `window.location.origin` fallback and `/_api` path prefix (which depended on Vercel rewrites) are removed.
+- `EXPO_PUBLIC_API_BASE_URL` is now required in all non-dev builds, including web.
+
+### Infra (`vercel.json`)
+
+- Removed `/api` and `/_api` proxy rewrites. Each Vercel project (QA, prod) sets its own `EXPO_PUBLIC_API_BASE_URL` env var to point directly at the appropriate Fly API.
+
 ## [1.1.3] - 2026-05-26 — Chore: Prebuild API to reduce Render cold-start time
 
 The production API now ships as a single esbuild-bundled JS file instead of being transpiled by `tsx` at boot, cutting application-level startup cost. Render's build step also skips the mobile, sanity, and web workspaces entirely.
