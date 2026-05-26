@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { bearer } from "better-auth/plugins"
 import { expo } from "@better-auth/expo"
 
 import { db } from "./db/client.js"
@@ -32,7 +33,7 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
   },
-  plugins: [expo()],
+  plugins: [expo(), bearer()],
   advanced: {
     defaultCookieAttributes: {
       sameSite: "none",
