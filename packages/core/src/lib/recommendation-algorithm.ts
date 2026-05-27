@@ -9,7 +9,7 @@ import {
 } from "./helpers/index.js";
 
 const SECONDARY_WEIGHT = 0.2
-const MAX_RECOMMENDATIONS = 3
+const MAX_RECOMMENDATIONS = 10
 const TOP_ACTIVITY_TYPES_COUNT = 6
 
 /*
