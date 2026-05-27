@@ -1,0 +1,32 @@
+name: Deploy API to Fly QA
+
+on:
+  push:
+    branches: [qa]
+    paths:
+      - "packages/core/**"
+      - "packages/types/**"
+      - "packages/mocks/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "fly.toml"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/fly-deploy-qa.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fly-deploy-qa
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy touchgrass-api-qa
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --config fly.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

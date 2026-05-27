@@ -1,9 +1,9 @@
 import { Platform } from "react-native"
 
 import { authClient } from "./client"
-import { getStoredToken } from "./token-store"
+import { clearStoredToken, getStoredToken } from "./token-store"
 
-export function authedFetch(
+export async function authedFetch(
   input: RequestInfo | URL,
   init: RequestInit = {},
 ): Promise<Response> {
@@ -13,7 +13,11 @@ export function authedFetch(
     if (token) {
       headers.set("Authorization", `Bearer ${token}`)
     }
-    return fetch(input, { ...init, credentials: "include", headers })
+    const response = await fetch(input, { ...init, headers })
+    if (response.status === 401) {
+      clearStoredToken()
+    }
+    return response
   }
   const cookie = authClient.getCookie()
   const headers = new Headers(init.headers)

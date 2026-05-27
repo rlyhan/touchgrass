@@ -3,6 +3,7 @@ import { test } from "node:test"
 
 import {
   parseExtraTrustedOrigins,
+  resolveCorsOrigins,
   resolveTrustedOrigins,
 } from "./trusted-origins.js"
 
@@ -59,4 +60,24 @@ test("resolveTrustedOrigins accepts a single https origin in production", () => 
   assert.deepEqual(origins, ["touchgrass://", "https://app.touchgrass.com"])
   // Localhost dev origins are NOT included in production.
   assert.ok(!origins.includes("http://localhost:8081"))
+})
+
+test("resolveCorsOrigins keeps only http(s) entries", () => {
+  assert.deepEqual(
+    resolveCorsOrigins([
+      "touchgrass://",
+      "exp://",
+      "exp+touchgrass://",
+      "http://localhost:8081",
+      "https://touchgrass-mobile-qa.vercel.app",
+    ]),
+    ["http://localhost:8081", "https://touchgrass-mobile-qa.vercel.app"],
+  )
+})
+
+test("resolveCorsOrigins returns empty when only app-scheme origins are present", () => {
+  assert.deepEqual(
+    resolveCorsOrigins(["touchgrass://", "exp://"]),
+    [],
+  )
 })

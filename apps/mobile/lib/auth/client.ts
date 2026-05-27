@@ -16,7 +16,6 @@ export const authClient = createAuthClient({
   baseURL: API_BASE_URL,
   fetchOptions: isWeb
     ? {
-        credentials: "include",
         onRequest: (ctx) => {
           const token = getStoredToken()
           if (token) {
@@ -25,6 +24,15 @@ export const authClient = createAuthClient({
           return ctx
         },
         onSuccess: (ctx) => {
+          // The signed bearer token (value.signature) is exposed via the
+          // `set-auth-token` response header by better-auth's bearer plugin.
+          // Reading from the header (vs the body's `token` field) keeps the
+          // raw session id out of response bodies that might be logged.
+          const issued = ctx.response?.headers.get("set-auth-token")
+          if (issued) {
+            setStoredToken(issued)
+            return
+          }
           const url = ctx.request?.url?.toString() ?? ""
           if (url.includes("/sign-out")) {
             clearStoredToken()
@@ -48,37 +56,4 @@ export const authClient = createAuthClient({
       ],
 })
 
-const {
-  signIn: _signIn,
-  signUp: _signUp,
-  signOut,
-  useSession,
-  getSession,
-} = authClient
-
-// On web, the bearer token must be in localStorage before the caller's
-// next request (e.g. refetch() in sign-in.tsx). Wrapping here is more
-// reliable than the onSuccess hook, which may fire after the promise resolves.
-export const signIn = isWeb
-  ? {
-      ..._signIn,
-      email: async (...args: Parameters<typeof _signIn.email>) => {
-        const result = await _signIn.email(...args)
-        if (result.data?.token) setStoredToken(result.data.token)
-        return result
-      },
-    }
-  : _signIn
-
-export const signUp = isWeb
-  ? {
-      ..._signUp,
-      email: async (...args: Parameters<typeof _signUp.email>) => {
-        const result = await _signUp.email(...args)
-        if (result.data?.token) setStoredToken(result.data.token)
-        return result
-      },
-    }
-  : _signUp
-
-export { signOut, useSession, getSession }
+export const { signIn, signUp, signOut, useSession, getSession } = authClient
