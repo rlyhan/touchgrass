@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.2.6] - 2026-05-27 — Chore: Broaden recommendation surface and pattern affinity
+
+Expands the recommendations list from 3 to 10 to give users more activities to browse while adjacent discovery features are still in flight, and widens each mock activity's `related_types` so secondary pattern affinity better reflects the personality dimensions a user actually shares with an activity.
+
+### API (`packages/core`)
+
+- Raised `MAX_RECOMMENDATIONS` in `src/lib/recommendation-algorithm.ts` from 3 to 10. The diversification pipeline (`helpers/diversify.ts`) is count-agnostic — the top picks pass still diversifies by activity type, so duplicate types only appear once the unique-type pool is exhausted.
+
+### Mocks (`packages/mocks`)
+
+- Broadened `related_types` on every mock activity in `recommendations.ts` (typically from 2 entries to 4–5). Secondary affinity is averaged across all related-type patterns and weighted by `SECONDARY_WEIGHT` (0.2), so a wider, more representative set sharpens scoring for users whose personality matches an activity through multiple dimensions rather than one.
+
+### Tests (`packages/core`)
+
+- Updated `recommendation-algorithm.test.ts` to assert the new 10-rec cap and refreshed stale "top 3 slots" commentary.
+
+### Docs (`context`)
+
+- Updated `recommendation-engine.md` to reference the new `MAX_RECOMMENDATIONS = 10` cap in the diversify-and-order step.
+
 ## [1.2.5] - 2026-05-27 — Refactor: Make mock portable-text helper file-local
 
 Tightens the `@touchgrass/mocks` package surface by removing an internal helper from its public exports.

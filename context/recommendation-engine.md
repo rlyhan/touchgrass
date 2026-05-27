@@ -169,7 +169,7 @@ The adjacent-pattern step means a user who fits a neighbouring pattern still ben
 
 ### 5. Diversify and order
 
-After scoring, `diversifyAndOrder` (in `helpers/diversify.ts`) produces the final ordered list before the top 3 (`MAX_RECOMMENDATIONS`) are taken.
+After scoring, `diversifyAndOrder` (in `helpers/diversify.ts`) produces the final ordered list before the top 10 (`MAX_RECOMMENDATIONS`) are taken.
 
 **Bucket classification** — each recommendation is placed into one of three buckets based on score and whether its `field` is one of the user's interests:
 

@@ -19,7 +19,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Music",
     estimated_time: "A weekend",
-    related_types: ["Skill-based", "Creative"],
+    related_types: ["Creative", "Skill-based", "Strategic", "Expressive"],
     description: pt("Design a personalized guitar pedalboard setup that improves your sound and playing workflow."),
     instructions: [
       { title: "Choose your essential pedals", description: "Start with effects you actually use often." },
@@ -34,7 +34,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Martial Arts",
     estimated_time: "1 hour",
-    related_types: ["Physical", "Skill-based"],
+    related_types: ["Physical", "Disciplined", "Skill-based", "Mindful"],
     description: pt("Learn the fundamentals of boxing while improving fitness, coordination, and confidence."),
     instructions: [
       { title: "Focus on stance and footwork", description: "Good movement is more important than power at first." },
@@ -49,7 +49,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Artistic",
     field: "Writing",
     estimated_time: "A few hours",
-    related_types: ["Creative", "Expressive"],
+    related_types: ["Creative", "Expressive", "Emotional", "Reflective"],
     description: pt("Create a suspenseful short screenplay built around tension, atmosphere, and a memorable twist."),
     instructions: [
       { title: "Choose a strong central fear", description: "Build the story around one unsettling concept." },
@@ -64,7 +64,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Writing",
     estimated_time: "1 hour",
-    related_types: ["Mindful", "Emotional"],
+    related_types: ["Mindful", "Emotional", "Expressive", "Creative"],
     description: pt("Slow down and reflect through freeform journaling while listening to calming jazz music."),
     instructions: [
       { title: "Choose a relaxing playlist", description: "Use music that helps you settle into the moment." },
@@ -79,7 +79,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Educational",
     field: "Music",
     estimated_time: "A week",
-    related_types: ["Educational", "Analytical"],
+    related_types: ["Intellectual", "Analytical", "Disciplined", "Creative"],
     description: pt("Learn foundational music theory concepts that strengthen songwriting and musicianship."),
     instructions: [
       { title: "Learn scales and intervals", description: "Understand how notes relate to each other." },
@@ -94,7 +94,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Music",
     estimated_time: "A few hours",
-    related_types: ["Artistic", "Expressive"],
+    related_types: ["Artistic", "Expressive", "Emotional", "Performative"],
     description: pt("Challenge yourself to write a complete short song with structure, melody, and emotion."),
     instructions: [
       { title: "Start with a simple progression", description: "Keep the musical foundation easy to build on." },
@@ -109,7 +109,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Music",
     estimated_time: "An evening",
-    related_types: ["Community-oriented", "Reflective"],
+    related_types: ["Community-oriented", "Collaborative", "Reflective", "Expressive"],
     description: pt("Bring friends together to intentionally listen to and discuss favorite vinyl records."),
     instructions: [
       { title: "Choose a theme or genre", description: "Create a cohesive listening experience." },
@@ -124,7 +124,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Martial Arts",
     estimated_time: "A weekend",
-    related_types: ["Skill-based"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative"],
     description: pt("Construct a durable heavy bag stand for boxing or kickboxing training at home."),
     instructions: [
       { title: "Measure your available space", description: "Plan for movement and stability around the bag." },
@@ -139,7 +139,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Mindful",
     field: "Martial Arts",
     estimated_time: "A week",
-    related_types: ["Mindful", "Physical"],
+    related_types: ["Reflective", "Therapeutic", "Disciplined", "Physical"],
     description: pt("Practice foundational Tai Chi movements that improve balance, relaxation, and focus."),
     instructions: [
       { title: "Move slowly and deliberately", description: "Prioritize control and awareness over speed." },
@@ -154,7 +154,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Martial Arts",
     estimated_time: "A week",
-    related_types: ["Educational", "Reflective"],
+    related_types: ["Mindful", "Educational", "Disciplined", "Emotional"],
     description: pt("Explore Bruce Lee’s philosophy, discipline, and cultural impact through biography and reflection."),
     instructions: [
       { title: "Take notes on key ideas", description: "Highlight lessons that resonate with you personally." },
@@ -169,7 +169,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Martial Arts",
     estimated_time: "A weekend",
-    related_types: ["Exploratory", "Goal-oriented"],
+    related_types: ["Exploratory", "Goal-oriented", "Physical", "Disciplined"],
     description: pt("Research and organize a trip centered around martial arts training, seminars, or cultural experiences."),
     instructions: [
       { title: "Choose a destination", description: "Look for gyms, dojos, or camps that match your interests." },
@@ -184,7 +184,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Writing",
     estimated_time: "A month",
-    related_types: ["Disciplined", "Goal-oriented"],
+    related_types: ["Mindful", "Emotional", "Expressive", "Creative", "Disciplined"],
     description: pt("Build a consistent reading habit by committing to reading every day for a month."),
     instructions: [
       { title: "Pick your reading list", description: "Choose books that genuinely interest you." },
@@ -199,7 +199,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Writing",
     estimated_time: "Ongoing",
-    related_types: ["Community-oriented", "Intellectual"],
+    related_types: ["Collaborative", "Community-oriented", "Intellectual", "Expressive"],
     description: pt("Meet fellow readers and discuss books in a collaborative and social setting."),
     instructions: [
       { title: "Find a nearby group", description: "Search online or ask local libraries for recommendations." },
@@ -214,7 +214,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Writing",
     estimated_time: "A weekend",
-    related_types: ["Goal-oriented", "Creative"],
+    related_types: ["Goal-oriented", "Creative", "Disciplined", "Strategic"],
     description: pt("Polish and submit your creative writing to a literary publication for consideration."),
     instructions: [
       { title: "Edit your story carefully", description: "Refine pacing, grammar, and clarity before submitting." },
@@ -229,7 +229,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Writing",
     estimated_time: "A week",
-    related_types: ["Analytical", "Educational"],
+    related_types: ["Analytical", "Educational", "Reflective", "Creative"],
     description: pt("Deeply examine a classic novel by studying themes, characters, and structure chapter by chapter."),
     instructions: [
       { title: "Read slowly and actively", description: "Highlight important passages and recurring ideas." },
@@ -244,7 +244,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Cooking",
     estimated_time: "A month",
-    related_types: ["Constructive", "Reflective"],
+    related_types: ["Artistic", "Expressive", "Reflective", "Experimental", "Constructive"],
     description: pt("Compile your favorite recipes, cooking notes, and personal touches into a custom cookbook."),
     instructions: [
       { title: "Collect your best recipes", description: "Choose dishes you genuinely enjoy making." },
@@ -259,7 +259,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Cooking",
     estimated_time: "A week",
-    related_types: ["Exploratory", "Experimental"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented", "Experimental"],
     description: pt("Immerse yourself in a regional cuisine by cooking dishes from the same culture for an entire week."),
     instructions: [
       { title: "Choose a region", description: "Pick a cuisine you are curious about exploring." },
@@ -274,7 +274,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Cooking",
     estimated_time: "A week",
-    related_types: ["Strategic", "Creative"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership", "Creative"],
     description: pt("Design and present a creative pop-up restaurant idea with a clear identity and audience."),
     instructions: [
       { title: "Define your concept", description: "Choose a cuisine, atmosphere, and target audience." },
@@ -289,7 +289,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Photography",
     estimated_time: "1 hour",
-    related_types: ["Mindful", "Artistic"],
+    related_types: ["Mindful", "Artistic", "Outdoorsy", "Emotional"],
     description: pt("Capture warm natural lighting and quiet moments during a walk at golden hour."),
     instructions: [
       { title: "Go out before sunset", description: "Plan your walk when the light is soft and warm." },
@@ -304,7 +304,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Photography",
     estimated_time: "A weekend",
-    related_types: ["Experimental", "Skill-based"],
+    related_types: ["Experimental", "Skill-based", "Creative", "Analytical"],
     description: pt("Create a simple pinhole camera and explore the fundamentals of analog photography."),
     instructions: [
       { title: "Gather lightproof materials", description: "Use a box or container that blocks external light." },
@@ -319,7 +319,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Artistic",
     field: "Photography",
     estimated_time: "A weekend",
-    related_types: ["Creative", "Expressive"],
+    related_types: ["Creative", "Expressive", "Reflective", "Experimental"],
     description: pt("Design a small self-published photo zine that tells a visual story or explores a theme."),
     instructions: [
       { title: "Choose a visual theme", description: "Build the zine around a consistent mood or idea." },
@@ -334,7 +334,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Photography",
     estimated_time: "An afternoon",
-    related_types: ["Leadership", "Outdoorsy"],
+    related_types: ["Leadership", "Collaborative", "Outdoorsy", "Creative"],
     description: pt("Organize and guide a casual group photography walk through an interesting location."),
     instructions: [
       { title: "Plan a scenic route", description: "Choose areas with good lighting and varied subjects." },
@@ -349,7 +349,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Outdoorsy",
     field: "Photography",
     estimated_time: "An afternoon",
-    related_types: ["Adventurous", "Artistic"],
+    related_types: ["Adventurous", "Artistic", "Reflective", "Exploratory"],
     description: pt("Photograph wildlife responsibly while exploring the natural beauty of a state park."),
     instructions: [
       { title: "Research the location", description: "Learn which animals are commonly seen there." },
@@ -364,7 +364,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Gaming",
     estimated_time: "An afternoon",
-    related_types: ["Leadership", "Collaborative"],
+    related_types: ["Collaborative", "Leadership", "Creative", "Community-oriented"],
     description: pt("Host a self-contained tabletop RPG adventure for friends in a single session."),
     instructions: [
       { title: "Prepare a simple storyline", description: "Keep the plot focused and easy to follow." },
@@ -379,7 +379,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Gaming",
     estimated_time: "A weekend",
-    related_types: ["Strategic", "Constructive"],
+    related_types: ["Strategic", "Constructive", "Experimental", "Analytical"],
     description: pt("Develop a playable board game prototype with original mechanics and objectives."),
     instructions: [
       { title: "Define the core gameplay loop", description: "Decide what players repeatedly do during the game." },
@@ -394,7 +394,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Gaming",
     estimated_time: "1 hour",
-    related_types: ["Performative", "Expressive"],
+    related_types: ["Performative", "Expressive", "Social", "Goal-oriented"],
     description: pt("Go live for the first time and learn the basics of streaming gameplay or creative content."),
     instructions: [
       { title: "Test your audio and video", description: "Make sure viewers can clearly hear and see you." },
@@ -409,7 +409,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Gaming",
     estimated_time: "A month",
-    related_types: ["Goal-oriented", "Competitive"],
+    related_types: ["Competitive", "Goal-oriented", "Strategic", "Disciplined"],
     description: pt("Commit to finishing a famously challenging RPG through patience and persistence."),
     instructions: [
       { title: "Learn the game systems", description: "Understanding mechanics will make progress smoother." },
@@ -424,7 +424,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Fitness",
     estimated_time: "A month",
-    related_types: ["Physical", "Disciplined"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive"],
     description: pt("Build upper body strength and consistency through a month-long push-up challenge."),
     instructions: [
       { title: "Start with realistic numbers", description: "Choose a daily goal you can maintain." },
@@ -439,7 +439,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Fitness",
     estimated_time: "A weekend",
-    related_types: ["Goal-oriented", "Strategic"],
+    related_types: ["Strategic", "Goal-oriented", "Disciplined", "Analytical"],
     description: pt("Design a practical home gym setup tailored to your fitness goals and available space."),
     instructions: [
       { title: "Measure your space", description: "Plan around movement and equipment clearance." },
@@ -454,7 +454,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Outdoorsy",
     field: "Fitness",
     estimated_time: "An afternoon",
-    related_types: ["Active", "Strategic"],
+    related_types: ["Active", "Strategic", "Physical", "Adventurous"],
     description: pt("Create an outdoor workout route that combines movement, cardio, and exercise stations."),
     instructions: [
       { title: "Scout the location", description: "Look for open areas and useful structures." },
@@ -469,7 +469,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Fitness",
     estimated_time: "A month",
-    related_types: ["Goal-oriented", "Physical"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented", "Physical"],
     description: pt("Train toward completing your first organized 5K race with confidence and preparation."),
     instructions: [
       { title: "Choose a beginner-friendly race", description: "Look for supportive local events." },
@@ -484,7 +484,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Fitness",
     estimated_time: "A month",
-    related_types: ["Educational", "Disciplined"],
+    related_types: ["Educational", "Disciplined", "Leadership", "Goal-oriented"],
     description: pt("Study exercise science and coaching principles to earn a personal training certification."),
     instructions: [
       { title: "Research certification programs", description: "Compare requirements and reputations." },
@@ -499,7 +499,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Coding",
     estimated_time: "A weekend",
-    related_types: ["Creative", "Skill-based"],
+    related_types: ["Creative", "Skill-based", "Analytical", "Strategic"],
     description: pt("Create a custom personal website that showcases your work, interests, or portfolio."),
     instructions: [
       { title: "Plan your site structure", description: "Decide which pages and sections you need." },
@@ -514,7 +514,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Coding",
     estimated_time: "A week",
-    related_types: ["Educational", "Reflective"],
+    related_types: ["Educational", "Reflective", "Analytical", "Disciplined"],
     description: pt("Study timeless software development principles from a classic programming book."),
     instructions: [
       { title: "Read actively", description: "Take notes on ideas that stand out to you." },
@@ -529,7 +529,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Coding",
     estimated_time: "1 hour",
-    related_types: ["Collaborative", "Community-oriented"],
+    related_types: ["Collaborative", "Community-oriented", "Leadership", "Creative"],
     description: pt("Collaborate with other developers during a casual coding meetup or hack night."),
     instructions: [
       { title: "Introduce yourself to others", description: "Networking is part of the experience." },
@@ -544,7 +544,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Coding",
     estimated_time: "A week",
-    related_types: ["Collaborative", "Goal-oriented"],
+    related_types: ["Collaborative", "Goal-oriented", "Disciplined", "Strategic"],
     description: pt("Make your first contribution to an open-source project through a pull request."),
     instructions: [
       { title: "Find a beginner-friendly issue", description: "Look for projects welcoming new contributors." },
@@ -559,7 +559,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Science",
     estimated_time: "1 hour",
-    related_types: ["Experimental", "Educational"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Experimental"],
     description: pt("Explore scientific concepts through safe and creative chemistry experiments at home."),
     instructions: [
       { title: "Choose a safe experiment", description: "Use household materials and simple reactions." },
@@ -574,7 +574,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Science",
     estimated_time: "A week",
-    related_types: ["Intellectual", "Educational"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive", "Educational"],
     description: pt("Explore astronomy, humanity, and science through Carl Sagan’s influential book Cosmos."),
     instructions: [
       { title: "Read a chapter at a time", description: "Take time to absorb the scientific concepts." },
@@ -589,7 +589,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Science",
     estimated_time: "A month",
-    related_types: ["Analytical", "Community-oriented"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic", "Community-oriented"],
     description: pt("Contribute observations or data to a citizen science initiative and support real research."),
     instructions: [
       { title: "Choose a project", description: "Find one related to nature, astronomy, or environmental science." },
@@ -604,7 +604,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Outdoorsy",
     field: "Science",
     estimated_time: "An afternoon",
-    related_types: ["Adventurous", "Educational"],
+    related_types: ["Adventurous", "Reflective", "Mindful", "Exploratory", "Educational"],
     description: pt("Explore a unique geological site while learning about natural history and land formation."),
     instructions: [
       { title: "Research the trail", description: "Check terrain, weather, and difficulty beforehand." },
@@ -619,7 +619,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Science",
     estimated_time: "A week",
-    related_types: ["Educational", "Community-oriented"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership", "Educational"],
     description: pt("Gain hands-on experience in scientific research by volunteering in a laboratory setting."),
     instructions: [
       { title: "Research local opportunities", description: "Look at universities, hospitals, or nonprofits." },
@@ -634,7 +634,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Nature",
     estimated_time: "A few hours",
-    related_types: ["Mindful", "Therapeutic"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Mindful"],
     description: pt("Grow fresh herbs indoors and create a calming, practical addition to your living space."),
     instructions: [
       { title: "Choose easy starter herbs", description: "Basil, mint, and parsley are beginner-friendly." },
@@ -649,7 +649,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Nature",
     estimated_time: "1 hour",
-    related_types: ["Mindful", "Therapeutic", "Outdoorsy"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive", "Therapeutic"],
     description: pt("Slow down and reconnect with nature through a calm, mindful walk in a forest environment."),
     instructions: [
       { title: "Walk without distractions", description: "Avoid checking your phone during the experience." },
@@ -664,7 +664,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Nature",
     estimated_time: "An afternoon",
-    related_types: ["Educational", "Outdoorsy"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic", "Outdoorsy"],
     description: pt("Learn about local biodiversity by identifying plant species in your area."),
     instructions: [
       { title: "Bring a plant identification app", description: "Use tools to help confirm species." },
@@ -679,7 +679,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Nature",
     estimated_time: "An afternoon",
-    related_types: ["Community-oriented", "Outdoorsy"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Outdoorsy"],
     description: pt("Help preserve local outdoor spaces by participating in a community trail cleanup."),
     instructions: [
       { title: "Bring gloves and supplies", description: "Prepare for collecting litter safely." },
@@ -694,7 +694,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Nature",
     estimated_time: "A weekend",
-    related_types: ["Outdoorsy", "Reflective"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented"],
     description: pt("Experience solitude and independence by spending a night camping alone in nature."),
     instructions: [
       { title: "Choose a safe campsite", description: "Pick an accessible and beginner-friendly location." },
@@ -709,7 +709,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Film",
     estimated_time: "A month",
-    related_types: ["Educational", "Analytical"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic"],
     description: pt("Study a filmmaker’s artistic evolution by watching their films in sequence."),
     instructions: [
       { title: "Choose a director you admire", description: "Pick someone with a distinct creative voice." },
@@ -724,7 +724,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Film",
     estimated_time: "1 hour",
-    related_types: ["Community-oriented", "Collaborative"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership"],
     description: pt("Create a memorable movie night experience around a shared genre, director, or theme."),
     instructions: [
       { title: "Choose a strong theme", description: "Pick films that connect visually or narratively." },
@@ -739,7 +739,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Film",
     estimated_time: "A few hours",
-    related_types: ["Creative", "Strategic"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership", "Creative"],
     description: pt("Develop and pitch a compelling logline for an original television pilot concept."),
     instructions: [
       { title: "Define the core conflict", description: "Clarify what drives the story forward." },
@@ -754,7 +754,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Film",
     estimated_time: "1 hour",
-    related_types: ["Mindful", "Emotional"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive"],
     description: pt("Think deeply about the films that have shaped your taste, emotions, or worldview."),
     instructions: [
       { title: "List your five favorites", description: "Choose films with lasting personal impact." },
@@ -769,7 +769,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Theater",
     estimated_time: "An afternoon",
-    related_types: ["Performative", "Expressive"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive", "Performative"],
     description: pt("Step onto the stage and audition for a local theater production."),
     instructions: [
       { title: "Prepare a short monologue", description: "Choose material that suits your personality." },
@@ -784,7 +784,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Theater",
     estimated_time: "A weekend",
-    related_types: ["Collaborative", "Artistic"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Collaborative"],
     description: pt("Create a functional and visually engaging set piece for a theater performance."),
     instructions: [
       { title: "Sketch the design first", description: "Plan dimensions and materials before building." },
@@ -799,7 +799,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Artistic",
     field: "Theater",
     estimated_time: "A few hours",
-    related_types: ["Creative", "Expressive"],
+    related_types: ["Creative", "Expressive", "Emotional", "Reflective"],
     description: pt("Write a concise stage play with strong characters and a focused dramatic arc."),
     instructions: [
       { title: "Limit the number of characters", description: "Keep the story manageable and focused." },
@@ -814,7 +814,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Theater",
     estimated_time: "1 hour",
-    related_types: ["Performative", "Collaborative", "Expressive"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Performative"],
     description: pt("Host a fun improvisation session filled with games, creativity, and spontaneous acting."),
     instructions: [
       { title: "Prepare simple improv games", description: "Use activities that encourage participation." },
@@ -829,7 +829,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Theater",
     estimated_time: "A weekend",
-    related_types: ["Leadership", "Collaborative"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership", "Collaborative"],
     description: pt("Lead actors through a staged reading that highlights storytelling and performance."),
     instructions: [
       { title: "Choose a strong script", description: "Pick material suited for vocal performance." },
@@ -844,7 +844,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Art",
     estimated_time: "1 hour",
-    related_types: ["Artistic", "Skill-based"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Artistic"],
     description: pt("Learn the basics of wheel throwing while creating handmade ceramic pieces."),
     instructions: [
       { title: "Center the clay carefully", description: "Balanced clay is essential for shaping pottery." },
@@ -859,7 +859,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Outdoorsy",
     field: "Art",
     estimated_time: "1 hour",
-    related_types: ["Artistic", "Mindful"],
+    related_types: ["Adventurous", "Reflective", "Mindful", "Exploratory", "Artistic"],
     description: pt("Practice observational drawing while enjoying the atmosphere of a public park."),
     instructions: [
       { title: "Find a comfortable location", description: "Choose a spot with interesting scenery or people." },
@@ -874,7 +874,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Art",
     estimated_time: "An afternoon",
-    related_types: ["Artistic", "Expressive"],
+    related_types: ["Artistic", "Expressive", "Reflective", "Experimental"],
     description: pt("Design a visually cohesive gallery wall using art, photos, or collected pieces."),
     instructions: [
       { title: "Choose a visual theme", description: "Keep colors or styles relatively consistent." },
@@ -889,7 +889,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Art",
     estimated_time: "A weekend",
-    related_types: ["Goal-oriented", "Artistic"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership", "Artistic"],
     description: pt("Share and sell your creative work in a local community market environment."),
     instructions: [
       { title: "Choose your best work", description: "Display pieces that represent your style clearly." },
@@ -904,7 +904,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Writing",
     estimated_time: "A few hours",
-    related_types: ["Expressive", "Emotional"],
+    related_types: ["Mindful", "Emotional", "Expressive", "Creative"],
     description: pt("Write a reflective personal essay centered around a meaningful experience or idea."),
     instructions: [
       { title: "Choose a personal theme", description: "Focus on a story with emotional significance." },
@@ -919,7 +919,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Writing",
     estimated_time: "A few hours",
-    related_types: ["Collaborative", "Creative"],
+    related_types: ["Collaborative", "Community-oriented", "Intellectual", "Expressive", "Creative"],
     description: pt("Collaborate on a fictional story by combining ideas, characters, and writing styles."),
     instructions: [
       { title: "Agree on the premise", description: "Start with a shared direction for the story." },
@@ -934,7 +934,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Writing",
     estimated_time: "A month",
-    related_types: ["Reflective", "Expressive", "Disciplined"],
+    related_types: ["Artistic", "Expressive", "Reflective", "Experimental", "Disciplined"],
     description: pt("Develop creativity and self-awareness through unfiltered daily writing sessions."),
     instructions: [
       { title: "Write without stopping", description: "Avoid editing or censoring your thoughts." },
@@ -949,7 +949,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Writing",
     estimated_time: "A week",
-    related_types: ["Goal-oriented", "Creative"],
+    related_types: ["Goal-oriented", "Creative", "Disciplined", "Strategic"],
     description: pt("Develop and pitch a compelling feature article idea to a publication."),
     instructions: [
       { title: "Research publication style", description: "Understand the magazine’s audience and tone." },
@@ -964,7 +964,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Writing",
     estimated_time: "A weekend",
-    related_types: ["Exploratory", "Reflective"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented"],
     description: pt("Explore a new environment and use the experience as inspiration for creative writing."),
     instructions: [
       { title: "Keep a travel notebook", description: "Record sensory details and observations." },
@@ -979,7 +979,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Dance",
     estimated_time: "1 hour",
-    related_types: ["Skill-based", "Physical"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive", "Skill-based"],
     description: pt("Learn the fundamentals of salsa dancing through beginner-friendly instruction."),
     instructions: [
       { title: "Practice the basic step", description: "Focus on rhythm and timing first." },
@@ -994,7 +994,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Performative",
     field: "Dance",
     estimated_time: "1 hour",
-    related_types: ["Skill-based", "Community-oriented"],
+    related_types: ["Expressive", "Social", "Creative", "Emotional", "Skill-based"],
     description: pt("Practice and perform a short dance routine inspired by popular TikTok choreography trends."),
     instructions: [
       { title: "Break the routine into sections", description: "Learn a few moves at a time instead of the entire dance at once." },
@@ -1009,7 +1009,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Dance",
     estimated_time: "An afternoon",
-    related_types: ["Active", "Community-oriented"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Active"],
     description: pt("Meet new people and enjoy a lively evening of music, dancing, and social connection."),
     instructions: [
       { title: "Dress comfortably", description: "Wear clothing and shoes suitable for movement." },
@@ -1024,7 +1024,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Artistic",
     field: "Dance",
     estimated_time: "A few hours",
-    related_types: ["Creative", "Expressive"],
+    related_types: ["Creative", "Expressive", "Emotional", "Reflective"],
     description: pt("Create a short original dance routine that communicates mood, rhythm, or personality."),
     instructions: [
       { title: "Choose a short music clip", description: "Pick something with a strong rhythm or emotion." },
@@ -1039,7 +1039,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Dance",
     estimated_time: "A week",
-    related_types: ["Educational", "Analytical"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic"],
     description: pt("Explore influential choreographers, performances, and movements that shaped modern dance."),
     instructions: [
       { title: "Research major pioneers", description: "Learn about dancers and choreographers who transformed the art form." },
@@ -1054,7 +1054,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Cycling",
     estimated_time: "An afternoon",
-    related_types: ["Outdoorsy", "Physical"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented", "Physical"],
     description: pt("Challenge yourself with a fresh cycling route that combines endurance and exploration."),
     instructions: [
       { title: "Plan the route ahead", description: "Check elevation, traffic, and road conditions." },
@@ -1069,7 +1069,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Cycling",
     estimated_time: "A weekend",
-    related_types: ["Skill-based"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative"],
     description: pt("Restore and customize a used bicycle frame into a fully functioning bike."),
     instructions: [
       { title: "Inspect the frame carefully", description: "Check for cracks, rust, or damage before starting." },
@@ -1084,7 +1084,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Cycling",
     estimated_time: "An afternoon",
-    related_types: ["Outdoorsy", "Community-oriented"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Outdoorsy"],
     description: pt("Ride with a cycling group and enjoy community, endurance, and shared motivation."),
     instructions: [
       { title: "Learn group riding etiquette", description: "Understand signaling and safe spacing." },
@@ -1099,7 +1099,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Cycling",
     estimated_time: "1 hour",
-    related_types: ["Competitive", "Physical"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive"],
     description: pt("Experience the intensity and excitement of your first local criterium cycling race."),
     instructions: [
       { title: "Practice cornering skills", description: "Smooth turns are essential in crit racing." },
@@ -1114,7 +1114,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Outdoorsy",
     field: "Cycling",
     estimated_time: "A weekend",
-    related_types: ["Adventurous", "Physical"],
+    related_types: ["Adventurous", "Reflective", "Mindful", "Exploratory", "Physical"],
     description: pt("Explore scenic landscapes and natural beauty during a cycling adventure through a national park."),
     instructions: [
       { title: "Research park regulations", description: "Check cycling access and trail rules." },
@@ -1129,7 +1129,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Hiking",
     estimated_time: "An afternoon",
-    related_types: ["Outdoorsy", "Physical"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented", "Physical"],
     description: pt("Reach a mountain summit before sunrise and experience breathtaking early morning views."),
     instructions: [
       { title: "Start hiking before dawn", description: "Allow enough time to reach the summit safely." },
@@ -1144,7 +1144,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Outdoorsy",
     field: "Hiking",
     estimated_time: "A weekend",
-    related_types: ["Adventurous", "Strategic"],
+    related_types: ["Adventurous", "Reflective", "Mindful", "Exploratory", "Strategic"],
     description: pt("Organize a multi-day backpacking adventure focused on preparation, endurance, and exploration."),
     instructions: [
       { title: "Plan campsites and routes", description: "Map daily distances and water sources carefully." },
@@ -1159,7 +1159,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Hiking",
     estimated_time: "An afternoon",
-    related_types: ["Leadership", "Outdoorsy"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Outdoorsy"],
     description: pt("Introduce someone new to hiking through a supportive and enjoyable outdoor experience."),
     instructions: [
       { title: "Choose a beginner-friendly trail", description: "Keep the route manageable and scenic." },
@@ -1174,7 +1174,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Artistic",
     field: "Hiking",
     estimated_time: "An afternoon",
-    related_types: ["Outdoorsy", "Creative"],
+    related_types: ["Creative", "Expressive", "Emotional", "Reflective", "Outdoorsy"],
     description: pt("Document a hiking trail through a connected series of photographs that tell a visual story."),
     instructions: [
       { title: "Choose a visual theme", description: "Focus on textures, colors, or changing landscapes." },
@@ -1189,7 +1189,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Hiking",
     estimated_time: "1 hour",
-    related_types: ["Mindful", "Outdoorsy"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive", "Outdoorsy"],
     description: pt("Spend quiet time journaling at a scenic overlook while reflecting on your thoughts and surroundings."),
     instructions: [
       { title: "Find a peaceful viewpoint", description: "Choose a location where you can sit comfortably and focus." },
@@ -1204,7 +1204,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Travel",
     estimated_time: "A weekend",
-    related_types: ["Exploratory", "Reflective"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented"],
     description: pt("Organize a short solo getaway focused on independence, exploration, and personal growth."),
     instructions: [
       { title: "Choose a manageable destination", description: "Pick somewhere safe and easy to navigate." },
@@ -1219,7 +1219,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Travel",
     estimated_time: "A weekend",
-    related_types: ["Reflective", "Artistic"],
+    related_types: ["Artistic", "Expressive", "Reflective", "Experimental"],
     description: pt("Turn your favorite travel memories into a visually cohesive photo book."),
     instructions: [
       { title: "Select your best images", description: "Choose photos that tell a story together." },
@@ -1234,7 +1234,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Travel",
     estimated_time: "A week",
-    related_types: ["Educational", "Disciplined"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic", "Disciplined"],
     description: pt("Build confidence in a new language by learning and practicing 50 essential words."),
     instructions: [
       { title: "Focus on useful vocabulary", description: "Learn greetings, numbers, and travel phrases first." },
@@ -1249,7 +1249,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Travel",
     estimated_time: "A weekend",
-    related_types: ["Community-oriented", "Exploratory"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Exploratory"],
     description: pt("Welcome a traveler into your home and exchange stories, culture, and experiences."),
     instructions: [
       { title: "Communicate expectations clearly", description: "Discuss schedules, boundaries, and accommodations." },
@@ -1264,7 +1264,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Travel",
     estimated_time: "A week",
-    related_types: ["Goal-oriented", "Creative"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership", "Creative"],
     description: pt("Pursue opportunities to write professionally about travel experiences and destinations."),
     instructions: [
       { title: "Build a small writing portfolio", description: "Collect sample articles or blog posts." },
@@ -1279,7 +1279,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Wellness",
     estimated_time: "A month",
-    related_types: ["Disciplined", "Mindful"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Mindful"],
     description: pt("Create a consistent morning routine that improves focus, energy, and overall wellbeing."),
     instructions: [
       { title: "Start with a few simple habits", description: "Avoid overcomplicating your routine initially." },
@@ -1294,7 +1294,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Wellness",
     estimated_time: "1 hour",
-    related_types: ["Mindful", "Therapeutic"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive", "Mindful"],
     description: pt("Slow down and improve flexibility through a calming Yin Yoga practice."),
     instructions: [
       { title: "Focus on deep breathing", description: "Use slow breaths to relax into poses." },
@@ -1309,7 +1309,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Wellness",
     estimated_time: "A week",
-    related_types: ["Analytical", "Disciplined"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic", "Disciplined"],
     description: pt("Monitor sleep habits and patterns to better understand your rest and recovery."),
     instructions: [
       { title: "Record sleep and wake times", description: "Track consistency throughout the two weeks." },
@@ -1324,7 +1324,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Wellness",
     estimated_time: "A month",
-    related_types: ["Educational", "Goal-oriented"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership", "Educational"],
     description: pt("Train toward becoming a certified yoga instructor while deepening your practice and teaching ability."),
     instructions: [
       { title: "Research certification programs", description: "Compare teaching styles and requirements." },
@@ -1339,7 +1339,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Astronomy",
     estimated_time: "A weekend",
-    related_types: ["Skill-based", "Experimental"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Experimental"],
     description: pt("Construct a stable telescope mount for backyard astronomy and night sky observation."),
     instructions: [
       { title: "Choose sturdy materials", description: "Stability is essential for clear viewing." },
@@ -1354,7 +1354,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Astronomy",
     estimated_time: "1 hour",
-    related_types: ["Mindful", "Outdoorsy"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive", "Outdoorsy"],
     description: pt("Spend quiet time beneath the stars contemplating the scale and beauty of the universe."),
     instructions: [
       { title: "Find a dark viewing location", description: "Reduce light pollution for a clearer experience." },
@@ -1369,7 +1369,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Artistic",
     field: "Astronomy",
     estimated_time: "An afternoon",
-    related_types: ["Outdoorsy", "Creative"],
+    related_types: ["Creative", "Expressive", "Emotional", "Reflective", "Outdoorsy"],
     description: pt("Capture detailed night sky photographs of the Milky Way using long-exposure techniques."),
     instructions: [
       { title: "Find a dark sky location", description: "Avoid city lights for the clearest visibility." },
@@ -1384,7 +1384,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Educational",
     field: "Technology",
     estimated_time: "A month",
-    related_types: ["Intellectual", "Reflective"],
+    related_types: ["Intellectual", "Reflective", "Disciplined", "Goal-oriented"],
     description: pt("Expand your technical knowledge by consistently watching in-depth technology content for a month."),
     instructions: [
       { title: "Choose a trusted creator", description: "Look for channels with thoughtful analysis and explanations." },
@@ -1399,7 +1399,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Engineering",
     estimated_time: "A weekend",
-    related_types: ["Skill-based", "Creative"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative"],
     description: pt("Design and print a personalized phone stand using 3D modeling and printing techniques."),
     instructions: [
       { title: "Sketch the design first", description: "Think about viewing angle and stability." },
@@ -1414,7 +1414,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Experimental",
     field: "Engineering",
     estimated_time: "A weekend",
-    related_types: ["Constructive", "Analytical"],
+    related_types: ["Creative", "Analytical", "Exploratory", "Constructive"],
     description: pt("Assemble a beginner-friendly Arduino robot while learning basic electronics and programming."),
     instructions: [
       { title: "Gather beginner components", description: "Use simple motors, sensors, and an Arduino board." },
@@ -1429,7 +1429,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Cars",
     estimated_time: "An afternoon",
-    related_types: ["Skill-based", "Disciplined"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative"],
     description: pt("Restore your vehicle’s appearance with a deep clean and professional-level detailing techniques."),
     instructions: [
       { title: "Wash the exterior thoroughly", description: "Remove dirt carefully before polishing." },
@@ -1444,7 +1444,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Cars",
     estimated_time: "A weekend",
-    related_types: ["Competitive", "Adventurous"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive", "Adventurous"],
     description: pt("Experience performance driving in a controlled environment during a weekend track event."),
     instructions: [
       { title: "Inspect your vehicle beforehand", description: "Check tires, brakes, and fluid levels." },
@@ -1459,7 +1459,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Motorcycles",
     estimated_time: "A month",
-    related_types: ["Goal-oriented", "Skill-based"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive", "Skill-based"],
     description: pt("Learn riding fundamentals and prepare for the tests required to earn a motorcycle license."),
     instructions: [
       { title: "Study local road rules", description: "Learn motorcycle-specific safety regulations." },
@@ -1474,7 +1474,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Motorcycles",
     estimated_time: "A weekend",
-    related_types: ["Exploratory", "Outdoorsy"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented"],
     description: pt("Organize a scenic motorcycle journey along coastal roads and destinations."),
     instructions: [
       { title: "Map scenic routes", description: "Look for roads with great views and safe riding conditions." },
@@ -1489,7 +1489,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Aviation",
     estimated_time: "1 hour",
-    related_types: ["Skill-based", "Adventurous"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive", "Skill-based"],
     description: pt("Experience the basics of flying with an introductory aviation lesson."),
     instructions: [
       { title: "Learn basic flight controls", description: "Understand how the aircraft responds to inputs." },
@@ -1504,7 +1504,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "Aviation",
     estimated_time: "A weekend",
-    related_types: ["Experimental", "Skill-based"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Experimental"],
     description: pt("Assemble and test a remote-control airplane while learning basic aerodynamics and engineering."),
     instructions: [
       { title: "Follow the assembly guide carefully", description: "Pay attention to balance and alignment." },
@@ -1519,7 +1519,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Sports",
     estimated_time: "Ongoing",
-    related_types: ["Active", "Competitive"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Active"],
     description: pt("Stay active and meet new people by playing in a recreational soccer league."),
     instructions: [
       { title: "Find a beginner-friendly league", description: "Choose a level that matches your experience." },
@@ -1534,7 +1534,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Sports",
     estimated_time: "An afternoon",
-    related_types: ["Community-oriented", "Exploratory"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Exploratory"],
     description: pt("Experience the atmosphere and excitement of watching sports live in person."),
     instructions: [
       { title: "Arrive early", description: "Take time to enjoy the venue and pre-game energy." },
@@ -1549,7 +1549,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Running",
     estimated_time: "Ongoing",
-    related_types: ["Community-oriented", "Active"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Active"],
     description: pt("Build consistency and motivation by running regularly with a local group."),
     instructions: [
       { title: "Find a pace group that suits you", description: "Choose a level that feels comfortable and sustainable." },
@@ -1564,7 +1564,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Active",
     field: "Climbing",
     estimated_time: "1 hour",
-    related_types: ["Skill-based", "Physical"],
+    related_types: ["Physical", "Disciplined", "Goal-oriented", "Competitive", "Skill-based"],
     description: pt("Challenge yourself physically and mentally through beginner-friendly indoor bouldering."),
     instructions: [
       { title: "Warm up properly", description: "Prepare fingers, shoulders, and legs before climbing." },
@@ -1579,7 +1579,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Climbing",
     estimated_time: "A weekend",
-    related_types: ["Skill-based", "Outdoorsy"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented", "Skill-based"],
     description: pt("Learn the fundamentals of outdoor climbing safety, movement, and rope systems."),
     instructions: [
       { title: "Listen carefully to instructors", description: "Safety knowledge is the foundation of climbing." },
@@ -1594,7 +1594,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Board Games",
     estimated_time: "An afternoon",
-    related_types: ["Community-oriented", "Collaborative"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership"],
     description: pt("Bring friends together regularly for strategy, laughter, and social connection through board games."),
     instructions: [
       { title: "Choose accessible games", description: "Pick games that suit the group’s experience level." },
@@ -1609,7 +1609,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Board Games",
     estimated_time: "An afternoon",
-    related_types: ["Analytical", "Strategic"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic"],
     description: pt("Challenge yourself mentally by learning and mastering a deep solo strategy game."),
     instructions: [
       { title: "Read the rules carefully", description: "Understanding systems is essential before playing." },
@@ -1624,7 +1624,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Exploratory",
     field: "Coffee",
     estimated_time: "A month",
-    related_types: ["Social", "Reflective"],
+    related_types: ["Adventurous", "Experimental", "Reflective", "Creative", "Social"],
     description: pt("Explore local coffee culture by visiting independently owned cafes around your area."),
     instructions: [
       { title: "Try a different drink each visit", description: "Expand your coffee preferences gradually." },
@@ -1639,7 +1639,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Fashion",
     estimated_time: "An afternoon",
-    related_types: ["Strategic", "Reflective"],
+    related_types: ["Artistic", "Expressive", "Reflective", "Experimental", "Strategic"],
     description: pt("Simplify your clothing choices by building a versatile and intentional wardrobe."),
     instructions: [
       { title: "Choose a consistent color palette", description: "Focus on pieces that combine easily together." },
@@ -1654,7 +1654,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Adventurous",
     field: "Fashion",
     estimated_time: "An afternoon",
-    related_types: ["Creative", "Exploratory"],
+    related_types: ["Exploratory", "Outdoorsy", "Reflective", "Goal-oriented", "Creative"],
     description: pt("Challenge yourself to create a stylish thrifted outfit on a small budget."),
     instructions: [
       { title: "Browse patiently", description: "Finding great pieces takes time and experimentation." },
@@ -1669,7 +1669,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Outdoorsy",
     field: "Camping",
     estimated_time: "A weekend",
-    related_types: ["Adventurous", "Reflective"],
+    related_types: ["Adventurous", "Reflective", "Mindful", "Exploratory"],
     description: pt("Enjoy a low-pressure outdoor camping experience using your car as a basecamp."),
     instructions: [
       { title: "Reserve a campsite early", description: "Popular parks can fill up quickly." },
@@ -1684,7 +1684,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Skill-based",
     field: "Camping",
     estimated_time: "A weekend",
-    related_types: ["Outdoorsy", "Disciplined"],
+    related_types: ["Disciplined", "Constructive", "Goal-oriented", "Creative", "Outdoorsy"],
     description: pt("Develop practical outdoor survival and wilderness skills through focused practice."),
     instructions: [
       { title: "Choose three core skills", description: "Examples include fire starting or navigation." },
@@ -1699,7 +1699,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Psychology",
     estimated_time: "A week",
-    related_types: ["Analytical", "Educational"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic"],
     description: pt("Explore cognitive biases and decision-making through a foundational psychology book."),
     instructions: [
       { title: "Read actively and slowly", description: "Pause to think about each concept carefully." },
@@ -1714,7 +1714,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Psychology",
     estimated_time: "A month",
-    related_types: ["Therapeutic", "Mindful"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive", "Therapeutic"],
     description: pt("Use structured journaling techniques to better understand thoughts, emotions, and behaviors."),
     instructions: [
       { title: "Write down recurring thoughts", description: "Identify emotional triggers and patterns." },
@@ -1729,7 +1729,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Philosophy",
     estimated_time: "A week",
-    related_types: ["Analytical", "Reflective"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic"],
     description: pt("Study Plato’s Republic while exploring justice, politics, and philosophical thought."),
     instructions: [
       { title: "Read one section at a time", description: "Focus on understanding key arguments clearly." },
@@ -1744,7 +1744,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Philosophy",
     estimated_time: "Ongoing",
-    related_types: ["Intellectual", "Collaborative"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Intellectual"],
     description: pt("Engage in thoughtful philosophical conversations with people from different perspectives."),
     instructions: [
       { title: "Choose a respectful community", description: "Look for groups focused on constructive discussion." },
@@ -1759,7 +1759,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Educational",
     field: "History",
     estimated_time: "An afternoon",
-    related_types: ["Intellectual", "Exploratory"],
+    related_types: ["Intellectual", "Reflective", "Disciplined", "Goal-oriented", "Exploratory"],
     description: pt("Learn about local history and culture through exhibits, artifacts, and storytelling."),
     instructions: [
       { title: "Take your time with exhibits", description: "Read descriptions and historical context carefully." },
@@ -1774,7 +1774,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "History",
     estimated_time: "A week",
-    related_types: ["Analytical", "Reflective"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic"],
     description: pt("Trace family roots and historical connections through genealogy research."),
     instructions: [
       { title: "Start with known relatives", description: "Record names, locations, and important dates." },
@@ -1789,7 +1789,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Disciplined",
     field: "Language",
     estimated_time: "A month",
-    related_types: ["Educational", "Goal-oriented"],
+    related_types: ["Goal-oriented", "Strategic", "Professional", "Skill-based", "Educational"],
     description: pt("Build consistency in language learning through a daily 30-day Duolingo streak."),
     instructions: [
       { title: "Set a realistic daily goal", description: "Choose a pace you can maintain consistently." },
@@ -1804,7 +1804,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Language",
     estimated_time: "Ongoing",
-    related_types: ["Educational", "Collaborative"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Educational"],
     description: pt("Practice speaking with a language exchange partner while helping each other improve."),
     instructions: [
       { title: "Choose a reliable platform", description: "Use language exchange communities or apps." },
@@ -1819,7 +1819,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Professional",
     field: "Business",
     estimated_time: "A few hours",
-    related_types: ["Strategic", "Goal-oriented"],
+    related_types: ["Goal-oriented", "Strategic", "Disciplined", "Leadership"],
     description: pt("Outline a concise business concept including goals, audience, and strategy on a single page."),
     instructions: [
       { title: "Define the core idea", description: "Clarify the product, service, or problem being solved." },
@@ -1834,7 +1834,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Business",
     estimated_time: "1 hour",
-    related_types: ["Professional", "Collaborative"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Professional"],
     description: pt("Meet entrepreneurs, exchange ideas, and learn from people building businesses locally."),
     instructions: [
       { title: "Introduce yourself confidently", description: "Prepare a short explanation of your interests or projects." },
@@ -1849,7 +1849,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Analytical",
     field: "Finance",
     estimated_time: "A few hours",
-    related_types: ["Disciplined", "Strategic"],
+    related_types: ["Intellectual", "Strategic", "Disciplined", "Reflective"],
     description: pt("Create a budgeting spreadsheet to better track spending, savings, and financial goals."),
     instructions: [
       { title: "List all income and expenses", description: "Start with an accurate overview of your finances." },
@@ -1864,7 +1864,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Finance",
     estimated_time: "A week",
-    related_types: ["Educational", "Reflective"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic"],
     description: pt("Explore how behavior and mindset influence financial decisions and long-term wealth."),
     instructions: [
       { title: "Read with reflection", description: "Think about how the ideas apply to your own habits." },
@@ -1879,7 +1879,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Leadership",
     field: "Leadership",
     estimated_time: "A month",
-    related_types: ["Community-oriented", "Professional"],
+    related_types: ["Social", "Strategic", "Professional", "Collaborative", "Community-oriented"],
     description: pt("Develop leadership skills by organizing and guiding a meaningful community initiative."),
     instructions: [
       { title: "Choose a realistic project", description: "Focus on a goal that benefits the local community." },
@@ -1894,7 +1894,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Intellectual",
     field: "Leadership",
     estimated_time: "A week",
-    related_types: ["Professional", "Educational"],
+    related_types: ["Analytical", "Educational", "Reflective", "Strategic", "Professional"],
     description: pt("Study leadership principles focused on accountability, discipline, and decision-making."),
     instructions: [
       { title: "Take notes on key principles", description: "Identify lessons that apply to your own leadership style." },
@@ -1909,7 +1909,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Meditation",
     estimated_time: "A week",
-    related_types: ["Mindful", "Disciplined"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive", "Disciplined"],
     description: pt("Immerse yourself in a silent meditation retreat focused on mindfulness and self-awareness."),
     instructions: [
       { title: "Prepare mentally beforehand", description: "Understand the structure and expectations of the retreat." },
@@ -1924,7 +1924,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Mindful",
     field: "Meditation",
     estimated_time: "A month",
-    related_types: ["Therapeutic", "Disciplined"],
+    related_types: ["Reflective", "Therapeutic", "Emotional", "Disciplined"],
     description: pt("Build calmness and awareness through a simple daily breathing practice."),
     instructions: [
       { title: "Choose a quiet environment", description: "Reduce distractions during the practice." },
@@ -1939,7 +1939,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Educational",
     field: "Education",
     estimated_time: "A month",
-    related_types: ["Intellectual", "Goal-oriented"],
+    related_types: ["Intellectual", "Reflective", "Disciplined", "Goal-oriented"],
     description: pt("Expand your knowledge and skills by completing a free online course in a topic that interests you."),
     instructions: [
       { title: "Choose a topic intentionally", description: "Pick something genuinely useful or exciting to you." },
@@ -1954,7 +1954,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Education",
     estimated_time: "A few hours",
-    related_types: ["Educational", "Collaborative"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership", "Educational"],
     description: pt("Share your knowledge by teaching someone a practical or creative skill you enjoy."),
     instructions: [
       { title: "Break the skill into steps", description: "Teach concepts in a simple and approachable way." },
@@ -1969,7 +1969,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Community-oriented",
     field: "Community",
     estimated_time: "1 hour",
-    related_types: ["Social", "Collaborative"],
+    related_types: ["Social", "Collaborative", "Leadership", "Therapeutic"],
     description: pt("Get involved in local issues and meet neighbors by attending a community association meeting."),
     instructions: [
       { title: "Listen to current concerns", description: "Learn about topics affecting the neighborhood." },
@@ -1984,7 +1984,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Social",
     field: "Community",
     estimated_time: "A weekend",
-    related_types: ["Leadership", "Community-oriented"],
+    related_types: ["Collaborative", "Community-oriented", "Expressive", "Leadership"],
     description: pt("Bring neighbors together through a fun and welcoming community block party."),
     instructions: [
       { title: "Coordinate permits and logistics", description: "Check local requirements for public gatherings." },
@@ -1999,7 +1999,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Community-oriented",
     field: "Volunteering",
     estimated_time: "Ongoing",
-    related_types: ["Therapeutic", "Social"],
+    related_types: ["Social", "Collaborative", "Leadership", "Therapeutic"],
     description: pt("Support your community by volunteering with a local food bank and helping distribute essential supplies."),
     instructions: [
       { title: "Research nearby organizations", description: "Look for food banks that match your availability and interests." },
@@ -2014,7 +2014,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Educational",
     field: "Volunteering",
     estimated_time: "Ongoing",
-    related_types: ["Leadership", "Community-oriented"],
+    related_types: ["Intellectual", "Reflective", "Disciplined", "Goal-oriented", "Leadership"],
     description: pt("Support and encourage a student through mentorship, guidance, and positive conversation."),
     instructions: [
       { title: "Build trust gradually", description: "Focus on listening and consistency over giving advice immediately." },
@@ -2029,7 +2029,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "DIY",
     estimated_time: "A weekend",
-    related_types: ["Skill-based", "Creative"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative"],
     description: pt("Create a custom wooden bookshelf while learning practical woodworking skills."),
     instructions: [
       { title: "Measure your space carefully", description: "Plan dimensions before cutting materials." },
@@ -2044,7 +2044,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Constructive",
     field: "DIY",
     estimated_time: "An afternoon",
-    related_types: ["Skill-based", "Experimental"],
+    related_types: ["Skill-based", "Strategic", "Disciplined", "Creative", "Experimental"],
     description: pt("Restore a vintage lamp by replacing outdated wiring and improving functionality safely."),
     instructions: [
       { title: "Inspect the lamp carefully", description: "Check for damaged components before starting." },
@@ -2059,7 +2059,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Creative",
     field: "Home Design",
     estimated_time: "An afternoon",
-    related_types: ["Constructive", "Strategic"],
+    related_types: ["Artistic", "Expressive", "Reflective", "Experimental", "Constructive"],
     description: pt("Refresh a room creatively by rearranging and repurposing items you already own."),
     instructions: [
       { title: "Remove unnecessary clutter", description: "Simplify the room before redesigning." },
@@ -2074,7 +2074,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Educational",
     field: "Home Design",
     estimated_time: "A week",
-    related_types: ["Creative", "Analytical"],
+    related_types: ["Intellectual", "Reflective", "Disciplined", "Goal-oriented", "Creative"],
     description: pt("Study foundational interior design concepts including layout, lighting, and visual balance."),
     instructions: [
       { title: "Research design principles", description: "Learn about color, spacing, and composition." },
@@ -2089,7 +2089,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Reflective",
     field: "Collecting",
     estimated_time: "Ongoing",
-    related_types: ["Creative", "Exploratory"],
+    related_types: ["Mindful", "Emotional", "Intellectual", "Expressive", "Creative"],
     description: pt("Begin collecting vinyl records and explore music through a more intentional listening experience."),
     instructions: [
       { title: "Choose albums you genuinely love", description: "Focus on personal enjoyment rather than rarity." },
@@ -2104,7 +2104,7 @@ export const RECOMMENDATIONS: Activity[] = [
     type: "Exploratory",
     field: "Collecting",
     estimated_time: "A month",
-    related_types: ["Social", "Reflective"],
+    related_types: ["Adventurous", "Experimental", "Reflective", "Creative", "Social"],
     description: pt("Explore antique markets regularly and discover unique objects, history, and craftsmanship."),
     instructions: [
       { title: "Visit different markets regularly", description: "Compare styles, vendors, and item quality." },
