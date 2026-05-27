@@ -1,7 +1,7 @@
 import type { PortableTextBlock } from "@portabletext/types";
 import { Activity } from "@touchgrass/types";
 
-export function pt(...paragraphs: string[]): PortableTextBlock[] {
+function pt(...paragraphs: string[]): PortableTextBlock[] {
   return paragraphs.map((text, i) => ({
     _type: "block",
     _key: `p${i}`,

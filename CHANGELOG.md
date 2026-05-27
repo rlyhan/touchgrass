@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.5] - 2026-05-27 — Refactor: Make mock portable-text helper file-local
+
+Tightens the `@touchgrass/mocks` package surface by removing an internal helper from its public exports.
+
+### Mocks (`packages/mocks`)
+
+- Made the `pt()` portable-text helper file-local in `recommendations.ts` (previously exported). It's an implementation detail used to build mock `description` fields and isn't part of the package's intended surface.
+
+### Tests (`packages/core`)
+
+- Removed the dedicated `recommendations/mock-portable-text.test.ts` suite now that `pt()` is private — its behavior remains covered implicitly through the mock data consumed by downstream tests.
+
 ## [1.2.4] - 2026-05-27 — Fix: Browser security headers
 
 Reduces the chance an XSS bug can execute in the web client — the primary mitigation against `localStorage` bearer-token exfiltration on the cross-site setup, where `HttpOnly` cookies are not an option.
