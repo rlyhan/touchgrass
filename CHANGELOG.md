@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.4] - 2026-05-27 — Fix: Browser security headers
+
+Reduces the chance an XSS bug can execute in the web client — the primary mitigation against `localStorage` bearer-token exfiltration on the cross-site setup, where `HttpOnly` cookies are not an option.
+
+### Web (`vercel.json`)
+
+- Added `Content-Security-Policy-Report-Only` covering `default-src`, `script-src`, `style-src`, `img-src`, `font-src`, `connect-src`, `frame-ancestors`, `base-uri`, `form-action`, and `object-src`. Report-only on purpose: Expo Router's static export may emit inline hydration scripts that would violate `script-src 'self'`. Deploy, watch the browser console for violations, then rename the header to `Content-Security-Policy` to enforce.
+- Added `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy` disabling `camera`, `microphone`, `geolocation`, and `interest-cohort`. Safe to enforce immediately — these don't risk breaking the app.
+
 ## [1.2.3] - 2026-05-27 — Fix: Harden bearer auth and CORS configuration
 
 Defense-in-depth hardening of the bearer-token auth path introduced in 1.2.1. Raw session ids no longer authenticate on their own; revoked sessions don't leave stale credentials in browser storage; and CORS no longer sees non-HTTP scheme entries it can never match.
