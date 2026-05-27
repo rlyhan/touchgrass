@@ -1,5 +1,73 @@
 # Changelog
 
+## [1.2.4] - 2026-05-27 — Fix: Browser security headers
+
+Reduces the chance an XSS bug can execute in the web client — the primary mitigation against `localStorage` bearer-token exfiltration on the cross-site setup, where `HttpOnly` cookies are not an option.
+
+### Web (`vercel.json`)
+
+- Added `Content-Security-Policy-Report-Only` covering `default-src`, `script-src`, `style-src`, `img-src`, `font-src`, `connect-src`, `frame-ancestors`, `base-uri`, `form-action`, and `object-src`. Report-only on purpose: Expo Router's static export may emit inline hydration scripts that would violate `script-src 'self'`. Deploy, watch the browser console for violations, then rename the header to `Content-Security-Policy` to enforce.
+- Added `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy` disabling `camera`, `microphone`, `geolocation`, and `interest-cohort`. Safe to enforce immediately — these don't risk breaking the app.
+
+## [1.2.3] - 2026-05-27 — Fix: Harden bearer auth and CORS configuration
+
+Defense-in-depth hardening of the bearer-token auth path introduced in 1.2.1. Raw session ids no longer authenticate on their own; revoked sessions don't leave stale credentials in browser storage; and CORS no longer sees non-HTTP scheme entries it can never match.
+
+### API (`packages/core`)
+
+- Enabled `requireSignature: true` on the better-auth `bearer` plugin. Only HMAC-signed tokens (the `<value>.<signature>` form emitted in the `set-auth-token` response header) are accepted, so a session id leaked via logs, analytics, or an APM tool cannot be used as a bearer credential on its own.
+- Split CORS origins from better-auth's `trustedOrigins`. `app.ts` now passes a filtered list (HTTP(S) entries only) to `cors()` via a new `resolveCorsOrigins` helper in `trusted-origins.ts`. App-scheme values (`touchgrass://`, `exp://`, `exp+touchgrass://`) remain on the better-auth side where they're meaningful, but no longer sit in the CORS allow-list as inert noise that invites mis-config.
+
+### Mobile (`apps/mobile`)
+
+- Switched web token capture to read the signed token from the `set-auth-token` response header in the auth-client `onSuccess` hook. Removed the previous `signIn.email`/`signUp.email` wrappers that pulled the raw session id from the response body, keeping the unsigned id out of bodies that downstream middleware or analytics tools might log.
+- `authedFetch` on web now clears the stored token when a non-auth API call (`/profiles`, `/recommendations`, etc.) returns 401, mirroring the existing auth-client `onError` behavior. Revoked sessions no longer leave a stale token in `localStorage` extending the XSS exfiltration window.
+
+## [1.2.2] - 2026-05-27 — Chore: Clean up post-Fly migration leftovers
+
+Removes stale Render-era infrastructure and dead options left over from the Vercel-proxy auth model. No functional change for end users; mobile preview/production builds now correctly target the Fly APIs and CI is leaner.
+
+### Mobile (`apps/mobile`)
+
+- `eas.json`: `preview` now sets `EXPO_PUBLIC_API_BASE_URL=https://touchgrass-api-qa.fly.dev` and `production` sets `https://touchgrass-api-prod.fly.dev`. Both were still pointing at the deprecated Render URL, so Expo Go preview and production builds were hitting the wrong backend.
+- Removed `credentials: "include"` from web `fetchOptions` in `lib/auth/client.ts` and from `authedFetch` in `lib/auth/fetch.ts`. Bearer tokens now carry the session on web, and third-party cookies are blocked anyway, so the flag was dead weight.
+
+### Infra (`.github/workflows`)
+
+- Deleted `keep-warm.yml`. The cron existed to mitigate Render's ~15 min idle shutdown; Fly's `auto_stop_machines = "suspend"` resumes machines in ~1–3 s, so the ping is no longer useful.
+
+## [1.2.1] - 2026-05-26 — Fix: Web auth broken by third-party cookie blocking
+
+Browsers block cookies set by `touchgrass-api.fly.dev` when the page is served from `touchgrass-mobile.vercel.app` (third-party cookie restriction), so cookie-based session tracking failed on web. Replaced it with bearer token auth: the server now accepts `Authorization: Bearer <token>` headers via better-auth's `bearer` plugin, and the web client stores the session token in `localStorage` and attaches it on every request. Native (Expo) flow is unchanged and continues to use the existing ExpoClient + SecureStore cookie storage.
+
+### API (`packages/core`)
+
+- Enabled better-auth's `bearer` plugin in `src/auth.ts` so `auth.api.getSession()` (used by `auth-session.ts` and the `/api/auth/*` handler) accepts session tokens from the `Authorization: Bearer` header in addition to cookies.
+
+### Mobile (`apps/mobile`)
+
+- Added `lib/auth/token-store.ts` — SSR-safe `localStorage` helpers (`getStoredToken`, `setStoredToken`, `clearStoredToken`) for web bearer token persistence.
+- Updated `lib/auth/client.ts` — `signIn.email` and `signUp.email` are wrapped on web to store the token synchronously before callers make subsequent requests (e.g. `refetch()`). The `onRequest` hook attaches `Authorization: Bearer` on every auth-client request; `onSuccess` clears the token on sign-out; `onError` clears it on 401. Native flow (ExpoClient + SecureStore) is unchanged.
+- Updated `lib/auth/fetch.ts` — `authedFetch` on web now reads the stored token and attaches `Authorization: Bearer` so non-auth API calls (`/profiles`, `/recommendations`, etc.) are also authenticated.
+
+## [1.2.0] - 2026-05-26 — Chore: Fly.io QA environment and direct API routing
+
+Introduces a Fly.io QA environment and removes the Vercel proxy layer so all clients call the API directly via `EXPO_PUBLIC_API_BASE_URL`. This enables QA and prod Vercel deployments to target independent APIs without sharing a `vercel.json` rewrite destination.
+
+### Infra (`fly.toml`)
+
+- Added Fly.io configuration for the `touchgrass-api-qa` app (`sjc` region, `shared-cpu-1x`, 256 MB). Machine suspension (`auto_stop_machines = "suspend"`) is used in place of full shutdown, giving ~1–3 s resume latency vs ~4 s cold boot and ~32 s on Render free tier.
+- `min_machines_running = 0` keeps the QA environment free when idle.
+
+### Mobile (`apps/mobile`)
+
+- Removed proxy-based URL resolution for web prod builds. `resolveBaseUrl()` now resolves `EXPO_PUBLIC_API_BASE_URL` first on all platforms; the `window.location.origin` fallback and `/_api` path prefix (which depended on Vercel rewrites) are removed.
+- `EXPO_PUBLIC_API_BASE_URL` is now required in all non-dev builds, including web.
+
+### Infra (`vercel.json`)
+
+- Removed `/api` and `/_api` proxy rewrites. Each Vercel project (QA, prod) sets its own `EXPO_PUBLIC_API_BASE_URL` env var to point directly at the appropriate Fly API.
+
 ## [1.1.3] - 2026-05-26 — Chore: Prebuild API to reduce Render cold-start time
 
 The production API now ships as a single esbuild-bundled JS file instead of being transpiled by `tsx` at boot, cutting application-level startup cost. Render's build step also skips the mobile, sanity, and web workspaces entirely.

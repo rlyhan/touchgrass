@@ -1,0 +1,32 @@
+name: Deploy API to Fly Prod
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/core/**"
+      - "packages/types/**"
+      - "packages/mocks/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "fly.prod.toml"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/fly-deploy-prod.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fly-deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy touchgrass-api-prod
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --config fly.prod.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_PROD }}

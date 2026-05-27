@@ -8,7 +8,7 @@ import express, {
 } from "express"
 import rateLimit from "express-rate-limit"
 
-import { auth, trustedOrigins } from "./auth.js"
+import { auth, corsOrigins } from "./auth.js"
 import { toNodeHandler } from "better-auth/node"
 import {
   type GetActivityDeps,
@@ -55,7 +55,7 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   app.set("trust proxy", 1)
   app.use(
     cors({
-      origin: trustedOrigins,
+      origin: corsOrigins,
       credentials: true,
     }),
   )
