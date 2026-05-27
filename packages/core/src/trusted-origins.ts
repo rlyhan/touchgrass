@@ -35,3 +35,13 @@ export function resolveTrustedOrigins({
   }
   return [APP_SCHEME, ...DEV_TRUSTED_ORIGINS, ...extraTrustedOrigins]
 }
+
+// Browsers only ever send `http(s)://...` in the Origin header, so the cors
+// middleware should only see those values. App-scheme entries (touchgrass://,
+// exp://) are meaningful to better-auth's own trustedOrigins check but are
+// noise — and a potential mis-config foothold — when passed to cors.
+export function resolveCorsOrigins(origins: string[]): string[] {
+  return origins.filter(
+    (o) => o.startsWith("http://") || o.startsWith("https://"),
+  )
+}
