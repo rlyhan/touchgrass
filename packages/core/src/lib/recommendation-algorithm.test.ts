@@ -27,9 +27,9 @@ const mockUserBfas: BFASScores = {
 
 const creativeMotivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
 
-test("getRecommendations returns up to 3 recommendations", () => {
+test("getRecommendations returns up to 10 recommendations", () => {
   const scored = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS)
-  assert.ok(scored.length <= 3)
+  assert.ok(scored.length <= 10)
   assert.ok(scored.length > 0)
 })
 
@@ -71,7 +71,7 @@ test("getRecommendations with Art interest includes at least one Art-field rec",
 
 test("getRecommendations: high-Openness/Extraversion user with explore_creative motivation and no interests surfaces creative-type recs", () => {
   // High E (4-HH) + high C (9-HH) + high O → strong Creative/Artistic affinity;
-  // motivation boost on top should dominate all 3 slots.
+  // motivation boost on top should dominate the top slots.
   const artisticCreativeUser: BFASScores = {
     Openness: 100,
     Intellect: 80,
@@ -87,7 +87,7 @@ test("getRecommendations: high-Openness/Extraversion user with explore_creative 
   const results = getRecommendations(artisticCreativeUser, [creativeMotivation], [], RECOMMENDATIONS)
   const creativeTypes = new Set(creativeMotivation.associated_activity_types)
   const matchCount = results.filter(({ rec }) => creativeTypes.has(rec.type)).length
-  assert.ok(matchCount >= 2, `expected >= 2 creative-type recs in top 3, got ${matchCount}`)
+  assert.ok(matchCount >= 2, `expected >= 2 creative-type recs, got ${matchCount}`)
 })
 
 test("getRecommendations: Art interest + explore_creative motivation surfaces Art-field creative-type recs", () => {
