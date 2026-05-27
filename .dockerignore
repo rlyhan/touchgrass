@@ -1,0 +1,23 @@
+.git
+.github
+*.md
+
+# Dev dependencies that npm ci will reinstall
+node_modules
+**/node_modules
+
+# Non-API apps — not needed for the Express server
+apps/mobile
+apps/sanity
+apps/web
+
+# Build artefacts
+packages/core/dist
+
+# Local env files — secrets are injected via Fly secrets
+.env*
+
+# Misc
+.vercel
+.expo
+*.log
