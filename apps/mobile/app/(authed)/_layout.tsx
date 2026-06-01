@@ -16,7 +16,7 @@ export default function AuthedLayout() {
   }
 
   if (!session?.user) {
-    return <Redirect href={"/onboarding/name" as Href} />
+    return <Redirect href={"/sign-in" as Href} />
   }
 
   return <Stack screenOptions={{ headerShown: false }} />

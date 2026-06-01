@@ -1,5 +1,6 @@
 import type { PatternWeightsResponse } from "@touchgrass/types"
 
+import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
 
@@ -10,6 +11,7 @@ export async function fetchPatternWeights(): Promise<
 > {
   const response = await authedFetch(apiUrl("/pattern-weights"))
 
+  if (response.status === 401) throw new UnauthenticatedError()
   if (!response.ok) {
     throw new Error(`Failed to fetch pattern weights (${response.status})`)
   }

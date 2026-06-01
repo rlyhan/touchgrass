@@ -15,6 +15,7 @@ import {
 import {
   fetchRecommendations,
   ProfileNotFoundError,
+  UnauthenticatedError,
 } from "@/lib/recommendations/api"
 import { colors } from "@/lib/theme/colors"
 import { useAsyncData } from "@/lib/use-async-data"
@@ -29,6 +30,10 @@ export default function RecommendationsPage() {
     try {
       return await fetchRecommendations()
     } catch (err) {
+      if (err instanceof UnauthenticatedError) {
+        router.replace("/sign-in" as Href)
+        return []
+      }
       // The user is authenticated but has no profile — most likely because
       // onboarding was interrupted before profile creation completed. Send
       // them back to finish it rather than leaving them on a dead-end error.
