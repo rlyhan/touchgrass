@@ -12,7 +12,8 @@
       "policy": "sdkVersion"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rlyhan.touchgrass"
     },
     "android": {
       "adaptiveIcon": {
