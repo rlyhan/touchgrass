@@ -6,9 +6,13 @@ Fixes a native-only bug where the pattern detail card failed to expand in Expo G
 
 ### Mobile (`apps/mobile`)
 
-- Fixed `TopPatternsSection` expand animation on native: `onLayout` inside a `height: 0` `Animated.View` reports `h = 0` due to Yoga constraining child layout to the parent's explicit height. Measurement is now taken from an absolutely-positioned, opacity-0, non-interactive clone outside the animated container so the true content height is always available before the animation fires.
+- Fixed `TopPatternsSection` expand animation on native: moved content measurement to an off-screen, opacity-0 clone outside the `height: 0` animated container (Yoga constrains child layout to the parent's explicit height, so `onLayout` always reported `h = 0`). Height is cached per pattern and animations are driven directly via `useSharedValue` to skip the `setState → re-render → useEffect` chain that caused visible jank on Android.
 - Added `bundleIdentifier: "com.rlyhan.touchgrass"` to `app.json` `ios` config, required for `expo run:ios` native builds.
 - Updated `ios` and `android` scripts to `expo run:ios` / `expo run:android` for native dev builds.
+
+### Storybook (`apps/mobile`)
+
+- Added stories for the four previously uncovered components: `PatternRing` (default, selected, dimmed, high/low match, 3-ring row), `PatternMatchAccordion` (default, alt pattern, long description), `TopPatternsSection` (default, close-matches, low-confidence), and `PortableText` (rich marks, single paragraph, custom className, empty).
 
 ### Docs
 
