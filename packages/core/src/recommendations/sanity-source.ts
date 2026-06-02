@@ -13,7 +13,7 @@ export type SanityClientConfig = {
 const ACTIVITIES_QUERY = `*[_type == "activity" && defined(slug.current) && defined(title)]{
   "slug": slug.current,
   title,
-  "imageUrl": imageUrl.asset->url,
+  "imageUrl": imageUrl.asset->url + "?w=800&fit=crop&auto=format",
   type,
   field,
   estimated_time,
