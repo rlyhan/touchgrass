@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Pressable, Text, View } from "react-native"
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -22,6 +23,13 @@ const PATTERN_BY_ID: Record<string, PatternType> = Object.fromEntries(
 )
 
 const ANIMATION_DURATION = 220
+const PANEL_GAP = 16
+const DETAIL_PADDING = 16
+
+const TIMING_CONFIG = {
+  duration: ANIMATION_DURATION,
+  easing: Easing.out(Easing.cubic),
+}
 
 type Props = {
   patternWeights: UserPatternWeights
@@ -56,11 +64,13 @@ export function TopPatternsSection({ patternWeights }: Props) {
   // Keep the last-shown pattern mounted so the collapse animation has
   // something to fade/shrink instead of the content vanishing instantly.
   const [displayedId, setDisplayedId] = useState<PatternTypeId | null>(null)
-  const [contentHeight, setContentHeight] = useState(0)
+  const heightById = useRef<Partial<Record<PatternTypeId, number>>>({})
   const heightValue = useSharedValue(0)
   const opacityValue = useSharedValue(0)
-  const marginTopValue = useSharedValue(0)
+  const gapValue = useSharedValue(0)
   const displayed = displayedId !== null ? PATTERN_BY_ID[displayedId] : null
+  const needsMeasure =
+    displayedId !== null && heightById.current[displayedId] === undefined
 
   useEffect(() => {
     if (selectedId !== null) {
@@ -73,33 +83,50 @@ export function TopPatternsSection({ patternWeights }: Props) {
     return () => clearTimeout(timeout)
   }, [selectedId])
 
-  // Wait for a real height measurement before expanding — onLayout inside the
-  // zero-height Animated.View reports h=0 on native (Yoga constrains children
-  // to the parent's explicit height). The measurement view below is outside
-  // that constraint, so contentHeight is always the true content height.
+  // Open (cached path): when displayedId changes and the height is already
+  // known, start the animation immediately without going through a state
+  // update. Uncached patterns are handled in handleLayout instead.
   useEffect(() => {
-    const isOpen = selectedId !== null
-    if (isOpen && contentHeight === 0) return
-    heightValue.value = withTiming(isOpen ? contentHeight : 0, {
-      duration: ANIMATION_DURATION,
-    })
-    opacityValue.value = withTiming(isOpen ? 1 : 0, {
-      duration: ANIMATION_DURATION,
-    })
-    marginTopValue.value = withTiming(isOpen ? 16 : 0, {
-      duration: ANIMATION_DURATION,
-    })
-  }, [selectedId, contentHeight, heightValue, opacityValue, marginTopValue])
+    if (!displayedId) return
+    const cached = heightById.current[displayedId]
+    if (cached === undefined) return
+    heightValue.value = withTiming(cached, TIMING_CONFIG)
+    opacityValue.value = withTiming(1, TIMING_CONFIG)
+    gapValue.value = withTiming(PANEL_GAP, TIMING_CONFIG)
+  }, [displayedId, heightValue, opacityValue, gapValue])
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: heightValue.value,
-    opacity: opacityValue.value,
-    marginTop: marginTopValue.value,
+  // Close: animate to zero when deselected.
+  useEffect(() => {
+    if (selectedId !== null) return
+    heightValue.value = withTiming(0, TIMING_CONFIG)
+    opacityValue.value = withTiming(0, TIMING_CONFIG)
+    gapValue.value = withTiming(0, TIMING_CONFIG)
+  }, [selectedId, heightValue, opacityValue, gapValue])
+
+  const gapStyle = useAnimatedStyle(() => ({
+    height: gapValue.value,
   }))
 
-  function handleSelect(id: PatternTypeId) {
-    setSelectedId((prev) => (prev === id ? null : id))
+  const panelStyle = useAnimatedStyle(() => ({
+    height: heightValue.value,
+    opacity: opacityValue.value,
+  }))
+
+  function handleLayout(height: number) {
+    if (!displayedId || height === 0) return
+    const prev = heightById.current[displayedId]
+    if (prev === height) return
+    heightById.current[displayedId] = height
+    // Trigger animation directly — skips the setContentHeight → re-render →
+    // effect chain that causes visible jank on Android.
+    heightValue.value = withTiming(height, TIMING_CONFIG)
+    opacityValue.value = withTiming(1, TIMING_CONFIG)
+    gapValue.value = withTiming(PANEL_GAP, TIMING_CONFIG)
   }
+
+  const handleSelect = useCallback((id: PatternTypeId) => {
+    setSelectedId((prev) => (prev === id ? null : id))
+  }, [])
 
   return (
     <View className="mb-6">
@@ -136,25 +163,26 @@ export function TopPatternsSection({ patternWeights }: Props) {
         })}
       </View>
 
-      {/*
-        Measurement-only view: positioned off-screen so it doesn't affect layout,
-        but unconstrained by the Animated.View height so onLayout reports the
-        true content height on native.
-      */}
-      <View
-        pointerEvents="none"
-        style={{ position: "absolute", opacity: 0, left: 0, right: 0 }}
-      >
+      <Animated.View style={gapStyle} />
+
+      {needsMeasure && displayed ? (
         <View
-          style={{ padding: 16 }}
-          onLayout={(e) => {
-            if (!displayed) return
-            setContentHeight(e.nativeEvent.layout.height)
+          style={{
+            position: "absolute",
+            opacity: 0,
+            left: 0,
+            right: 0,
+            pointerEvents: "none",
           }}
         >
-          {displayed ? <PatternDetail pattern={displayed} /> : null}
+          <View
+            style={{ padding: DETAIL_PADDING }}
+            onLayout={(e) => handleLayout(e.nativeEvent.layout.height)}
+          >
+            <PatternDetail pattern={displayed} />
+          </View>
         </View>
-      </View>
+      ) : null}
 
       <Animated.View
         style={[
@@ -163,10 +191,10 @@ export function TopPatternsSection({ patternWeights }: Props) {
             borderRadius: 16,
             backgroundColor: colors.gray[100],
           },
-          animatedStyle,
+          panelStyle,
         ]}
       >
-        <View style={{ padding: 16 }}>
+        <View testID="pattern-detail-panel" style={{ padding: DETAIL_PADDING }}>
           {displayed ? <PatternDetail pattern={displayed} /> : null}
         </View>
       </Animated.View>

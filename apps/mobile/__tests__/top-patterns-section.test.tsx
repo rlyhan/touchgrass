@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react-native"
 
 // Replace the animated ring with a simple text stub so we don't have to render
 // the SVG or run the reanimated animation in tests.
@@ -57,7 +63,11 @@ describe("TopPatternsSection", () => {
     fireEvent.press(
       screen.getByRole("button", { name: `Show details for ${pattern.name}` }),
     )
-    expect(screen.getByText(pattern.shortDescription)).toBeTruthy()
+    expect(
+      within(screen.getByTestId("pattern-detail-panel")).getByText(
+        pattern.shortDescription,
+      ),
+    ).toBeTruthy()
   })
 
   it("hides the description when the selected ring is tapped again", () => {
@@ -93,12 +103,13 @@ describe("TopPatternsSection", () => {
     fireEvent.press(
       screen.getByRole("button", { name: `Show details for ${first.name}` }),
     )
-    expect(screen.getByText(first.shortDescription)).toBeTruthy()
+    const panel = () => screen.getByTestId("pattern-detail-panel")
+    expect(within(panel()).getByText(first.shortDescription)).toBeTruthy()
 
     fireEvent.press(
       screen.getByRole("button", { name: `Show details for ${second.name}` }),
     )
-    expect(screen.queryByText(first.shortDescription)).toBeNull()
-    expect(screen.getByText(second.shortDescription)).toBeTruthy()
+    expect(within(panel()).queryByText(first.shortDescription)).toBeNull()
+    expect(within(panel()).getByText(second.shortDescription)).toBeTruthy()
   })
 })
