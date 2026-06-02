@@ -1,0 +1,12 @@
+/* Override the mobile-phone frame applied in global.css */
+@media screen and (min-width: 768px) {
+  #root {
+    max-width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    align-items: stretch !important;
+  }
+}

@@ -1,7 +1,9 @@
+import { router } from "expo-router"
 import { useEffect, useState } from "react"
 
 import type { UserPatternWeights } from "@touchgrass/types"
 
+import { UnauthenticatedError } from "@/lib/auth/errors"
 import { fetchPatternWeights } from "./api"
 import { getCachedPatternWeights } from "./cache"
 
@@ -34,8 +36,12 @@ export function usePatternWeights(): UsePatternWeightsResult {
         setWeights(w)
         setStatus("ready")
       })
-      .catch(() => {
+      .catch((err) => {
         if (cancelled) return
+        if (err instanceof UnauthenticatedError) {
+          router.replace("/sign-in")
+          return
+        }
         setStatus("error")
       })
     return () => {

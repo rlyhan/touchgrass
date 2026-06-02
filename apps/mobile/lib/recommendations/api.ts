@@ -1,11 +1,14 @@
 import type { Activity, RecommendationsResponse } from "@touchgrass/types"
 
+import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
 import {
   setCachedDominantPattern,
   setCachedPatternWeights,
 } from "@/lib/patterns/cache"
+
+export { UnauthenticatedError } from "@/lib/auth/errors"
 
 const activityCache = new Map<string, Activity>()
 
@@ -22,6 +25,10 @@ export class ProfileNotFoundError extends Error {
 
 export async function fetchRecommendations(): Promise<Activity[]> {
   const response = await authedFetch(apiUrl("/recommendations"))
+
+  if (response.status === 401) {
+    throw new UnauthenticatedError()
+  }
 
   if (response.status === 404) {
     throw new ProfileNotFoundError()
@@ -51,6 +58,7 @@ export async function fetchActivityBySlug(slug: string): Promise<Activity | null
     apiUrl(`/activities/${encodeURIComponent(slug)}`),
   )
 
+  if (response.status === 401) throw new UnauthenticatedError()
   if (response.status === 404) return null
   if (!response.ok) {
     throw new Error(`Failed to fetch activity (${response.status})`)

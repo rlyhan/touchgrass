@@ -16,6 +16,7 @@ import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
 import { resolveDominantPattern } from "@/lib/patterns/cache"
 import { usePatternWeights } from "@/lib/patterns/use-pattern-weights"
+import { UnauthenticatedError } from "@/lib/auth/errors"
 import {
   fetchActivityBySlug,
   getCachedActivity,
@@ -76,8 +77,12 @@ export default function ActivityDetailPage() {
           setActivityStatus((prev) => (prev === "ready" ? prev : "not-found"))
         }
       })
-      .catch(() => {
+      .catch((err) => {
         if (cancelled) return
+        if (err instanceof UnauthenticatedError) {
+          router.replace("/sign-in" as Href)
+          return
+        }
         // Network error: keep showing cached copy if we had one.
         setActivityStatus((prev) => (prev === "ready" ? prev : "error"))
       })
