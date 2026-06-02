@@ -83,6 +83,7 @@ export const activitySchema = defineType({
       name: 'estimated_time',
       title: 'Estimated Time',
       type: 'string',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'tips',

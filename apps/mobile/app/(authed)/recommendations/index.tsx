@@ -1,5 +1,5 @@
 import { router, type Href } from "expo-router"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -15,6 +15,7 @@ import {
 import {
   fetchRecommendations,
   ProfileNotFoundError,
+  UnauthenticatedError,
 } from "@/lib/recommendations/api"
 import { colors } from "@/lib/theme/colors"
 import { useAsyncData } from "@/lib/use-async-data"
@@ -29,6 +30,10 @@ export default function RecommendationsPage() {
     try {
       return await fetchRecommendations()
     } catch (err) {
+      if (err instanceof UnauthenticatedError) {
+        router.replace("/sign-in" as Href)
+        return []
+      }
       // The user is authenticated but has no profile — most likely because
       // onboarding was interrupted before profile creation completed. Send
       // them back to finish it rather than leaving them on a dead-end error.
@@ -41,6 +46,26 @@ export default function RecommendationsPage() {
   }, [])
 
   const { data: recommendations = [], status, reload } = useAsyncData(fetcher)
+  const patternWeights = getCachedPatternWeights()
+
+  const listHeader = useMemo(
+    () => (
+      <>
+        <View className="items-center">
+          <GrassLogo />
+        </View>
+        {patternWeights ? (
+          <View className="mt-10">
+            <TopPatternsSection patternWeights={patternWeights} />
+          </View>
+        ) : null}
+        <Text className="mb-8 mt-4 text-3xl font-bold tracking-tight text-gray-900">
+          Your recommendations
+        </Text>
+      </>
+    ),
+    [patternWeights],
+  )
 
   const handleSignOut = useCallback(async () => {
     setSigningOut(true)
@@ -117,24 +142,7 @@ export default function RecommendationsPage() {
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={5}
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 32 }}
-        ListHeaderComponent={
-          <>
-            <View className="items-center">
-              <GrassLogo />
-            </View>
-            {(() => {
-              const weights = getCachedPatternWeights()
-              return weights ? (
-                <View className="mt-10">
-                  <TopPatternsSection patternWeights={weights} />
-                </View>
-              ) : null
-            })()}
-            <Text className="mb-8 mt-4 text-3xl font-bold tracking-tight text-gray-900">
-              Your recommendations
-            </Text>
-          </>
-        }
+        ListHeaderComponent={listHeader}
         ListFooterComponent={
           <View className="mt-12 items-center">
             <Pressable

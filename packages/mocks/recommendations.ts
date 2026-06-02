@@ -15,7 +15,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-guitar-pedalboard",
     title: "Build a Guitar Pedalboard",
-    imageUrl: "https://images.unsplash.com/photo-1511379938547-c1f69419868d",
+    imageUrl: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Music",
     estimated_time: "A weekend",
@@ -30,7 +30,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "join-a-beginner-boxing-class",
     title: "Join a Beginner Boxing Class",
-    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Martial Arts",
     estimated_time: "1 hour",
@@ -45,7 +45,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "write-a-short-horror-screenplay",
     title: "Write a Short Horror Screenplay",
-    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba",
+    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&fit=crop&auto=format",
     type: "Artistic",
     field: "Writing",
     estimated_time: "A few hours",
@@ -60,7 +60,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "journal-while-listening-to-jazz",
     title: "Journal While Listening to Jazz",
-    imageUrl: "https://images.unsplash.com/photo-1511192336575-5a79af67a629",
+    imageUrl: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Writing",
     estimated_time: "1 hour",
@@ -75,7 +75,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "study-music-theory-basics",
     title: "Study Music Theory Basics",
-    imageUrl: "https://images.unsplash.com/photo-1514119412350-e174d90d280e",
+    imageUrl: "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=800&fit=crop&auto=format",
     type: "Educational",
     field: "Music",
     estimated_time: "A week",
@@ -90,7 +90,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "compose-a-1-minute-song",
     title: "Compose a 1-Minute Song",
-    imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+    imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Music",
     estimated_time: "A few hours",
@@ -105,7 +105,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "host-a-vinyl-listening-night",
     title: "Host a Vinyl Listening Night",
-    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b",
+    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Music",
     estimated_time: "An evening",
@@ -120,7 +120,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-home-heavy-bag-stand",
     title: "Build a Home Heavy Bag Stand",
-    imageUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd",
+    imageUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Martial Arts",
     estimated_time: "A weekend",
@@ -135,7 +135,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "learn-tai-chi-basics",
     title: "Learn Tai Chi Basics",
-    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773",
+    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&fit=crop&auto=format",
     type: "Mindful",
     field: "Martial Arts",
     estimated_time: "A week",
@@ -150,7 +150,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "read-a-bruce-lee-biography",
     title: "Read a Bruce Lee Biography",
-    imageUrl: "https://images.unsplash.com/photo-1544717305-2782549b5136",
+    imageUrl: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Martial Arts",
     estimated_time: "A week",
@@ -165,7 +165,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "plan-a-martial-arts-training-trip",
     title: "Plan a Martial Arts Training Trip",
-    imageUrl: "https://images.unsplash.com/photo-1544717684-1243da23b545",
+    imageUrl: "https://images.unsplash.com/photo-1544717684-1243da23b545?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Martial Arts",
     estimated_time: "A weekend",
@@ -180,7 +180,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "start-a-30-day-reading-challenge",
     title: "Start a 30-Day Reading Challenge",
-    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Writing",
     estimated_time: "A month",
@@ -195,7 +195,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "join-a-local-book-club",
     title: "Join a Local Book Club",
-    imageUrl: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da",
+    imageUrl: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Writing",
     estimated_time: "Ongoing",
@@ -210,7 +210,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "submit-a-story-to-a-literary-magazine",
     title: "Submit a Story to a Literary Magazine",
-    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a",
+    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Writing",
     estimated_time: "A weekend",
@@ -225,7 +225,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "analyze-a-classic-novel-chapter-by-chapter",
     title: "Analyze a Classic Novel Chapter by Chapter",
-    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Writing",
     estimated_time: "A week",
@@ -240,7 +240,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "develop-a-personal-cookbook",
     title: "Develop a Personal Cookbook",
-    imageUrl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061",
+    imageUrl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Cooking",
     estimated_time: "A month",
@@ -255,7 +255,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "cook-one-regions-cuisine-for-a-week",
     title: "Cook One Region's Cuisine for a Week",
-    imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+    imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Cooking",
     estimated_time: "A week",
@@ -270,7 +270,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "pitch-a-pop-up-restaurant-concept",
     title: "Pitch a Pop-Up Restaurant Concept",
-    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Cooking",
     estimated_time: "A week",
@@ -285,7 +285,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "shoot-a-golden-hour-walk",
     title: "Shoot a Golden Hour Walk",
-    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Photography",
     estimated_time: "1 hour",
@@ -300,7 +300,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-working-pinhole-camera",
     title: "Build a Working Pinhole Camera",
-    imageUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32",
+    imageUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Photography",
     estimated_time: "A weekend",
@@ -315,7 +315,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "create-a-12-page-photo-zine",
     title: "Create a 12-Page Photo Zine",
-    imageUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32",
+    imageUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&fit=crop&auto=format",
     type: "Artistic",
     field: "Photography",
     estimated_time: "A weekend",
@@ -330,7 +330,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "lead-a-saturday-photowalk",
     title: "Lead a Saturday Photowalk",
-    imageUrl: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4",
+    imageUrl: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Photography",
     estimated_time: "An afternoon",
@@ -345,7 +345,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "capture-wildlife-in-a-state-park",
     title: "Capture Wildlife in a State Park",
-    imageUrl: "https://images.unsplash.com/photo-1474511320723-9a56873867b5",
+    imageUrl: "https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=800&fit=crop&auto=format",
     type: "Outdoorsy",
     field: "Photography",
     estimated_time: "An afternoon",
@@ -360,7 +360,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "run-a-tabletop-rpg-one-shot",
     title: "Run a Tabletop RPG One-Shot",
-    imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420",
+    imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Gaming",
     estimated_time: "An afternoon",
@@ -375,7 +375,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "design-a-board-game-prototype",
     title: "Design a Board Game Prototype",
-    imageUrl: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09",
+    imageUrl: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Gaming",
     estimated_time: "A weekend",
@@ -390,7 +390,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "stream-your-first-twitch-session",
     title: "Stream Your First Twitch Session",
-    imageUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e",
+    imageUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Gaming",
     estimated_time: "1 hour",
@@ -405,7 +405,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "beat-a-notoriously-difficult-rpg",
     title: "Beat a Notoriously Difficult RPG",
-    imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420",
+    imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Gaming",
     estimated_time: "A month",
@@ -420,7 +420,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "try-a-30-day-push-up-challenge",
     title: "Try a 30-Day Push-Up Challenge",
-    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Fitness",
     estimated_time: "A month",
@@ -435,7 +435,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-garage-gym-setup",
     title: "Build a Garage Gym Setup",
-    imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48",
+    imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Fitness",
     estimated_time: "A weekend",
@@ -450,7 +450,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "map-a-park-workout-loop",
     title: "Map a Park Workout Loop",
-    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop&auto=format",
     type: "Outdoorsy",
     field: "Fitness",
     estimated_time: "An afternoon",
@@ -465,7 +465,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "sign-up-for-your-first-5k",
     title: "Sign Up for Your First 5K",
-    imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078",
+    imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Fitness",
     estimated_time: "A month",
@@ -480,7 +480,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "get-personal-trainer-certified",
     title: "Get Personal Trainer Certified",
-    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Fitness",
     estimated_time: "A month",
@@ -495,7 +495,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-personal-site-from-scratch",
     title: "Build a Personal Site From Scratch",
-    imageUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+    imageUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Coding",
     estimated_time: "A weekend",
@@ -510,7 +510,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "read-the-pragmatic-programmer",
     title: "Read The Pragmatic Programmer",
-    imageUrl: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4",
+    imageUrl: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Coding",
     estimated_time: "A week",
@@ -525,7 +525,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "join-a-local-hack-night",
     title: "Join a Local Hack Night",
-    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Coding",
     estimated_time: "1 hour",
@@ -540,7 +540,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "contribute-your-first-open-source-pr",
     title: "Contribute Your First Open Source PR",
-    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Coding",
     estimated_time: "A week",
@@ -555,7 +555,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "run-a-kitchen-chemistry-experiment",
     title: "Run a Kitchen Chemistry Experiment",
-    imageUrl: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e",
+    imageUrl: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Science",
     estimated_time: "1 hour",
@@ -570,7 +570,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "read-cosmos-by-carl-sagan",
     title: "Read Cosmos by Carl Sagan",
-    imageUrl: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564",
+    imageUrl: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Science",
     estimated_time: "A week",
@@ -585,7 +585,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "track-a-citizen-science-project",
     title: "Track a Citizen Science Project",
-    imageUrl: "https://images.unsplash.com/photo-1532094349884-543bc11b234d",
+    imageUrl: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Science",
     estimated_time: "A month",
@@ -600,7 +600,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "hike-to-a-geological-formation",
     title: "Hike to a Geological Formation",
-    imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+    imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&fit=crop&auto=format",
     type: "Outdoorsy",
     field: "Science",
     estimated_time: "An afternoon",
@@ -615,7 +615,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "apply-to-a-lab-volunteer-program",
     title: "Apply to a Lab Volunteer Program",
-    imageUrl: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e",
+    imageUrl: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Science",
     estimated_time: "A week",
@@ -630,7 +630,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "start-an-indoor-herb-garden",
     title: "Start an Indoor Herb Garden",
-    imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735",
+    imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Nature",
     estimated_time: "A few hours",
@@ -645,7 +645,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "spend-an-hour-forest-bathing",
     title: "Spend an Hour Forest Bathing",
-    imageUrl: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+    imageUrl: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Nature",
     estimated_time: "1 hour",
@@ -660,7 +660,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "identify-ten-local-plant-species",
     title: "Identify Ten Local Plant Species",
-    imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735",
+    imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Nature",
     estimated_time: "An afternoon",
@@ -675,7 +675,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "volunteer-for-a-trail-cleanup",
     title: "Volunteer for a Trail Cleanup",
-    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Nature",
     estimated_time: "An afternoon",
@@ -690,7 +690,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "camp-solo-for-a-single-night",
     title: "Camp Solo for a Single Night",
-    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Nature",
     estimated_time: "A weekend",
@@ -705,7 +705,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "watch-a-directors-full-filmography",
     title: "Watch a Director's Full Filmography",
-    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba",
+    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Film",
     estimated_time: "A month",
@@ -720,7 +720,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "host-a-themed-film-night",
     title: "Host a Themed Film Night",
-    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba",
+    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Film",
     estimated_time: "1 hour",
@@ -735,7 +735,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "pitch-a-tv-pilot-logline",
     title: "Pitch a TV Pilot Logline",
-    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Film",
     estimated_time: "A few hours",
@@ -750,7 +750,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "reflect-on-your-five-favorite-films",
     title: "Reflect on Your Five Favorite Films",
-    imageUrl: "https://images.unsplash.com/photo-1485846234645-a62644f84728",
+    imageUrl: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Film",
     estimated_time: "1 hour",
@@ -765,7 +765,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "audition-for-community-theater",
     title: "Audition for Community Theater",
-    imageUrl: "https://images.unsplash.com/photo-1503095396549-807759245b35",
+    imageUrl: "https://images.unsplash.com/photo-1503095396549-807759245b35?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Theater",
     estimated_time: "An afternoon",
@@ -780,7 +780,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-set-piece-for-a-production",
     title: "Build a Set Piece for a Production",
-    imageUrl: "https://images.unsplash.com/photo-1503095396549-807759245b35",
+    imageUrl: "https://images.unsplash.com/photo-1503095396549-807759245b35?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Theater",
     estimated_time: "A weekend",
@@ -795,7 +795,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "write-a-10-minute-play",
     title: "Write a 10-Minute Play",
-    imageUrl: "https://images.unsplash.com/photo-1516280440614-37939bbacd81",
+    imageUrl: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&fit=crop&auto=format",
     type: "Artistic",
     field: "Theater",
     estimated_time: "A few hours",
@@ -810,7 +810,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "run-an-improv-night-with-friends",
     title: "Run an Improv Night With Friends",
-    imageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac",
+    imageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Theater",
     estimated_time: "1 hour",
@@ -825,7 +825,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "direct-a-staged-reading",
     title: "Direct a Staged Reading",
-    imageUrl: "https://images.unsplash.com/photo-1503095396549-807759245b35",
+    imageUrl: "https://images.unsplash.com/photo-1503095396549-807759245b35?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Theater",
     estimated_time: "A weekend",
@@ -840,7 +840,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "take-a-pottery-wheel-class",
     title: "Take a Pottery Wheel Class",
-    imageUrl: "https://images.unsplash.com/photo-1515377905703-c4788e51af15",
+    imageUrl: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Art",
     estimated_time: "1 hour",
@@ -855,7 +855,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "sketch-in-a-public-park",
     title: "Sketch in a Public Park",
-    imageUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f",
+    imageUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&fit=crop&auto=format",
     type: "Outdoorsy",
     field: "Art",
     estimated_time: "1 hour",
@@ -870,7 +870,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "curate-a-gallery-wall-in-your-home",
     title: "Curate a Gallery Wall in Your Home",
-    imageUrl: "https://images.unsplash.com/photo-1513694203232-719a280e022f",
+    imageUrl: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Art",
     estimated_time: "An afternoon",
@@ -885,7 +885,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "sell-a-piece-at-a-local-market",
     title: "Sell a Piece at a Local Market",
-    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865",
+    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Art",
     estimated_time: "A weekend",
@@ -900,7 +900,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "draft-a-personal-essay",
     title: "Draft a Personal Essay",
-    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a",
+    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Writing",
     estimated_time: "A few hours",
@@ -915,7 +915,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "co-write-a-story-with-a-friend",
     title: "Co-Write a Story With a Friend",
-    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Writing",
     estimated_time: "A few hours",
@@ -930,7 +930,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "try-stream-of-consciousness-daily",
     title: "Try Stream-of-Consciousness Daily",
-    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a",
+    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Writing",
     estimated_time: "A month",
@@ -945,7 +945,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "pitch-a-magazine-feature-article",
     title: "Pitch a Magazine Feature Article",
-    imageUrl: "https://images.unsplash.com/photo-1495020689067-958852a7765e",
+    imageUrl: "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Writing",
     estimated_time: "A week",
@@ -960,7 +960,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "travel-for-writing-inspiration",
     title: "Travel for Writing Inspiration",
-    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Writing",
     estimated_time: "A weekend",
@@ -975,7 +975,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "take-a-beginner-salsa-class",
     title: "Take a Beginner Salsa Class",
-    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4",
+    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Dance",
     estimated_time: "1 hour",
@@ -990,7 +990,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "learn-a-tiktok-choreography",
     title: "Learn a TikTok Choreography",
-    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4",
+    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&fit=crop&auto=format",
     type: "Performative",
     field: "Dance",
     estimated_time: "1 hour",
@@ -1005,7 +1005,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "attend-a-friday-night-dance-social",
     title: "Attend a Friday Night Dance Social",
-    imageUrl: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+    imageUrl: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Dance",
     estimated_time: "An afternoon",
@@ -1020,7 +1020,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "choreograph-a-30-second-routine",
     title: "Choreograph a 30-Second Routine",
-    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4",
+    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&fit=crop&auto=format",
     type: "Artistic",
     field: "Dance",
     estimated_time: "A few hours",
@@ -1035,7 +1035,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "study-the-history-of-modern-dance",
     title: "Study the History of Modern Dance",
-    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4",
+    imageUrl: "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Dance",
     estimated_time: "A week",
@@ -1050,7 +1050,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "ride-a-new-20-mile-loop",
     title: "Ride a New 20-Mile Loop",
-    imageUrl: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8",
+    imageUrl: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Cycling",
     estimated_time: "An afternoon",
@@ -1065,7 +1065,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-up-a-used-bike-frame",
     title: "Build Up a Used Bike Frame",
-    imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b",
+    imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Cycling",
     estimated_time: "A weekend",
@@ -1080,7 +1080,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "join-a-sunday-group-ride",
     title: "Join a Sunday Group Ride",
-    imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b",
+    imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Cycling",
     estimated_time: "An afternoon",
@@ -1095,7 +1095,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "race-your-first-local-crit",
     title: "Race Your First Local Crit",
-    imageUrl: "https://images.unsplash.com/photo-1541625602330-2277a4c46182",
+    imageUrl: "https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Cycling",
     estimated_time: "1 hour",
@@ -1110,7 +1110,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "cycle-through-a-national-park",
     title: "Cycle Through a National Park",
-    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&fit=crop&auto=format",
     type: "Outdoorsy",
     field: "Cycling",
     estimated_time: "A weekend",
@@ -1125,7 +1125,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "hike-a-sunrise-summit",
     title: "Hike a Sunrise Summit",
-    imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+    imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Hiking",
     estimated_time: "An afternoon",
@@ -1140,7 +1140,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "plan-a-three-day-backpacking-trip",
     title: "Plan a Three-Day Backpacking Trip",
-    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&fit=crop&auto=format",
     type: "Outdoorsy",
     field: "Hiking",
     estimated_time: "A weekend",
@@ -1155,7 +1155,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "lead-a-friend-on-their-first-hike",
     title: "Lead a Friend on Their First Hike",
-    imageUrl: "https://images.unsplash.com/photo-1551632811-561732d1e306",
+    imageUrl: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Hiking",
     estimated_time: "An afternoon",
@@ -1170,7 +1170,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "photograph-a-trail-in-a-series",
     title: "Photograph a Trail in a Series",
-    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&fit=crop&auto=format",
     type: "Artistic",
     field: "Hiking",
     estimated_time: "An afternoon",
@@ -1185,7 +1185,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "journal-at-a-mountain-overlook",
     title: "Journal at a Mountain Overlook",
-    imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+    imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Hiking",
     estimated_time: "1 hour",
@@ -1200,7 +1200,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "plan-a-weekend-solo-trip",
     title: "Plan a Weekend Solo Trip",
-    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Travel",
     estimated_time: "A weekend",
@@ -1215,7 +1215,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-travel-photo-book",
     title: "Build a Travel Photo Book",
-    imageUrl: "https://images.unsplash.com/photo-1488646953014-85cb44e25828",
+    imageUrl: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Travel",
     estimated_time: "A weekend",
@@ -1230,7 +1230,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "learn-50-words-in-a-new-language",
     title: "Learn 50 Words in a New Language",
-    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Travel",
     estimated_time: "A week",
@@ -1245,7 +1245,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "host-a-couchsurfer-for-a-weekend",
     title: "Host a Couchsurfer for a Weekend",
-    imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+    imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Travel",
     estimated_time: "A weekend",
@@ -1260,7 +1260,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "apply-to-be-a-travel-writer",
     title: "Apply to Be a Travel Writer",
-    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a",
+    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Travel",
     estimated_time: "A week",
@@ -1275,7 +1275,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-morning-routine",
     title: "Build a Morning Routine",
-    imageUrl: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88",
+    imageUrl: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Wellness",
     estimated_time: "A month",
@@ -1290,7 +1290,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "take-a-yin-yoga-class",
     title: "Take a Yin Yoga Class",
-    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773",
+    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Wellness",
     estimated_time: "1 hour",
@@ -1305,7 +1305,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "track-your-sleep-for-two-weeks",
     title: "Track Your Sleep for Two Weeks",
-    imageUrl: "https://images.unsplash.com/photo-1495195134817-aeb325a55b65",
+    imageUrl: "https://images.unsplash.com/photo-1495195134817-aeb325a55b65?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Wellness",
     estimated_time: "A week",
@@ -1320,7 +1320,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "become-a-certified-yoga-teacher",
     title: "Become a Certified Yoga Teacher",
-    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773",
+    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Wellness",
     estimated_time: "A month",
@@ -1335,7 +1335,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-backyard-telescope-mount",
     title: "Build a Backyard Telescope Mount",
-    imageUrl: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564",
+    imageUrl: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Astronomy",
     estimated_time: "A weekend",
@@ -1350,7 +1350,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "reflect-on-the-cosmos-under-the-night-sky",
     title: "Reflect on the Cosmos Under the Night Sky",
-    imageUrl: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564",
+    imageUrl: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Astronomy",
     estimated_time: "1 hour",
@@ -1365,7 +1365,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "photograph-the-milky-way",
     title: "Photograph the Milky Way",
-    imageUrl: "https://images.unsplash.com/photo-1502134249126-9f3755a50d78",
+    imageUrl: "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&fit=crop&auto=format",
     type: "Artistic",
     field: "Astronomy",
     estimated_time: "An afternoon",
@@ -1380,7 +1380,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "follow-a-tech-deep-dive-channel-for-a-month",
     title: "Follow a Tech Deep-Dive Channel for a Month",
-    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&fit=crop&auto=format",
     type: "Educational",
     field: "Technology",
     estimated_time: "A month",
@@ -1395,7 +1395,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "3d-print-a-custom-phone-stand",
     title: "3D Print a Custom Phone Stand",
-    imageUrl: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4",
+    imageUrl: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Engineering",
     estimated_time: "A weekend",
@@ -1410,7 +1410,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-simple-arduino-robot",
     title: "Build a Simple Arduino Robot",
-    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&fit=crop&auto=format",
     type: "Experimental",
     field: "Engineering",
     estimated_time: "A weekend",
@@ -1425,7 +1425,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "detail-your-car-to-showroom-standard",
     title: "Detail Your Car to Showroom Standard",
-    imageUrl: "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+    imageUrl: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Cars",
     estimated_time: "An afternoon",
@@ -1440,7 +1440,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "attend-a-weekend-track-day",
     title: "Attend a Weekend Track Day",
-    imageUrl: "https://images.unsplash.com/photo-1502877338535-766e1452684a",
+    imageUrl: "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Cars",
     estimated_time: "A weekend",
@@ -1455,7 +1455,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "get-your-motorcycle-license",
     title: "Get Your Motorcycle License",
-    imageUrl: "https://images.unsplash.com/photo-1517846693594-1567da72af75",
+    imageUrl: "https://images.unsplash.com/photo-1517846693594-1567da72af75?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Motorcycles",
     estimated_time: "A month",
@@ -1470,7 +1470,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "plan-a-coastal-motorcycle-road-trip",
     title: "Plan a Coastal Motorcycle Road Trip",
-    imageUrl: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+    imageUrl: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Motorcycles",
     estimated_time: "A weekend",
@@ -1485,7 +1485,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "take-an-intro-flight-lesson",
     title: "Take an Intro Flight Lesson",
-    imageUrl: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05",
+    imageUrl: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Aviation",
     estimated_time: "1 hour",
@@ -1500,7 +1500,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-remote-control-plane",
     title: "Build a Remote-Control Plane",
-    imageUrl: "https://images.unsplash.com/photo-1474302770737-173ee21bab63",
+    imageUrl: "https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "Aviation",
     estimated_time: "A weekend",
@@ -1515,7 +1515,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "join-a-recreational-soccer-league",
     title: "Join a Recreational Soccer League",
-    imageUrl: "https://images.unsplash.com/photo-1517466787929-bc90951d0974",
+    imageUrl: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Sports",
     estimated_time: "Ongoing",
@@ -1530,7 +1530,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "attend-a-live-sporting-event",
     title: "Attend a Live Sporting Event",
-    imageUrl: "https://images.unsplash.com/photo-1508098682722-e99c643e7485",
+    imageUrl: "https://images.unsplash.com/photo-1508098682722-e99c643e7485?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Sports",
     estimated_time: "An afternoon",
@@ -1545,7 +1545,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "join-a-local-running-club",
     title: "Join a Local Running Club",
-    imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078",
+    imageUrl: "https://images.unsplash.com/photo-1483721310020-03333e577078?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Running",
     estimated_time: "Ongoing",
@@ -1560,7 +1560,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "try-an-indoor-bouldering-gym",
     title: "Try an Indoor Bouldering Gym",
-    imageUrl: "https://images.unsplash.com/photo-1522163182402-834f871fd851",
+    imageUrl: "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&fit=crop&auto=format",
     type: "Active",
     field: "Climbing",
     estimated_time: "1 hour",
@@ -1575,7 +1575,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "take-an-outdoor-rock-climbing-course",
     title: "Take an Outdoor Rock Climbing Course",
-    imageUrl: "https://images.unsplash.com/photo-1522163182402-834f871fd851",
+    imageUrl: "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Climbing",
     estimated_time: "A weekend",
@@ -1590,7 +1590,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "host-a-monthly-board-game-night",
     title: "Host a Monthly Board Game Night",
-    imageUrl: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09",
+    imageUrl: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Board Games",
     estimated_time: "An afternoon",
@@ -1605,7 +1605,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "solo-through-a-complex-strategy-game",
     title: "Solo Through a Complex Strategy Game",
-    imageUrl: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09",
+    imageUrl: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Board Games",
     estimated_time: "An afternoon",
@@ -1620,7 +1620,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "visit-five-local-independent-cafes",
     title: "Visit Five Local Independent Cafes",
-    imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085",
+    imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&fit=crop&auto=format",
     type: "Exploratory",
     field: "Coffee",
     estimated_time: "A month",
@@ -1635,7 +1635,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "curate-a-capsule-wardrobe",
     title: "Curate a Capsule Wardrobe",
-    imageUrl: "https://images.unsplash.com/photo-1496747611176-843222e1e57c",
+    imageUrl: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Fashion",
     estimated_time: "An afternoon",
@@ -1650,7 +1650,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "thrift-a-full-outfit-under-20",
     title: "Thrift a Full Outfit Under $20",
-    imageUrl: "https://images.unsplash.com/photo-1483985988355-763728e1935b",
+    imageUrl: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&fit=crop&auto=format",
     type: "Adventurous",
     field: "Fashion",
     estimated_time: "An afternoon",
@@ -1665,7 +1665,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "car-camp-at-a-state-park",
     title: "Car Camp at a State Park",
-    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop&auto=format",
     type: "Outdoorsy",
     field: "Camping",
     estimated_time: "A weekend",
@@ -1680,7 +1680,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "master-three-essential-wilderness-skills",
     title: "Master Three Essential Wilderness Skills",
-    imageUrl: "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+    imageUrl: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&fit=crop&auto=format",
     type: "Skill-based",
     field: "Camping",
     estimated_time: "A weekend",
@@ -1695,7 +1695,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "read-thinking-fast-and-slow",
     title: "Read Thinking, Fast and Slow",
-    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Psychology",
     estimated_time: "A week",
@@ -1710,7 +1710,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "try-cognitive-behavioral-journaling",
     title: "Try Cognitive Behavioral Journaling",
-    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a",
+    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Psychology",
     estimated_time: "A month",
@@ -1725,7 +1725,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "work-through-platos-republic",
     title: "Work Through Plato's Republic",
-    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Philosophy",
     estimated_time: "A week",
@@ -1740,7 +1740,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "join-an-online-philosophy-discussion-group",
     title: "Join an Online Philosophy Discussion Group",
-    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Philosophy",
     estimated_time: "Ongoing",
@@ -1755,7 +1755,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "visit-a-local-historical-museum",
     title: "Visit a Local Historical Museum",
-    imageUrl: "https://images.unsplash.com/photo-1518998053901-5348d3961a04",
+    imageUrl: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800&fit=crop&auto=format",
     type: "Educational",
     field: "History",
     estimated_time: "An afternoon",
@@ -1770,7 +1770,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "research-your-family-genealogy",
     title: "Research Your Family Genealogy",
-    imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+    imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "History",
     estimated_time: "A week",
@@ -1785,7 +1785,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "start-a-30-day-duolingo-streak",
     title: "Start a 30-Day Duolingo Streak",
-    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&fit=crop&auto=format",
     type: "Disciplined",
     field: "Language",
     estimated_time: "A month",
@@ -1800,7 +1800,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "find-a-language-exchange-partner",
     title: "Find a Language Exchange Partner",
-    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Language",
     estimated_time: "Ongoing",
@@ -1815,7 +1815,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "write-a-one-page-business-plan",
     title: "Write a One-Page Business Plan",
-    imageUrl: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a",
+    imageUrl: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=800&fit=crop&auto=format",
     type: "Professional",
     field: "Business",
     estimated_time: "A few hours",
@@ -1830,7 +1830,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "attend-a-local-entrepreneur-meetup",
     title: "Attend a Local Entrepreneur Meetup",
-    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865",
+    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Business",
     estimated_time: "1 hour",
@@ -1845,7 +1845,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-personal-budget-spreadsheet",
     title: "Build a Personal Budget Spreadsheet",
-    imageUrl: "https://images.unsplash.com/photo-1554224155-6726b3ff858f",
+    imageUrl: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&fit=crop&auto=format",
     type: "Analytical",
     field: "Finance",
     estimated_time: "A few hours",
@@ -1860,7 +1860,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "read-the-psychology-of-money",
     title: "Read The Psychology of Money",
-    imageUrl: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a",
+    imageUrl: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Finance",
     estimated_time: "A week",
@@ -1875,7 +1875,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "volunteer-to-lead-a-community-project",
     title: "Volunteer to Lead a Community Project",
-    imageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac",
+    imageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&fit=crop&auto=format",
     type: "Leadership",
     field: "Leadership",
     estimated_time: "A month",
@@ -1890,7 +1890,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "read-extreme-ownership",
     title: "Read Extreme Ownership",
-    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+    imageUrl: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&fit=crop&auto=format",
     type: "Intellectual",
     field: "Leadership",
     estimated_time: "A week",
@@ -1905,7 +1905,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "complete-a-10-day-vipassana-course",
     title: "Complete a 10-Day Vipassana Course",
-    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773",
+    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Meditation",
     estimated_time: "A week",
@@ -1920,7 +1920,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "set-up-a-daily-5-minute-breath-practice",
     title: "Set Up a Daily 5-Minute Breath Practice",
-    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773",
+    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&fit=crop&auto=format",
     type: "Mindful",
     field: "Meditation",
     estimated_time: "A month",
@@ -1935,7 +1935,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "enroll-in-a-free-online-course",
     title: "Enroll in a Free Online Course",
-    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&fit=crop&auto=format",
     type: "Educational",
     field: "Education",
     estimated_time: "A month",
@@ -1950,7 +1950,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "teach-a-skill-to-someone-you-know",
     title: "Teach a Skill to Someone You Know",
-    imageUrl: "https://images.unsplash.com/photo-1513258496099-48168024aec0",
+    imageUrl: "https://images.unsplash.com/photo-1513258496099-48168024aec0?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Education",
     estimated_time: "A few hours",
@@ -1965,7 +1965,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "attend-a-neighborhood-association-meeting",
     title: "Attend a Neighborhood Association Meeting",
-    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865",
+    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&fit=crop&auto=format",
     type: "Community-oriented",
     field: "Community",
     estimated_time: "1 hour",
@@ -1980,7 +1980,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "organize-a-block-party",
     title: "Organize a Block Party",
-    imageUrl: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+    imageUrl: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&fit=crop&auto=format",
     type: "Social",
     field: "Community",
     estimated_time: "A weekend",
@@ -1995,7 +1995,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "sign-up-with-a-local-food-bank",
     title: "Sign Up With a Local Food Bank",
-    imageUrl: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c",
+    imageUrl: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&fit=crop&auto=format",
     type: "Community-oriented",
     field: "Volunteering",
     estimated_time: "Ongoing",
@@ -2010,7 +2010,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "mentor-a-high-school-student",
     title: "Mentor a High School Student",
-    imageUrl: "https://images.unsplash.com/photo-1513258496099-48168024aec0",
+    imageUrl: "https://images.unsplash.com/photo-1513258496099-48168024aec0?w=800&fit=crop&auto=format",
     type: "Educational",
     field: "Volunteering",
     estimated_time: "Ongoing",
@@ -2025,7 +2025,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "build-a-wooden-bookshelf-from-scratch",
     title: "Build a Wooden Bookshelf From Scratch",
-    imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
+    imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "DIY",
     estimated_time: "A weekend",
@@ -2040,7 +2040,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "rewire-a-vintage-lamp",
     title: "Rewire a Vintage Lamp",
-    imageUrl: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4",
+    imageUrl: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=800&fit=crop&auto=format",
     type: "Constructive",
     field: "DIY",
     estimated_time: "An afternoon",
@@ -2055,7 +2055,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "redesign-a-room-with-no-new-purchases",
     title: "Redesign a Room With No New Purchases",
-    imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85",
+    imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&fit=crop&auto=format",
     type: "Creative",
     field: "Home Design",
     estimated_time: "An afternoon",
@@ -2070,7 +2070,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "learn-the-basics-of-interior-design",
     title: "Learn the Basics of Interior Design",
-    imageUrl: "https://images.unsplash.com/photo-1484154218962-a197022b5858",
+    imageUrl: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&fit=crop&auto=format",
     type: "Educational",
     field: "Home Design",
     estimated_time: "A week",
@@ -2085,7 +2085,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "start-a-vinyl-record-collection",
     title: "Start a Vinyl Record Collection",
-    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b",
+    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Collecting",
     estimated_time: "Ongoing",
@@ -2100,7 +2100,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "spend-a-month-visiting-antique-markets",
     title: "Spend a Month Visiting Antique Markets",
-    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865",
+    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&fit=crop&auto=format",
     type: "Exploratory",
     field: "Collecting",
     estimated_time: "A month",

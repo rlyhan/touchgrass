@@ -66,13 +66,40 @@ npm start
 
 This runs `@touchgrass/core` (Express on port 3000) and `@touchgrass/mobile` (Expo) concurrently. Both must be running for auth, profiles, and recommendations to work.
 
-**Platform-specific:**
+> **Note:** `npm start` uses `concurrently`, which prefixes log output and breaks QR code rendering in the terminal. If you need to scan a QR code to open the app in Expo Go on a physical device, run the two servers in separate terminals instead (see below).
+
+**Physical device (Expo Go) — separate terminals:**
 
 ```bash
-npm run ios       # iOS Simulator
-npm run android   # Android Emulator
+# Terminal 1 — API server
+npm run dev --workspace=@touchgrass/core
+
+# Terminal 2 — Expo dev server (QR code renders correctly here)
+cd apps/mobile && npx expo start
+```
+
+Then scan the QR code with the **Expo Go app** on your device (not the native camera).
+
+**Platform-specific (simulators/emulators):**
+
+```bash
+npm run ios       # iOS Simulator — native dev build (requires bundleIdentifier in app.json)
+npm run android   # Android Emulator — native dev build
 npm run web       # Browser at http://localhost:8081
 ```
+
+> **Note:** `npm run ios` / `npm run android` compile a native development build. This is slower to start than Expo Go but reflects real device behaviour more accurately. The `bundleIdentifier` (`com.rlyhan.touchgrass`) in `apps/mobile/app.json` is required for these commands.
+
+**Release build (accurate performance testing — animations, transitions):**
+
+Expo Go and native dev builds both run JavaScript in debug mode, which can make animations appear slow. For a production-accurate test, build in release mode:
+
+```bash
+cd apps/mobile
+EXPO_PUBLIC_API_BASE_URL=http://localhost:3000 npx expo run:ios --configuration Release
+```
+
+This must be run from `apps/mobile`, not the repo root.
 
 **Run workspaces individually:**
 

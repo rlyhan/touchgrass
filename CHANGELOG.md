@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.2.7] - 2026-06-02 — Fix: Pattern detail expand animation and iOS native build support
+
+Fixes a native-only bug where the pattern detail card failed to expand in Expo Go and on-device builds. Adds iOS native build configuration and documents the native and release build workflows.
+
+### Mobile (`apps/mobile`)
+
+- Fixed `TopPatternsSection` expand animation on native: moved content measurement to an off-screen, opacity-0 clone outside the `height: 0` animated container (Yoga constrains child layout to the parent's explicit height, so `onLayout` always reported `h = 0`). Height is cached per pattern and animations are driven directly via `useSharedValue` to skip the `setState → re-render → useEffect` chain that caused visible jank on Android.
+- Added `bundleIdentifier: "com.rlyhan.touchgrass"` to `app.json` `ios` config, required for `expo run:ios` native builds.
+- Updated `ios` and `android` scripts to `expo run:ios` / `expo run:android` for native dev builds.
+
+### Storybook (`apps/mobile`)
+
+- Added stories for the four previously uncovered components: `PatternRing` (default, selected, dimmed, high/low match, 3-ring row), `PatternMatchAccordion` (default, alt pattern, long description), `TopPatternsSection` (default, close-matches, low-confidence), and `PortableText` (rich marks, single paragraph, custom className, empty).
+
+### Docs
+
+- Added physical-device Expo Go setup (two-terminal workflow), native dev build notes, and a release build command (`EXPO_PUBLIC_API_BASE_URL=http://localhost:3000 npx expo run:ios --configuration Release`) for accurate animation and performance testing to `README.md`.
+
 ## [1.2.6] - 2026-05-27 — Chore: Broaden recommendation surface and pattern affinity
 
 Expands the recommendations list from 3 to 10 to give users more activities to browse while adjacent discovery features are still in flight, and widens each mock activity's `related_types` so secondary pattern affinity better reflects the personality dimensions a user actually shares with an activity.

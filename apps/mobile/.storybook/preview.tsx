@@ -3,6 +3,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import type { Preview } from "@storybook/react-native"
 
 import "../global.css"
+import "./storybook-web.css"
 
 const preview: Preview = {
   decorators: [
