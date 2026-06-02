@@ -37,6 +37,19 @@ function pickTopThree(weights: UserPatternWeights): PatternTypeId[] {
     .map(([id]) => id)
 }
 
+function PatternDetail({ pattern }: { pattern: PatternType }) {
+  return (
+    <>
+      <Text className="text-base font-semibold text-gray-900">
+        {pattern.name}
+      </Text>
+      <Text className="mt-2 text-sm leading-relaxed text-gray-700">
+        {pattern.shortDescription}
+      </Text>
+    </>
+  )
+}
+
 export function TopPatternsSection({ patternWeights }: Props) {
   const topThree = useMemo(() => pickTopThree(patternWeights), [patternWeights])
   const [selectedId, setSelectedId] = useState<PatternTypeId | null>(null)
@@ -46,6 +59,7 @@ export function TopPatternsSection({ patternWeights }: Props) {
   const [contentHeight, setContentHeight] = useState(0)
   const heightValue = useSharedValue(0)
   const opacityValue = useSharedValue(0)
+  const marginTopValue = useSharedValue(0)
   const displayed = displayedId !== null ? PATTERN_BY_ID[displayedId] : null
 
   useEffect(() => {
@@ -59,19 +73,28 @@ export function TopPatternsSection({ patternWeights }: Props) {
     return () => clearTimeout(timeout)
   }, [selectedId])
 
+  // Wait for a real height measurement before expanding — onLayout inside the
+  // zero-height Animated.View reports h=0 on native (Yoga constrains children
+  // to the parent's explicit height). The measurement view below is outside
+  // that constraint, so contentHeight is always the true content height.
   useEffect(() => {
     const isOpen = selectedId !== null
+    if (isOpen && contentHeight === 0) return
     heightValue.value = withTiming(isOpen ? contentHeight : 0, {
       duration: ANIMATION_DURATION,
     })
     opacityValue.value = withTiming(isOpen ? 1 : 0, {
       duration: ANIMATION_DURATION,
     })
-  }, [selectedId, contentHeight, heightValue, opacityValue])
+    marginTopValue.value = withTiming(isOpen ? 16 : 0, {
+      duration: ANIMATION_DURATION,
+    })
+  }, [selectedId, contentHeight, heightValue, opacityValue, marginTopValue])
 
   const animatedStyle = useAnimatedStyle(() => ({
     height: heightValue.value,
     opacity: opacityValue.value,
+    marginTop: marginTopValue.value,
   }))
 
   function handleSelect(id: PatternTypeId) {
@@ -112,31 +135,39 @@ export function TopPatternsSection({ patternWeights }: Props) {
           )
         })}
       </View>
+
+      {/*
+        Measurement-only view: positioned off-screen so it doesn't affect layout,
+        but unconstrained by the Animated.View height so onLayout reports the
+        true content height on native.
+      */}
+      <View
+        pointerEvents="none"
+        style={{ position: "absolute", opacity: 0, left: 0, right: 0 }}
+      >
+        <View
+          style={{ padding: 16 }}
+          onLayout={(e) => {
+            if (!displayed) return
+            setContentHeight(e.nativeEvent.layout.height)
+          }}
+        >
+          {displayed ? <PatternDetail pattern={displayed} /> : null}
+        </View>
+      </View>
+
       <Animated.View
         style={[
           {
             overflow: "hidden",
             borderRadius: 16,
             backgroundColor: colors.gray[100],
-            marginTop: displayedId ? 16 : 0
           },
           animatedStyle,
         ]}
       >
-        <View
-          onLayout={(e) => setContentHeight(e.nativeEvent.layout.height)}
-          style={{ padding: 16 }}
-        >
-          {displayed ? (
-            <>
-              <Text className="text-base font-semibold text-gray-900">
-                {displayed.name}
-              </Text>
-              <Text className="mt-2 text-sm leading-relaxed text-gray-700">
-                {displayed.shortDescription}
-              </Text>
-            </>
-          ) : null}
+        <View style={{ padding: 16 }}>
+          {displayed ? <PatternDetail pattern={displayed} /> : null}
         </View>
       </Animated.View>
     </View>
