@@ -200,6 +200,54 @@ Remaining recommendations are appended in bucket order (Top → Middle → Botto
 
 ---
 
+## Activity Type Definitions
+
+Strict definitions for the individual `associated_activity_types` configured within the `MOTIVATION_OPTIONS` array.
+
+### Creative / Expressive Sub-types
+- **Creative**: Actively bringing something new into existence by combining ideas, materials, or forms in a novel way.
+- **Artistic**: Engaging in aesthetic creation or interpretation, focusing on beauty, design, and emotional resonance.
+- **Constructive**: Building, assembling, or fabricating physical or digital structures through organized planning and execution.
+- **Expressive**: Communicating internal thoughts, feelings, or identities outwardly through a chosen medium.
+- **Performative**: Executing actions, movements, or speech live before an audience or within a designated display space.
+
+### Intellectual / Reflective Sub-types
+- **Intellectual**: Engaging the mind in complex thought, abstract conceptualization, and the pursuit of deep understanding.
+- **Analytical**: Breaking down complex information, systems, or data into smaller parts to understand their mechanics and logic.
+- **Educational**: Participating in structured or unstructured learning to acquire specific factual knowledge or technical skills.
+- **Reflective**: Turning thought inward to evaluate personal experiences, beliefs, behaviors, and inner states.
+
+### Active / Competitive Sub-types
+- **Active**: Requiring physical movement, kinetic engagement, or the expenditure of bodily energy.
+- **Physical**: Focusing directly on the mechanics, capabilities, conditioning, and limits of the human body.
+- **Skill-based**: Requiring specialized coordination, training, and deliberate practice to achieve technical proficiency.
+- **Competitive**: Measuring performance against an opponent, a scoring standard, or a personal record to determine success.
+
+### Exploratory / Adventurous Sub-types
+- **Adventurous**: Stepping past the familiar to embrace uncertainty, raw experiences, and spontaneous risk.
+- **Outdoorsy**: Engaging with natural, open-air, or non-urban environments that require adaptation to natural elements.
+- **Exploratory**: Mapping uncharted territory, observing environments, and gathering baseline findings without a fixed hypothesis.
+- **Experimental**: Testing specific variables or trial actions in a controlled way to observe concrete cause-and-effect outcomes.
+
+### Social / Community Sub-types
+- **Social**: Interacting directly with others to enjoy companionship, conversation, and mutual presence.
+- **Collaborative**: Working jointly with a team or partner to co-create, problem-solve, or achieve a shared outcome.
+- **Leadership**: Guiding, motivating, or organizing a group of people toward a specific direction or collective goal.
+- **Community-oriented**: Contributing to the welfare, identity, and shared success of a specific local or cultural group.
+
+### Professional / Goal-oriented Sub-types
+- **Professional**: Aligning actions with career advancement, industry standards, or formal workplace development.
+- **Goal-oriented**: Organizing actions strictly around achieving a clear, measurable, and predefined end state.
+- **Disciplined**: Maintaining consistent, controlled behavior and adherence to a rigorous routine despite distractions.
+- **Strategic**: Planning and executing actions based on long-term foresight, resource management, and competitive advantage.
+
+### Emotional / Therapeutic Sub-types
+- **Mindful**: Maintaining deliberate, non-judgmental presence and acute awareness of the current moment.
+- **Therapeutic**: Engaging in actions specifically designed to heal, restore, or remediate psychological or physical strain.
+- **Emotional**: Process-driven engagement that focuses on identifying, experiencing, and healthily channeling feelings.
+
+---
+
 ## Future Evolution
 
 We will add more inputs later in the future.
