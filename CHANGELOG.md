@@ -10,7 +10,7 @@ Fixes direct loads and hard refreshes of `/activities/<slug>` URLs returning a V
 
 ### Deployment (`vercel.json`)
 
-- Added a rewrite mapping `/activities/:slug` → `/activities/_shell`. Rewrites run after the filesystem check, so real assets still serve directly and only unknown activity paths fall through to the shell. Covers single-segment slugs only; nested dynamic routes would each need their own rewrite.
+- Added a rewrite mapping `/activities/:slug` → `/activities/_shell.html`. The `.html` extension is required because clean URLs are not enabled on the Vercel project (flat routes resolve only at their `.html` path). Rewrites run after the filesystem check, so real assets still serve directly and only unknown activity paths fall through to the shell. Covers single-segment slugs only; nested dynamic routes would each need their own rewrite.
 
 ## [1.3.0] - 2026-06-15 — Feat: Landing screen
 
