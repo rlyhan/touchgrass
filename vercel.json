@@ -5,6 +5,12 @@
   "outputDirectory": "apps/mobile/dist",
   "framework": null,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/activities/:slug",
+      "destination": "/activities/_shell"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
