@@ -17,7 +17,7 @@ export default function Index() {
 
   return (
     <Redirect
-      href={(session?.user ? "/recommendations" : "/onboarding/name") as Href}
+      href={(session?.user ? "/recommendations" : "/landing") as Href}
     />
   )
 }

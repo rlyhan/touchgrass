@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0] - 2026-06-15 — Feat: Landing screen
+
+Adds an unauthenticated landing screen as the entry point for new visitors, separating first-touch sign-up/log-in choice from the onboarding flow.
+
+### Mobile (`apps/mobile`)
+
+- Added `app/landing.tsx`: a branded landing screen with the `GrassLogo`, product tagline, and primary "Sign up" / ghost "Log in" actions routing to `/onboarding/name` and `/sign-in`. Uses a white-to-mint `LinearGradient` background, `SafeAreaView` edges, and accessible `Pressable` buttons with pressed states drawn from the shared `colors` theme.
+- Redirected the unauthenticated root (`app/index.tsx`) to `/landing` instead of `/onboarding/name`, so new users land on the entry screen before committing to onboarding. Authenticated users still redirect straight to `/recommendations`.
+
 ## [1.2.7] - 2026-06-02 — Fix: Pattern detail expand animation and iOS native build support
 
 Fixes a native-only bug where the pattern detail card failed to expand in Expo Go and on-device builds. Adds iOS native build configuration and documents the native and release build workflows.
