@@ -48,6 +48,16 @@ function PatternMatch({ activity }: { activity: Activity }) {
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
 
+// Activity slugs are CMS-driven, so we don't enumerate them at build time.
+// Static export only emits HTML for routes it knows about, so a dynamic route
+// with no params produces no file and direct hits / hard refreshes 404 at the
+// host. We emit a single placeholder "shell" page instead; Vercel rewrites
+// every /activities/* request to it (see vercel.json), and the component below
+// reads the real slug from the URL on the client and fetches the activity.
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return [{ slug: "_shell" }]
+}
+
 export default function ActivityDetailPage() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.1] - 2026-06-15 — Fix: Activity deep-link 404s on Vercel
+
+Fixes direct loads and hard refreshes of `/activities/<slug>` URLs returning a Vercel platform 404, caused by the static web export not emitting any file for the dynamic activity route.
+
+### Mobile (`apps/mobile`)
+
+- Added `generateStaticParams` to `app/(authed)/activities/[slug].tsx` returning a single `_shell` placeholder, so the static export emits one shell page (`dist/activities/_shell.html`) for the dynamic route. The shell hydrates client-side and reads the real slug from the URL via `useLocalSearchParams` before fetching the activity, so no build-time enumeration of CMS slugs is required.
+
+### Deployment (`vercel.json`)
+
+- Added a rewrite mapping `/activities/:slug` → `/activities/_shell.html`. The `.html` extension is required because clean URLs are not enabled on the Vercel project (flat routes resolve only at their `.html` path). Rewrites run after the filesystem check, so real assets still serve directly and only unknown activity paths fall through to the shell. Covers single-segment slugs only; nested dynamic routes would each need their own rewrite.
+
 ## [1.3.0] - 2026-06-15 — Feat: Landing screen
 
 Adds an unauthenticated landing screen as the entry point for new visitors, separating first-touch sign-up/log-in choice from the onboarding flow.
