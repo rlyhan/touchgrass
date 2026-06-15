@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.2] - 2026-06-16 — Chore: Document activity sub-type definitions and align mock affinities
+
+Establishes canonical, strict definitions for every activity sub-type used across the recommendation engine, and re-classifies the mock catalog's `type` and `related_types` to conform to those definitions so secondary pattern affinity reflects each activity's true character.
+
+### Docs (`context`)
+
+- Added an "Activity Type Definitions" section to `recommendation-engine.md` defining all 27 `associated_activity_types` referenced by `MOTIVATION_OPTIONS`, grouped into seven families (Creative/Expressive, Intellectual/Reflective, Active/Competitive, Exploratory/Adventurous, Social/Community, Professional/Goal-oriented, Emotional/Therapeutic). Each entry gives a one-line behavioural definition to disambiguate overlapping types (e.g. Creative vs. Artistic vs. Constructive) when authoring activity data.
+
+### Mocks (`packages/mocks`)
+
+- Re-classified primary `type` and refined `related_types` on the mock activities in `recommendations.ts` to match the newly documented definitions — correcting mismatches (e.g. a Bruce Lee biography moved from `Reflective` to `Educational`, a personal cookbook from `Creative` to `Constructive`) and tightening secondary affinities to the sub-types that genuinely apply. Several `related_types` lists were trimmed from five entries to four. Since secondary affinity is averaged across `related_types` and weighted by `SECONDARY_WEIGHT` (0.2), these adjustments sharpen scoring without changing the algorithm.
+
 ## [1.3.1] - 2026-06-15 — Fix: Activity deep-link 404s on Vercel
 
 Fixes direct loads and hard refreshes of `/activities/<slug>` URLs returning a Vercel platform 404, caused by the static web export not emitting any file for the dynamic activity route.
