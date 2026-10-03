@@ -5,10 +5,11 @@
   "outputDirectory": "apps/mobile/dist",
   "framework": null,
   "trailingSlash": false,
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/activities/:slug",
-      "destination": "/activities/_shell.html"
+      "destination": "/activities/_shell"
     }
   ],
   "headers": [
