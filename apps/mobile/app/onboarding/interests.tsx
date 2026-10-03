@@ -8,6 +8,7 @@ import { Chip, ChipGroup } from "@/components/ui/chip"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { getFieldIcon } from "@/lib/icons"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 import { toggleItem } from "@/lib/toggle-item"
 import { ACTIVITY_FIELDS } from "@touchgrass/types/constants"
 import type { ActivityField } from "@touchgrass/types"
@@ -15,7 +16,7 @@ import type { ActivityField } from "@touchgrass/types"
 export default function InterestsScreen() {
   const { control, setValue } = useOnboardingForm()
 
-  function goNext() { router.push("/onboarding/personality" as Href) }
+  function goNext() { router.push(ONBOARDING_ROUTES.personality as Href) }
   function skip() {
     setValue("interests", [])
     goNext()
@@ -25,7 +26,7 @@ export default function InterestsScreen() {
     <OnboardingScreenShell
       step={3}
       totalSteps={5}
-      backHref="/onboarding/basic-details"
+      backHref={ONBOARDING_ROUTES.basicDetails as Href}
       title="Pick a few things you're interested in."
       subtitle="Don't worry if you can't think of anything right now."
       footer={

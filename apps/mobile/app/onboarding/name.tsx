@@ -8,8 +8,9 @@ import { PrimaryButton } from "@/components/ui/primary-button"
 import { TextField } from "@/components/ui/text-field"
 import { signUp } from "@/lib/auth/client"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 
-const NEXT: Href = "/onboarding/basic-details" as Href
+const NEXT: Href = ONBOARDING_ROUTES.basicDetails as Href
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MIN_PASSWORD_LENGTH = 8
 

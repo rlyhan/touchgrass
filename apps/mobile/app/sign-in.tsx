@@ -13,6 +13,7 @@ import { GrassLogo } from "@/components/icons/grass-logo"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { TextField } from "@/components/ui/text-field"
 import { signIn, useSession } from "@/lib/auth/client"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -108,7 +109,7 @@ export default function SignInScreen() {
           </View>
 
           <View className="mt-8 flex-row justify-center">
-            <Link href={"/onboarding/name" as Href} className="text-sm" accessibilityRole="link" accessibilityLabel="New here? Create an account">
+            <Link href={ONBOARDING_ROUTES.name as Href} className="text-sm" accessibilityRole="link" accessibilityLabel="New here? Create an account">
               <Text className="text-gray-500">New here? </Text>
               <Text className="font-semibold text-emerald-600">
                 Create an account

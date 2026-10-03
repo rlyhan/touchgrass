@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 import { colors } from "@/lib/theme/colors"
 
 export default function LandingScreen() {
@@ -25,7 +26,7 @@ export default function LandingScreen() {
         <View style={styles.actions}>
           <Pressable
             style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPrimaryPressed]}
-            onPress={() => router.push("/onboarding/name" as Href)}
+            onPress={() => router.push(ONBOARDING_ROUTES.name as Href)}
             accessibilityRole="button"
             accessibilityLabel="Sign up"
           >
