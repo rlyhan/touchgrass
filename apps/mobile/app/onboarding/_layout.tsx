@@ -20,17 +20,20 @@ export default function OnboardingLayout() {
   const userId = session?.user?.id ?? null
 
   const checkProfile = useCallback(
-    async () => (userId ? fetchHasProfile() : false),
+    async () => ({ userId, hasProfile: userId ? await fetchHasProfile() : false }),
     [userId],
   )
-  const { data: hasProfile, status: profileStatus } = useAsyncData(checkProfile)
+  const { data: profile, status: profileStatus } = useAsyncData(checkProfile)
 
+  // useAsyncData restarts a render after userId changes, so until then `profile`
+  // still describes the previous user and must not count as a finished check.
+  const profileIsStale = profileStatus === "ready" && profile?.userId !== userId
   // Only the first check blocks rendering, so sign-up isn't interrupted by a spinner.
-  const checking = isPending || profileStatus === "loading"
+  const checking = isPending || profileStatus === "loading" || profileIsStale
   const [settled, setSettled] = useState(false)
   if (!settled && !checking) setSettled(true)
 
-  if (hasProfile === true) {
+  if (!profileIsStale && profile?.hasProfile === true) {
     return <Redirect href={"/recommendations" as Href} />
   }
 
