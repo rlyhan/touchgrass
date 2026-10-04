@@ -16,6 +16,9 @@ export const authClient = createAuthClient({
   baseURL: API_BASE_URL,
   fetchOptions: isWeb
     ? {
+        // better-auth defaults to "include"; a leftover cross-site cookie would
+        // then authenticate useSession while bearer-only API calls get 401.
+        credentials: "omit",
         onRequest: (ctx) => {
           const token = getStoredToken()
           if (token) {
