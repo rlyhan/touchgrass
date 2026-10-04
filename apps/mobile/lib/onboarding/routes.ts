@@ -23,3 +23,15 @@ export function isOnboardingRoute(pathname: string): pathname is OnboardingRoute
 export function onboardingRouteRequiresAuth(pathname: string): boolean {
   return !PUBLIC_ONBOARDING_ROUTES.has(pathname)
 }
+
+export function onboardingScreenName(route: OnboardingRoute): string {
+  return route.slice("/onboarding/".length)
+}
+
+export const PUBLIC_ONBOARDING_SCREENS = Object.values(ONBOARDING_ROUTES)
+  .filter((route) => !onboardingRouteRequiresAuth(route))
+  .map(onboardingScreenName)
+
+export const PROTECTED_ONBOARDING_SCREENS = Object.values(ONBOARDING_ROUTES)
+  .filter(onboardingRouteRequiresAuth)
+  .map(onboardingScreenName)
