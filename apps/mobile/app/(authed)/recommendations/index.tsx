@@ -8,6 +8,7 @@ import { TopPatternsSection } from "@/components/patterns/top-patterns-section"
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { signOut } from "@/lib/auth/client"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 import {
   clearPatternWeightsCache,
   getCachedPatternWeights,
@@ -38,7 +39,7 @@ export default function RecommendationsPage() {
       // onboarding was interrupted before profile creation completed. Send
       // them back to finish it rather than leaving them on a dead-end error.
       if (err instanceof ProfileNotFoundError) {
-        router.replace("/onboarding/basic-details" as Href)
+        router.replace(ONBOARDING_ROUTES.basicDetails as Href)
         return []
       }
       throw err

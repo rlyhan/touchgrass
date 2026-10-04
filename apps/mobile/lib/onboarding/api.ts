@@ -1,3 +1,4 @@
+import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
 
@@ -12,6 +13,20 @@ function birthdateToIso(formValue: string): string {
 
 export type CreateProfileResponse = {
   profile: { id: string }
+}
+
+// There's no dedicated profile lookup endpoint, so this probes the cheapest
+// profile-backed one: /pattern-weights answers 404 when the signed-in user has
+// no profile yet and 200 once onboarding has created one.
+export async function fetchHasProfile(): Promise<boolean> {
+  const response = await authedFetch(apiUrl("/pattern-weights"))
+
+  if (response.status === 401) throw new UnauthenticatedError()
+  if (response.status === 404) return false
+  if (!response.ok) {
+    throw new Error(`Failed to check profile (${response.status})`)
+  }
+  return true
 }
 
 export async function createProfile(

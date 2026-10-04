@@ -6,15 +6,17 @@ import { Text, View } from "react-native"
 import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { TextField } from "@/components/ui/text-field"
-import { signUp } from "@/lib/auth/client"
+import { signUp, useSession } from "@/lib/auth/client"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 
-const NEXT: Href = "/onboarding/basic-details" as Href
+const NEXT: Href = ONBOARDING_ROUTES.basicDetails as Href
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MIN_PASSWORD_LENGTH = 8
 
 export default function NameScreen() {
   const { control } = useOnboardingForm()
+  const { refetch: refetchSession } = useSession()
   const [name, email, password, confirmPassword] = useWatch({
     control,
     name: ["name", "email", "password", "confirmPassword"],
@@ -49,6 +51,9 @@ export default function NameScreen() {
         setError(signUpError.message ?? "Could not create account")
         return
       }
+      // better-auth refreshes the session on a timer after sign-up; load it now
+      // so the next step is no longer protected when we navigate.
+      await refetchSession()
       router.push(NEXT)
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.")

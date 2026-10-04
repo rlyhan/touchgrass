@@ -13,6 +13,7 @@ import {
   EMPLOYMENT_OPTIONS,
   GENDER_OPTIONS,
 } from "@/lib/onboarding/options"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 
 const BIRTHDATE_PATTERN = /^\d{2}\/\d{2}\/\d{4}$/
 
@@ -47,13 +48,13 @@ export default function BasicDetailsScreen() {
     <OnboardingScreenShell
       step={2}
       totalSteps={5}
-      backHref="/onboarding/name"
+      backHref={ONBOARDING_ROUTES.name as Href}
       title="Tell us some basic info about yourself."
       footer={
         <PrimaryButton
           label="Continue"
           disabled={!canContinue}
-          onPress={() => router.push("/onboarding/interests" as Href)}
+          onPress={() => router.push(ONBOARDING_ROUTES.interests as Href)}
         />
       }
     >

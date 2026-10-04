@@ -6,6 +6,7 @@ import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { Slider } from "@/components/ui/slider"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 import { BFAS_PARENT_LABELS, BFAS_TRAITS } from "@touchgrass/types/constants"
 import type { BFASTraitDefinition, PersonalityTrait } from "@touchgrass/types"
 
@@ -27,13 +28,13 @@ const BFAS_GROUPS: TraitGroup[] = BFAS_TRAITS.reduce<TraitGroup[]>(
 export default function PersonalityScreen() {
   const { control } = useOnboardingForm()
 
-  function goNext() { router.push("/onboarding/motivation" as Href) }
+  function goNext() { router.push(ONBOARDING_ROUTES.motivation as Href) }
 
   return (
     <OnboardingScreenShell
       step={4}
       totalSteps={5}
-      backHref="/onboarding/interests"
+      backHref={ONBOARDING_ROUTES.interests as Href}
       title="How would you describe your personality?"
       subtitle="These traits are based off the Big Five Aspect Scale (BFAS)."
       footer={<PrimaryButton label="Continue" onPress={goNext} />}

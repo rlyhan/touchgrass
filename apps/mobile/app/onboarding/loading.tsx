@@ -8,6 +8,7 @@ import {
 import { useSession } from "@/lib/auth/client"
 import { createProfile } from "@/lib/onboarding/api"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 
 export default function OnboardingLoadingScreen() {
   const { getValues } = useOnboardingForm()
@@ -26,7 +27,7 @@ export default function OnboardingLoadingScreen() {
     // without the in-memory form). Redirect the user to re-enter their details
     // rather than firing a request we know will fail.
     if (!values.birthdate.trim() || !values.heightCm.trim() || !values.location.trim()) {
-      router.replace("/onboarding/basic-details" as Href)
+      router.replace(ONBOARDING_ROUTES.basicDetails as Href)
       return
     }
 
@@ -34,7 +35,7 @@ export default function OnboardingLoadingScreen() {
     // from the auth session (which always has it after signUp.email completes).
     const name = values.name.trim() || session?.user?.name || ""
     if (!name) {
-      router.replace("/onboarding/name" as Href)
+      router.replace(ONBOARDING_ROUTES.name as Href)
       return
     }
 

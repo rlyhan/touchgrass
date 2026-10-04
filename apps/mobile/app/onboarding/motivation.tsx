@@ -6,6 +6,7 @@ import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
 import { OptionCard } from "@/components/ui/option-card"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 import { toggleItem } from "@/lib/toggle-item"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
@@ -14,13 +15,13 @@ export default function MotivationScreen() {
   const motivations = useWatch({ control, name: "motivations" })
   const canContinue = motivations.length >= 1
 
-  const onSubmit = handleSubmit(() => router.replace("/onboarding/loading" as Href))
+  const onSubmit = handleSubmit(() => router.replace(ONBOARDING_ROUTES.loading as Href))
 
   return (
     <OnboardingScreenShell
       step={5}
       totalSteps={5}
-      backHref="/onboarding/personality"
+      backHref={ONBOARDING_ROUTES.personality as Href}
       title="Why are you looking for a new hobby/activity?"
       footer={
         <PrimaryButton

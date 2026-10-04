@@ -1,34 +1,49 @@
-import { router, Stack, usePathname, type Href } from "expo-router"
-import { useEffect } from "react"
-import { Platform } from "react-native"
+import { Redirect, Stack, type Href } from "expo-router"
+import { useCallback, useState } from "react"
+import { ActivityIndicator, View } from "react-native"
 
 import { useSession } from "@/lib/auth/client"
-import { getStoredToken } from "@/lib/auth/token-store"
+import { fetchHasProfile } from "@/lib/onboarding/api"
 import { OnboardingProvider } from "@/lib/onboarding/context"
+import {
+  PROTECTED_ONBOARDING_SCREENS,
+  PUBLIC_ONBOARDING_SCREENS,
+} from "@/lib/onboarding/routes"
+import { colors } from "@/lib/theme/colors"
+import { useAsyncData } from "@/lib/use-async-data"
 
-// The name step is where sign-up happens, so it's the only onboarding screen
-// reachable without a session. Every later step assumes an account exists.
-const PUBLIC_ONBOARDING_PATHS = new Set(["/onboarding/name"])
-
-// Temporary guard: send unauthenticated visitors who land directly on a
-// mid-flow step (e.g. a pasted /onboarding/basic-details URL) back home.
-// On web the bearer token lives in localStorage, so we can check synchronously
-// on mount; native stores it in SecureStore, so fall back to the session hook.
-function useRedirectIfUnauthenticated() {
-  const pathname = usePathname()
-  const { data: session, isPending } = useSession()
-  const isPublic = PUBLIC_ONBOARDING_PATHS.has(pathname)
-
-  useEffect(() => {
-    if (isPublic) return
-    const hasAuth =
-      Platform.OS === "web" ? getStoredToken() !== null : isPending || !!session?.user
-    if (!hasAuth) router.replace("/" as Href)
-  }, [isPublic, isPending, session])
-}
-
+// Signed-out visitors only reach the name step (Stack.Protected falls back to it);
+// signed-in users with a profile go to recommendations. Signed-in users without
+// one stay, so interrupted onboarding can be finished.
 export default function OnboardingLayout() {
-  useRedirectIfUnauthenticated()
+  const { data: session, isPending } = useSession()
+  const userId = session?.user?.id ?? null
+
+  const checkProfile = useCallback(
+    async () => ({ userId, hasProfile: userId ? await fetchHasProfile() : false }),
+    [userId],
+  )
+  const { data: profile, status: profileStatus } = useAsyncData(checkProfile)
+
+  // useAsyncData restarts a render after userId changes, so until then `profile`
+  // still describes the previous user and must not count as a finished check.
+  const profileIsStale = profileStatus === "ready" && profile?.userId !== userId
+  // Only the first check blocks rendering, so sign-up isn't interrupted by a spinner.
+  const checking = isPending || profileStatus === "loading" || profileIsStale
+  const [settled, setSettled] = useState(false)
+  if (!settled && !checking) setSettled(true)
+
+  if (!profileIsStale && profile?.hasProfile === true) {
+    return <Redirect href={"/recommendations" as Href} />
+  }
+
+  if (!settled && checking) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator color={colors.emerald[500]} />
+      </View>
+    )
+  }
 
   return (
     <OnboardingProvider>
@@ -38,7 +53,16 @@ export default function OnboardingLayout() {
           animation: "slide_from_right",
           contentStyle: { backgroundColor: "white" },
         }}
-      />
+      >
+        {PUBLIC_ONBOARDING_SCREENS.map((name) => (
+          <Stack.Screen key={name} name={name} />
+        ))}
+        <Stack.Protected guard={userId !== null}>
+          {PROTECTED_ONBOARDING_SCREENS.map((name) => (
+            <Stack.Screen key={name} name={name} />
+          ))}
+        </Stack.Protected>
+      </Stack>
     </OnboardingProvider>
   )
 }
