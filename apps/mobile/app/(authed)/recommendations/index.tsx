@@ -1,11 +1,11 @@
 import { router, type Href } from "expo-router"
 import { useCallback, useMemo, useState } from "react"
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native"
+import { ActivityIndicator, Pressable, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { TopPatternsSection } from "@/components/patterns/top-patterns-section"
-import { RecommendationCard } from "@/components/recommendations/recommendation-card"
+import { ActivityList } from "@/components/recommendations/activity-list"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { signOut } from "@/lib/auth/client"
 import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
@@ -21,8 +21,6 @@ import {
 import { colors } from "@/lib/theme/colors"
 import { useAsyncData } from "@/lib/use-async-data"
 import type { Activity } from "@touchgrass/types"
-
-const ItemSeparator = () => <View style={{ height: 16 }} />
 
 export default function RecommendationsPage() {
   const [signingOut, setSigningOut] = useState(false)
@@ -76,27 +74,6 @@ export default function RecommendationsPage() {
     router.replace("/sign-in" as Href)
   }, [])
 
-  const renderItem = useCallback(
-    ({ item: rec }: { item: Activity }) => (
-      <Pressable
-        onPress={() =>
-          router.push(`/activities/${rec.slug}` as Href)
-        }
-        accessibilityRole="button"
-        accessibilityLabel={`View details for ${rec.title}`}
-      >
-        <RecommendationCard
-          title={rec.title}
-          imageUrl={rec.imageUrl}
-          type={rec.type}
-          field={rec.field}
-          estimatedTime={rec.estimated_time}
-        />
-      </Pressable>
-    ),
-    [],
-  )
-
   if (status !== "ready") {
     return (
       <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
@@ -136,13 +113,8 @@ export default function RecommendationsPage() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <FlatList
-        data={recommendations}
-        keyExtractor={(rec) => rec.slug}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-        initialNumToRender={5}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 32 }}
+      <ActivityList
+        activities={recommendations}
         ListHeaderComponent={listHeader}
         ListFooterComponent={
           <View className="mt-12 items-center">
