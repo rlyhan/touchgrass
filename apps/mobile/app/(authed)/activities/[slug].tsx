@@ -15,6 +15,7 @@ import { RecommendationCard } from "@/components/recommendations/recommendation-
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
 import { UnauthenticatedError } from "@/lib/auth/errors"
+import { usePatternWeights } from "@/lib/patterns/use-pattern-weights"
 import {
   fetchActivityBySlug,
   getCachedActivity,
@@ -22,13 +23,17 @@ import {
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
+import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
 
 const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
 
-// The pattern arrives as a query param from the recommendations list, so
-// activities opened from anywhere else (e.g. browse) don't claim a match.
-function PatternMatch({ patternId }: { patternId?: string }) {
-  const pattern = patternId ? PATTERN_BY_ID[patternId] : null
+// The pattern arrives as a query param from the recommendations list. It is
+// only shown if it matches the viewer's own weights, so shared or edited links
+// can't claim a match for someone else.
+function PatternMatch({ activity, patternId }: { activity: Activity; patternId: string }) {
+  const { weights } = usePatternWeights()
+  if (!weights || getDominantPatternId(weights, activity) !== patternId) return null
+  const pattern = PATTERN_BY_ID[patternId]
   if (!pattern) return null
   return (
     <View className="mt-5">
@@ -146,7 +151,7 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        <PatternMatch patternId={pattern} />
+        {pattern ? <PatternMatch activity={activity} patternId={pattern} /> : null}
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">

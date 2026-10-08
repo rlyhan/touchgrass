@@ -21,6 +21,11 @@ jest.mock("@/lib/recommendations/api", () => ({
   fetchActivityBySlug: jest.fn(),
 }))
 
+// ── pattern weights ───────────────────────────────────────────────────────────
+jest.mock("@/lib/patterns/use-pattern-weights", () => ({
+  usePatternWeights: jest.fn(() => ({ weights: undefined, status: "loading" })),
+}))
+
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("react-native-safe-area-context", () => {
   const { View } = require("react-native")
@@ -310,20 +315,42 @@ describe("ActivityDetailPage", () => {
   })
 
   describe("pattern-match accordion", () => {
+    const mockUsePatternWeights = jest.mocked(
+      require("@/lib/patterns/use-pattern-weights").usePatternWeights,
+    )
+
     beforeEach(() => {
       mockGetCachedActivity.mockReturnValue(ACTIVITY)
       mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
+      mockUsePatternWeights.mockReturnValue({ weights: { "4-HH": 0.9 }, status: "ready" })
     })
 
-    it("hides the accordion when no pattern param is passed", () => {
+    it("hides the accordion and skips loading weights when no pattern param is passed", () => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(mockUsePatternWeights).not.toHaveBeenCalled()
+    })
+
+    it("hides the accordion when the pattern param is not a known pattern", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "nope" })
       render(<ActivityDetailPage />)
 
       expect(screen.queryByText(/You were matched/)).toBeNull()
     })
 
-    it("hides the accordion when the pattern param is not a known pattern", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "nope" })
+    it("hides the accordion while the viewer's weights are loading", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "4-HH" })
+      mockUsePatternWeights.mockReturnValue({ weights: undefined, status: "loading" })
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByText(/You were matched/)).toBeNull()
+    })
+
+    it("hides the accordion when the pattern param doesn't match the viewer's weights", () => {
+      // 9-HH is a candidate for this activity, but the viewer's dominant is 4-HH.
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "9-HH" })
       render(<ActivityDetailPage />)
 
       expect(screen.queryByText(/You were matched/)).toBeNull()
