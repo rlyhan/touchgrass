@@ -1,5 +1,5 @@
 import { router, type Href } from "expo-router"
-import { useCallback } from "react"
+import { useCallback, type Ref } from "react"
 import { FlatList, Pressable, View, type FlatListProps } from "react-native"
 
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
@@ -9,6 +9,7 @@ export type ListedActivity = Activity & { dominantPatternId?: PatternTypeId | nu
 
 type Props = Omit<FlatListProps<ListedActivity>, "data" | "renderItem" | "keyExtractor"> & {
   activities: ListedActivity[]
+  ref?: Ref<FlatList<ListedActivity>>
 }
 
 function activityHref({ slug, dominantPatternId }: ListedActivity): Href {
@@ -18,7 +19,7 @@ function activityHref({ slug, dominantPatternId }: ListedActivity): Href {
 
 const ItemSeparator = () => <View style={{ height: 16 }} />
 
-export function ActivityList({ activities, ...listProps }: Props) {
+export function ActivityList({ activities, ref, ...listProps }: Props) {
   const renderItem = useCallback(
     ({ item: activity }: { item: ListedActivity }) => (
       <Pressable
@@ -40,6 +41,7 @@ export function ActivityList({ activities, ...listProps }: Props) {
 
   return (
     <FlatList
+      ref={ref}
       data={activities}
       keyExtractor={(activity) => activity.slug}
       renderItem={renderItem}

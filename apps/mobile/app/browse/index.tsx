@@ -1,12 +1,15 @@
-import { useMemo, useState } from "react"
-import { Text, TextInput } from "react-native"
+import { useMemo, useRef, useState } from "react"
+import { FlatList, Text, TextInput } from "react-native"
 
+import type { ListedActivity } from "@/components/recommendations/activity-list"
 import { ActivityListScreen } from "@/components/recommendations/activity-list-screen"
+import { Pagination } from "@/components/ui/pagination"
 import { colors } from "@/lib/theme/colors"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 
 const RANDOM_ACTIVITY_COUNT = 10
+const SEARCH_PAGE_SIZE = 10
 
 function generateRandomActivities(): Activity[] {
   const randomActivities = new Set<Activity>()
@@ -25,16 +28,39 @@ function matchesQuery(activity: Activity, query: string): boolean {
 export default function BrowsePage() {
   const randomActivities = useMemo(generateRandomActivities, [])
   const [query, setQuery] = useState("")
+  const [page, setPage] = useState(1)
+  const listRef = useRef<FlatList<ListedActivity>>(null)
 
-  const activities = useMemo(() => {
+  const searchResults = useMemo(() => {
     const normalised = query.trim().toLowerCase()
-    if (!normalised) return randomActivities
+    if (!normalised) return null
     return RECOMMENDATIONS.filter((activity) => matchesQuery(activity, normalised))
-  }, [query, randomActivities])
+  }, [query])
+
+  const pageCount = searchResults ? Math.ceil(searchResults.length / SEARCH_PAGE_SIZE) : 0
+  const activities = searchResults
+    ? searchResults.slice((page - 1) * SEARCH_PAGE_SIZE, page * SEARCH_PAGE_SIZE)
+    : randomActivities
+
+  function handleQueryChange(text: string) {
+    setQuery(text)
+    setPage(1)
+  }
+
+  function handlePageChange(nextPage: number) {
+    setPage(nextPage)
+    listRef.current?.scrollToOffset({ offset: 0, animated: true })
+  }
 
   return (
     <ActivityListScreen
+      listRef={listRef}
       activities={activities}
+      footer={
+        pageCount > 1 ? (
+          <Pagination page={page} pageCount={pageCount} onPageChange={handlePageChange} />
+        ) : null
+      }
       header={
         <>
           <Text className="mt-10 text-3xl font-bold tracking-tight text-gray-900">
@@ -42,7 +68,7 @@ export default function BrowsePage() {
           </Text>
           <TextInput
             value={query}
-            onChangeText={setQuery}
+            onChangeText={handleQueryChange}
             placeholder="Search activities"
             placeholderTextColor={colors.gray[400]}
             accessibilityLabel="Search activities"

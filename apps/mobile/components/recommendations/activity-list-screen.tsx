@@ -1,5 +1,5 @@
-import type { ReactNode } from "react"
-import { View } from "react-native"
+import type { ReactNode, Ref } from "react"
+import { FlatList, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { AuthButton } from "@/components/auth/auth-button"
@@ -10,12 +10,14 @@ type Props = {
   activities: ListedActivity[]
   header?: ReactNode
   footer?: ReactNode
+  listRef?: Ref<FlatList<ListedActivity>>
 }
 
-export function ActivityListScreen({ activities, header, footer }: Props) {
+export function ActivityListScreen({ activities, header, footer, listRef }: Props) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <ActivityList
+        ref={listRef}
         activities={activities}
         ListHeaderComponent={
           <>
