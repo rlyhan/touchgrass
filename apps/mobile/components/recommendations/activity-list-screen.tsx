@@ -9,9 +9,10 @@ import { ActivityList, type ListedActivity } from "@/components/recommendations/
 type Props = {
   activities: ListedActivity[]
   header?: ReactNode
+  footer?: ReactNode
 }
 
-export function ActivityListScreen({ activities, header }: Props) {
+export function ActivityListScreen({ activities, header, footer }: Props) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <ActivityList
@@ -25,9 +26,12 @@ export function ActivityListScreen({ activities, header }: Props) {
           </>
         }
         ListFooterComponent={
-          <View className="mt-12 items-center">
-            <AuthButton />
-          </View>
+          <>
+            {footer ? <View className="mt-10">{footer}</View> : null}
+            <View className="mt-12 items-center">
+              <AuthButton />
+            </View>
+          </>
         }
       />
     </SafeAreaView>

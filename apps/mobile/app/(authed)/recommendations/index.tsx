@@ -85,5 +85,16 @@ export default function RecommendationsPage() {
     )
   }
 
-  return <ActivityListScreen activities={recommendations} header={listHeader} />
+  return (
+    <ActivityListScreen
+      activities={recommendations}
+      header={listHeader}
+      footer={
+        <PrimaryButton
+          label="Browse more activities"
+          onPress={() => router.push("/browse" as Href)}
+        />
+      }
+    />
+  )
 }

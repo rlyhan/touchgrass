@@ -131,6 +131,17 @@ describe("RecommendationsPage", () => {
     expect(mockPush).toHaveBeenCalledWith(`/activities/${RECS[1].slug}`)
   })
 
+  it("pushes the browse route when the browse CTA is pressed", async () => {
+    mockFetchRecommendations.mockResolvedValue(RECS)
+    render(<RecommendationsPage />)
+
+    fireEvent.press(
+      await screen.findByRole("button", { name: "Browse more activities" }),
+    )
+
+    expect(mockPush).toHaveBeenCalledWith("/browse")
+  })
+
   it("redirects to onboarding when the user has no profile yet", async () => {
     mockFetchRecommendations.mockRejectedValue(new Api.ProfileNotFoundError())
     render(<RecommendationsPage />)
