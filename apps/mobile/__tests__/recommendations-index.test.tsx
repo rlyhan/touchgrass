@@ -63,6 +63,7 @@ jest.mock("@/components/recommendations/recommendation-card", () => ({
 import * as Auth from "@/lib/auth/client"
 import * as Api from "@/lib/recommendations/api"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
+import type { RecommendedActivity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
 
 const mockPush = jest.mocked(ExpoRouter.router.push)
@@ -71,7 +72,10 @@ const mockFetchRecommendations = jest.mocked(Api.fetchRecommendations)
 const mockSignOut = jest.mocked(Auth.signOut)
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
-const RECS = RECOMMENDATIONS.slice(0, 2)
+const RECS: RecommendedActivity[] = [
+  { ...RECOMMENDATIONS[0], dominantPatternId: "4-HH" },
+  { ...RECOMMENDATIONS[1], dominantPatternId: null },
+]
 
 import RecommendationsPage from "@/app/(authed)/recommendations"
 
@@ -101,7 +105,7 @@ describe("RecommendationsPage", () => {
     expect(screen.getByText(RECS[1].title)).toBeTruthy()
   })
 
-  it("pushes the detail route when a card is pressed", async () => {
+  it("pushes the detail route with the dominant pattern when a card is pressed", async () => {
     mockFetchRecommendations.mockResolvedValue(RECS)
     render(<RecommendationsPage />)
 
@@ -111,8 +115,20 @@ describe("RecommendationsPage", () => {
     fireEvent.press(card)
 
     expect(mockPush).toHaveBeenCalledWith(
-      `/activities/${RECS[0].slug}`,
+      `/activities/${RECS[0].slug}?pattern=4-HH`,
     )
+  })
+
+  it("pushes the detail route without a pattern when none was resolved", async () => {
+    mockFetchRecommendations.mockResolvedValue(RECS)
+    render(<RecommendationsPage />)
+
+    const card = await screen.findByRole("button", {
+      name: `View details for ${RECS[1].title}`,
+    })
+    fireEvent.press(card)
+
+    expect(mockPush).toHaveBeenCalledWith(`/activities/${RECS[1].slug}`)
   })
 
   it("redirects to onboarding when the user has no profile yet", async () => {

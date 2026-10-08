@@ -14,8 +14,6 @@ import { PatternMatchAccordion } from "@/components/patterns/pattern-match-accor
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
-import { resolveDominantPattern } from "@/lib/patterns/cache"
-import { usePatternWeights } from "@/lib/patterns/use-pattern-weights"
 import { UnauthenticatedError } from "@/lib/auth/errors"
 import {
   fetchActivityBySlug,
@@ -27,14 +25,10 @@ import { PATTERN_TYPES } from "@touchgrass/types/constants"
 
 const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
 
-function PatternMatch({ activity }: { activity: Activity }) {
-  // Hook ensures pattern weights are fetched if not already cached so direct
-  // entries (deep links, refresh) still resolve a dominant pattern.
-  const { weights } = usePatternWeights()
-  // Resolve via the shared cache: returns cached dominant for dashboard-sourced
-  // activities, or computes from weights for direct entries. Threshold-gated.
-  const dominantId = weights ? resolveDominantPattern(activity) : null
-  const pattern = dominantId ? PATTERN_BY_ID[dominantId] : null
+// The pattern arrives as a query param from the recommendations list, so
+// activities opened from anywhere else (e.g. browse) don't claim a match.
+function PatternMatch({ patternId }: { patternId?: string }) {
+  const pattern = patternId ? PATTERN_BY_ID[patternId] : null
   if (!pattern) return null
   return (
     <View className="mt-5">
@@ -59,7 +53,7 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 }
 
 export default function ActivityDetailPage() {
-  const { slug } = useLocalSearchParams<{ slug: string }>()
+  const { slug, pattern } = useLocalSearchParams<{ slug: string; pattern?: string }>()
 
   const cached = slug ? getCachedActivity(slug) : undefined
   const [activity, setActivity] = useState<Activity | null>(cached ?? null)
@@ -152,7 +146,7 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        <PatternMatch activity={activity} />
+        <PatternMatch patternId={pattern} />
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">

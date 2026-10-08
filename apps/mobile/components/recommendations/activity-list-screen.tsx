@@ -4,11 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { AuthButton } from "@/components/auth/auth-button"
 import { GrassLogo } from "@/components/icons/grass-logo"
-import { ActivityList } from "@/components/recommendations/activity-list"
-import type { Activity } from "@touchgrass/types"
+import { ActivityList, type ListedActivity } from "@/components/recommendations/activity-list"
 
 type Props = {
-  activities: Activity[]
+  activities: ListedActivity[]
   header?: ReactNode
 }
 

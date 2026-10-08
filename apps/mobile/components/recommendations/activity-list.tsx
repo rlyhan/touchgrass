@@ -3,19 +3,26 @@ import { useCallback } from "react"
 import { FlatList, Pressable, View, type FlatListProps } from "react-native"
 
 import { RecommendationCard } from "@/components/recommendations/recommendation-card"
-import type { Activity } from "@touchgrass/types"
+import type { Activity, PatternTypeId } from "@touchgrass/types"
 
-type Props = Omit<FlatListProps<Activity>, "data" | "renderItem" | "keyExtractor"> & {
-  activities: Activity[]
+export type ListedActivity = Activity & { dominantPatternId?: PatternTypeId | null }
+
+type Props = Omit<FlatListProps<ListedActivity>, "data" | "renderItem" | "keyExtractor"> & {
+  activities: ListedActivity[]
+}
+
+function activityHref({ slug, dominantPatternId }: ListedActivity): Href {
+  const base = `/activities/${slug}`
+  return (dominantPatternId ? `${base}?pattern=${encodeURIComponent(dominantPatternId)}` : base) as Href
 }
 
 const ItemSeparator = () => <View style={{ height: 16 }} />
 
 export function ActivityList({ activities, ...listProps }: Props) {
   const renderItem = useCallback(
-    ({ item: activity }: { item: Activity }) => (
+    ({ item: activity }: { item: ListedActivity }) => (
       <Pressable
-        onPress={() => router.push(`/activities/${activity.slug}` as Href)}
+        onPress={() => router.push(activityHref(activity))}
         accessibilityRole="button"
         accessibilityLabel={`View details for ${activity.title}`}
       >

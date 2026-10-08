@@ -17,10 +17,10 @@ import {
 } from "@/lib/recommendations/api"
 import { colors } from "@/lib/theme/colors"
 import { useAsyncData } from "@/lib/use-async-data"
-import type { Activity } from "@touchgrass/types"
+import type { RecommendedActivity } from "@touchgrass/types"
 
 export default function RecommendationsPage() {
-  const fetcher = useCallback(async (): Promise<Activity[]> => {
+  const fetcher = useCallback(async (): Promise<RecommendedActivity[]> => {
     try {
       return await fetchRecommendations()
     } catch (err) {

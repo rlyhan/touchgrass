@@ -21,17 +21,6 @@ jest.mock("@/lib/recommendations/api", () => ({
   fetchActivityBySlug: jest.fn(),
 }))
 
-// ── pattern weights ───────────────────────────────────────────────────────────
-// Stub out the patterns cache + hook so the accordion stays hidden by default
-// (no weights resolved). Individual tests can override these to exercise the
-// match copy.
-jest.mock("@/lib/patterns/cache", () => ({
-  resolveDominantPattern: jest.fn(() => null),
-}))
-jest.mock("@/lib/patterns/use-pattern-weights", () => ({
-  usePatternWeights: jest.fn(() => ({ weights: undefined, status: "loading" })),
-}))
-
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("react-native-safe-area-context", () => {
   const { View } = require("react-native")
@@ -321,46 +310,28 @@ describe("ActivityDetailPage", () => {
   })
 
   describe("pattern-match accordion", () => {
-    const mockResolveDominantPattern = jest.mocked(
-      require("@/lib/patterns/cache").resolveDominantPattern,
-    )
-    const mockUsePatternWeights = jest.mocked(
-      require("@/lib/patterns/use-pattern-weights").usePatternWeights,
-    )
-
     beforeEach(() => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       mockGetCachedActivity.mockReturnValue(ACTIVITY)
       mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
     })
 
-    it("hides the accordion when no dominant pattern resolves", () => {
-      mockUsePatternWeights.mockReturnValue({
-        weights: { "4-HH": 0.5 },
-        status: "ready",
-      })
-      mockResolveDominantPattern.mockReturnValue(null)
+    it("hides the accordion when no pattern param is passed", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       render(<ActivityDetailPage />)
 
       expect(screen.queryByText(/You were matched/)).toBeNull()
     })
 
-    it("hides the accordion while pattern weights are still loading", () => {
-      mockUsePatternWeights.mockReturnValue({
-        weights: undefined,
-        status: "loading",
-      })
+    it("hides the accordion when the pattern param is not a known pattern", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "nope" })
       render(<ActivityDetailPage />)
+
       expect(screen.queryByText(/You were matched/)).toBeNull()
     })
 
     it("renders the match copy and reveals the short description on expand", () => {
-      mockUsePatternWeights.mockReturnValue({
-        weights: { "4-HH": 0.9 },
-        status: "ready",
-      })
       // 4-HH → Enchanting Visionary
-      mockResolveDominantPattern.mockReturnValue("4-HH")
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "4-HH" })
       render(<ActivityDetailPage />)
 
       const trigger = screen.getByRole("button", {
