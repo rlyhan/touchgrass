@@ -1,10 +1,7 @@
-import { LinearGradient } from "expo-linear-gradient"
 import { useMemo } from "react"
-import { View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { Text } from "react-native"
 
-import { AuthButton } from "@/components/auth/auth-button"
-import { ActivityList } from "@/components/recommendations/activity-list"
+import { ActivityListScreen } from "@/components/recommendations/activity-list-screen"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 
@@ -22,17 +19,13 @@ export default function BrowsePage() {
   const activities = useMemo(generateRandomActivities, [])
 
   return (
-    <LinearGradient colors={["#ffffff", "#F0FDF6"]} locations={[0, 1]} style={{ flex: 1 }}>
-      <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-        <ActivityList
-          activities={activities}
-          ListFooterComponent={
-            <View className="mt-12 items-center">
-              <AuthButton />
-            </View>
-          }
-        />
-      </SafeAreaView>
-    </LinearGradient>
+    <ActivityListScreen
+      activities={activities}
+      header={
+        <Text className="mb-8 mt-10 text-3xl font-bold tracking-tight text-gray-900">
+          Browse activities
+        </Text>
+      }
+    />
   )
 }

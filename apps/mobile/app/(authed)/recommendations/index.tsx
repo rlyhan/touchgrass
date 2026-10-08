@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { AuthButton } from "@/components/auth/auth-button"
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { TopPatternsSection } from "@/components/patterns/top-patterns-section"
-import { ActivityList } from "@/components/recommendations/activity-list"
+import { ActivityListScreen } from "@/components/recommendations/activity-list-screen"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
 import { getCachedPatternWeights } from "@/lib/patterns/cache"
@@ -45,9 +45,6 @@ export default function RecommendationsPage() {
   const listHeader = useMemo(
     () => (
       <>
-        <View className="items-center">
-          <GrassLogo />
-        </View>
         {patternWeights ? (
           <View className="mt-10">
             <TopPatternsSection patternWeights={patternWeights} />
@@ -88,17 +85,5 @@ export default function RecommendationsPage() {
     )
   }
 
-  return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <ActivityList
-        activities={recommendations}
-        ListHeaderComponent={listHeader}
-        ListFooterComponent={
-          <View className="mt-12 items-center">
-            <AuthButton />
-          </View>
-        }
-      />
-    </SafeAreaView>
-  )
+  return <ActivityListScreen activities={recommendations} header={listHeader} />
 }
