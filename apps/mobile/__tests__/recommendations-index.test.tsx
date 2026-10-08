@@ -25,6 +25,7 @@ jest.mock("@/lib/recommendations/api", () => {
   return {
     fetchRecommendations: jest.fn(),
     ProfileNotFoundError,
+    UnauthenticatedError: jest.requireActual("@/lib/auth/errors").UnauthenticatedError,
   }
 })
 
