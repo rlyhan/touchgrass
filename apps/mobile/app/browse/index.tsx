@@ -1,9 +1,10 @@
 import { useMemo, useRef, useState } from "react"
-import { FlatList, Text, TextInput } from "react-native"
+import { ActivityIndicator, FlatList, Text, TextInput } from "react-native"
 
 import type { ListedActivity } from "@/components/recommendations/activity-list"
 import { ActivityListScreen } from "@/components/recommendations/activity-list-screen"
 import { Pagination } from "@/components/ui/pagination"
+import { searchActivities } from "@/lib/browse/api"
 import { colors } from "@/lib/theme/colors"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
@@ -19,46 +20,70 @@ function generateRandomActivities(): Activity[] {
   return Array.from(randomActivities)
 }
 
-function matchesQuery(activity: Activity, query: string): boolean {
-  return [activity.title, activity.field, activity.type].some((value) =>
-    value.toLowerCase().includes(query),
-  )
-}
-
 export default function BrowsePage() {
   const randomActivities = useMemo(generateRandomActivities, [])
   const [query, setQuery] = useState("")
   const [page, setPage] = useState(1)
+  const [results, setResults] = useState<Activity[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const latestRequest = useRef(0)
   const listRef = useRef<FlatList<ListedActivity>>(null)
 
-  const searchResults = useMemo(() => {
-    const normalised = query.trim().toLowerCase()
-    if (!normalised) return null
-    return RECOMMENDATIONS.filter((activity) => matchesQuery(activity, normalised))
-  }, [query])
-
-  const pageCount = searchResults ? Math.ceil(searchResults.length / SEARCH_PAGE_SIZE) : 0
-  const activities = searchResults
-    ? searchResults.slice((page - 1) * SEARCH_PAGE_SIZE, page * SEARCH_PAGE_SIZE)
-    : randomActivities
+  async function loadPage(text: string, pageNumber: number) {
+    const requestId = ++latestRequest.current
+    setLoading(true)
+    try {
+      const result = await searchActivities(text, {
+        offset: (pageNumber - 1) * SEARCH_PAGE_SIZE,
+        limit: SEARCH_PAGE_SIZE,
+      })
+      // A newer query or page change started while this one was in flight.
+      if (requestId !== latestRequest.current) return
+      setResults(result.items)
+      setTotal(result.total)
+    } catch {
+      // Keep the current page on failure; there's no error UI until search hits the API.
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false)
+    }
+  }
 
   function handleQueryChange(text: string) {
     setQuery(text)
     setPage(1)
+    if (!text.trim()) {
+      latestRequest.current++
+      setResults([])
+      setTotal(0)
+      setLoading(false)
+      return
+    }
+    loadPage(text, 1)
   }
 
   function handlePageChange(nextPage: number) {
     setPage(nextPage)
     listRef.current?.scrollToOffset({ offset: 0, animated: true })
+    loadPage(query, nextPage)
   }
+
+  const searching = query.trim() !== ""
+  const pageCount = Math.ceil(total / SEARCH_PAGE_SIZE)
+  const showPagination = searching && pageCount > 1
 
   return (
     <ActivityListScreen
       listRef={listRef}
-      activities={activities}
+      activities={searching ? results : randomActivities}
       footer={
-        pageCount > 1 ? (
-          <Pagination page={page} pageCount={pageCount} onPageChange={handlePageChange} />
+        loading || showPagination ? (
+          <>
+            {loading ? <ActivityIndicator color={colors.emerald[500]} className="mb-6" /> : null}
+            {showPagination ? (
+              <Pagination page={page} pageCount={pageCount} onPageChange={handlePageChange} />
+            ) : null}
+          </>
         ) : null
       }
       header={
