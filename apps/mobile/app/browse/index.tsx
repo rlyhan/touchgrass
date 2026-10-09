@@ -78,11 +78,19 @@ export default function BrowsePage() {
   const pageCount = Math.ceil(total / SEARCH_PAGE_SIZE)
   const showPagination = searching && pageCount > 1
   const showSpinner = loading || (!searching && randomActivities === null)
+  const showNoResults = searching && !loading && results.length === 0
 
   return (
     <ActivityListScreen
       listRef={listRef}
       activities={searching ? results : (randomActivities ?? [])}
+      empty={
+        showNoResults ? (
+          <Text className="text-center text-base text-gray-500">
+            No activities match &ldquo;{query.trim()}&rdquo;
+          </Text>
+        ) : null
+      }
       footer={
         showSpinner || showPagination ? (
           <>

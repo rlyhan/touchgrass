@@ -10,15 +10,17 @@ type Props = {
   activities: ListedActivity[]
   header?: ReactNode
   footer?: ReactNode
+  empty?: ReactNode
   listRef?: Ref<FlatList<ListedActivity>>
 }
 
-export function ActivityListScreen({ activities, header, footer, listRef }: Props) {
+export function ActivityListScreen({ activities, header, footer, empty, listRef }: Props) {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <ActivityList
         ref={listRef}
         activities={activities}
+        ListEmptyComponent={empty ? <>{empty}</> : null}
         ListHeaderComponent={
           <>
             <View className="items-center">

@@ -108,6 +108,15 @@ describe("BrowsePage", () => {
     expect(screen.queryByRole("button", { name: "Page 1" })).toBeNull()
   })
 
+  it("shows a no-results message when nothing matches", async () => {
+    mockSearchActivities.mockResolvedValue({ items: [], total: 0 })
+    render(<BrowsePage />)
+
+    await act(async () => typeQuery("  zzz "))
+
+    expect(screen.getByText("No activities match “zzz”")).toBeTruthy()
+  })
+
   it("ignores a response that arrives after a newer query", async () => {
     let resolveStale: (page: BrowseApi.SearchPage) => void = () => {}
     mockSearchActivities
