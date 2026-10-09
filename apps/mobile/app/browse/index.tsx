@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ActivityIndicator, FlatList, Text, TextInput } from "react-native"
 
 import type { ListedActivity } from "@/components/recommendations/activity-list"
@@ -21,7 +21,7 @@ function generateRandomActivities(): Activity[] {
 }
 
 export default function BrowsePage() {
-  const randomActivities = useMemo(generateRandomActivities, [])
+  const [randomActivities, setRandomActivities] = useState<Activity[] | null>(null)
   const [query, setQuery] = useState("")
   const [page, setPage] = useState(1)
   const [results, setResults] = useState<Activity[]>([])
@@ -29,6 +29,12 @@ export default function BrowsePage() {
   const [loading, setLoading] = useState(false)
   const latestRequest = useRef(0)
   const listRef = useRef<FlatList<ListedActivity>>(null)
+
+  // Picked after mount so the web build's pre-rendered HTML (which can't know
+  // the random pick) matches the browser's first render.
+  useEffect(() => {
+    setRandomActivities(generateRandomActivities())
+  }, [])
 
   async function loadPage(text: string, pageNumber: number) {
     const requestId = ++latestRequest.current
@@ -71,15 +77,16 @@ export default function BrowsePage() {
   const searching = query.trim() !== ""
   const pageCount = Math.ceil(total / SEARCH_PAGE_SIZE)
   const showPagination = searching && pageCount > 1
+  const showSpinner = loading || (!searching && randomActivities === null)
 
   return (
     <ActivityListScreen
       listRef={listRef}
-      activities={searching ? results : randomActivities}
+      activities={searching ? results : (randomActivities ?? [])}
       footer={
-        loading || showPagination ? (
+        showSpinner || showPagination ? (
           <>
-            {loading ? <ActivityIndicator color={colors.emerald[500]} className="mb-6" /> : null}
+            {showSpinner ? <ActivityIndicator color={colors.emerald[500]} className="mb-6" /> : null}
             {showPagination ? (
               <Pagination page={page} pageCount={pageCount} onPageChange={handlePageChange} />
             ) : null}
