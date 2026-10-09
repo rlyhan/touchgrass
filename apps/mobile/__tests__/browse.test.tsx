@@ -19,7 +19,12 @@ jest.mock("@/lib/browse/api", () => ({
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("lucide-react-native", () => {
   const { View } = require("react-native")
-  return { ChevronLeft: () => <View />, ChevronRight: () => <View /> }
+  return {
+    ChevronLeft: () => <View />,
+    ChevronRight: () => <View />,
+    Search: () => <View />,
+    X: () => <View />,
+  }
 })
 
 jest.mock("react-native-safe-area-context", () => {

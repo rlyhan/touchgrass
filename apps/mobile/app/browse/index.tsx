@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { ActivityIndicator, FlatList, Text, TextInput } from "react-native"
+import { ActivityIndicator, FlatList, Text, View } from "react-native"
 
 import type { ListedActivity } from "@/components/recommendations/activity-list"
 import { ActivityListScreen } from "@/components/recommendations/activity-list-screen"
 import { Pagination } from "@/components/ui/pagination"
+import { SearchField } from "@/components/ui/search-field"
 import { searchActivities } from "@/lib/browse/api"
 import { colors } from "@/lib/theme/colors"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
@@ -106,17 +107,13 @@ export default function BrowsePage() {
           <Text className="mt-10 text-3xl font-bold tracking-tight text-gray-900">
             Browse activities
           </Text>
-          <TextInput
-            value={query}
-            onChangeText={handleQueryChange}
-            placeholder="Search activities"
-            placeholderTextColor={colors.gray[400]}
-            accessibilityLabel="Search activities"
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-            className="mb-8 mt-4 h-12 rounded-2xl border border-gray-200 bg-white px-4 text-base text-gray-900"
-          />
+          <View className="mb-8 mt-4">
+            <SearchField
+              label="Search activities"
+              value={query}
+              onChangeText={handleQueryChange}
+            />
+          </View>
         </>
       }
     />
