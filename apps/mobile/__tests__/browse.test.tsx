@@ -7,7 +7,7 @@ jest.mock("expo-router", () => ({
 }))
 
 jest.mock("@/lib/auth/client", () => ({
-  signOut: jest.fn(() => Promise.resolve()),
+  signOut: jest.fn(() => Promise.resolve({ data: { success: true }, error: null })),
   useSession: jest.fn(() => ({ data: null, isPending: false })),
 }))
 

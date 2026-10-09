@@ -31,7 +31,7 @@ jest.mock("@/lib/recommendations/api", () => {
 
 // ── auth ──────────────────────────────────────────────────────────────────────
 jest.mock("@/lib/auth/client", () => ({
-  signOut: jest.fn(() => Promise.resolve()),
+  signOut: jest.fn(() => Promise.resolve({ data: { success: true }, error: null })),
   useSession: jest.fn(() => ({ data: { user: { id: "u1" } }, isPending: false })),
 }))
 
