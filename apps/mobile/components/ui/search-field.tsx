@@ -23,7 +23,8 @@ export function SearchField({ label, value, onChangeText, ...inputProps }: Props
         placeholder={inputProps.placeholder ?? label}
         accessibilityLabel={label}
         placeholderTextColor={colors.gray[400]}
-        className="ml-2 h-full flex-1 text-base text-gray-900"
+        textAlignVertical="center"
+        className="ml-2 h-full flex-1 py-0 text-[16px] text-gray-900"
       />
       {value ? (
         <Pressable

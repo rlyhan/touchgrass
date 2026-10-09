@@ -34,7 +34,7 @@ function ArrowButton({
       accessibilityRole="button"
       accessibilityLabel={`${direction === "previous" ? "Previous" : "Next"} page`}
       accessibilityState={{ disabled }}
-      className="h-10 w-10 items-center justify-center rounded-full"
+      className="h-11 w-11 items-center justify-center rounded-full"
     >
       <Icon size={20} color={disabled ? colors.gray[200] : colors.gray[600]} />
     </Pressable>
@@ -59,7 +59,7 @@ export function Pagination({ page, pageCount, onPageChange }: Props) {
             accessibilityRole="button"
             accessibilityLabel={`Page ${pageNumber}`}
             accessibilityState={{ selected }}
-            className={`h-10 w-10 items-center justify-center rounded-full ${
+            className={`h-11 w-11 items-center justify-center rounded-full ${
               selected ? "bg-emerald-500" : "border border-gray-200 bg-white"
             }`}
           >
