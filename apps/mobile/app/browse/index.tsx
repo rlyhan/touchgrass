@@ -1,3 +1,4 @@
+import { Image } from "expo-image"
 import { useEffect, useRef, useState } from "react"
 import { ActivityIndicator, FlatList, Text, View } from "react-native"
 
@@ -12,6 +13,8 @@ import type { Activity } from "@touchgrass/types"
 
 const RANDOM_ACTIVITY_COUNT = 10
 const SEARCH_PAGE_SIZE = 10
+const PREFETCH_IMAGE_COUNT = 3
+const PREFETCH_TIMEOUT_MS = 1500
 
 function generateRandomActivities(): Activity[] {
   const randomActivities = new Set<Activity>()
@@ -19,6 +22,22 @@ function generateRandomActivities(): Activity[] {
     randomActivities.add(RECOMMENDATIONS[Math.floor(Math.random() * RECOMMENDATIONS.length)])
   }
   return Array.from(randomActivities)
+}
+
+// Keeps the spinner up until the top cards' images are in memory, but never
+// longer than the timeout so one slow image can't block the list.
+async function prefetchLeadImages(activities: Activity[]): Promise<void> {
+  const urls = activities.slice(0, PREFETCH_IMAGE_COUNT).map((activity) => activity.imageUrl)
+  if (urls.length === 0) return
+  await new Promise<void>((resolve) => {
+    const timer = setTimeout(resolve, PREFETCH_TIMEOUT_MS)
+    Image.prefetch(urls, "memory-disk")
+      .catch(() => false)
+      .finally(() => {
+        clearTimeout(timer)
+        resolve()
+      })
+  })
 }
 
 export default function BrowsePage() {
@@ -34,7 +53,14 @@ export default function BrowsePage() {
   // Picked after mount so the web build's pre-rendered HTML (which can't know
   // the random pick) matches the browser's first render.
   useEffect(() => {
-    setRandomActivities(generateRandomActivities())
+    let cancelled = false
+    const picked = generateRandomActivities()
+    prefetchLeadImages(picked).then(() => {
+      if (!cancelled) setRandomActivities(picked)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   async function loadPage(text: string, pageNumber: number) {
@@ -46,6 +72,8 @@ export default function BrowsePage() {
         limit: SEARCH_PAGE_SIZE,
       })
       // A newer query or page change started while this one was in flight.
+      if (requestId !== latestRequest.current) return
+      await prefetchLeadImages(result.items)
       if (requestId !== latestRequest.current) return
       setResults(result.items)
       setTotal(result.total)

@@ -17,6 +17,10 @@ jest.mock("@/lib/browse/api", () => ({
 }))
 
 // ── heavy native deps ─────────────────────────────────────────────────────────
+jest.mock("expo-image", () => ({
+  Image: { prefetch: jest.fn(() => Promise.resolve(true)) },
+}))
+
 jest.mock("lucide-react-native", () => {
   const { View } = require("react-native")
   return {
@@ -49,11 +53,13 @@ jest.mock("@/components/recommendations/recommendation-card", () => ({
 }))
 
 import * as BrowseApi from "@/lib/browse/api"
+import { Image } from "expo-image"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
 import BrowsePage from "@/app/browse"
 
 const mockSearchActivities = jest.mocked(BrowseApi.searchActivities)
+const mockPrefetch = jest.mocked(Image.prefetch)
 
 const FIRST_PAGE = RECOMMENDATIONS.slice(0, 10)
 const SECOND_PAGE = RECOMMENDATIONS.slice(10, 13)
@@ -70,18 +76,21 @@ function typeQuery(text: string) {
 describe("BrowsePage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockPrefetch.mockResolvedValue(true)
   })
 
-  it("shows ten random activities and no page numbers before searching", () => {
+  it("shows ten random activities and no page numbers before searching", async () => {
     render(<BrowsePage />)
+    await act(async () => {})
 
     expect(listedTitles()).toHaveLength(10)
     expect(mockSearchActivities).not.toHaveBeenCalled()
     expect(screen.queryByRole("button", { name: "Page 1" })).toBeNull()
   })
 
-  it("lets card taps through while the keyboard is open and dismisses it on scroll", () => {
+  it("lets card taps through while the keyboard is open and dismisses it on scroll", async () => {
     render(<BrowsePage />)
+    await act(async () => {})
     const list = screen.UNSAFE_getByType(FlatList)
 
     expect(list.props.keyboardShouldPersistTaps).toBe("handled")
@@ -128,6 +137,53 @@ describe("BrowsePage", () => {
     await act(async () => typeQuery("  zzz "))
 
     expect(screen.getByText("No activities match “zzz”")).toBeTruthy()
+  })
+
+  it("prefetches the first three images before showing a page", async () => {
+    let finishPrefetch: (loaded: boolean) => void = () => {}
+    mockSearchActivities.mockResolvedValue({ items: FIRST_PAGE, total: 10 })
+    render(<BrowsePage />)
+    await act(async () => {})
+    mockPrefetch.mockReturnValueOnce(new Promise((resolve) => (finishPrefetch = resolve)))
+
+    await act(async () => typeQuery("guitar"))
+
+    expect(mockPrefetch).toHaveBeenLastCalledWith(
+      FIRST_PAGE.slice(0, 3).map((a) => a.imageUrl),
+      "memory-disk",
+    )
+    expect(listedTitles()).toEqual([])
+
+    await act(async () => finishPrefetch(true))
+    expect(listedTitles()).toEqual(FIRST_PAGE.map((a) => a.title))
+  })
+
+  it("shows the page anyway if the images take longer than the timeout", async () => {
+    jest.useFakeTimers()
+    try {
+      mockSearchActivities.mockResolvedValue({ items: FIRST_PAGE, total: 10 })
+      render(<BrowsePage />)
+      await act(async () => {})
+      mockPrefetch.mockReturnValueOnce(new Promise(() => {}))
+
+      await act(async () => typeQuery("guitar"))
+      expect(listedTitles()).toEqual([])
+
+      await act(async () => jest.advanceTimersByTime(1500))
+      expect(listedTitles()).toEqual(FIRST_PAGE.map((a) => a.title))
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it("waits for the random set's images before showing it", async () => {
+    let finishPrefetch: (loaded: boolean) => void = () => {}
+    mockPrefetch.mockReturnValueOnce(new Promise((resolve) => (finishPrefetch = resolve)))
+    render(<BrowsePage />)
+
+    expect(listedTitles()).toEqual([])
+    await act(async () => finishPrefetch(true))
+    expect(listedTitles()).toHaveLength(10)
   })
 
   it("ignores a response that arrives after a newer query", async () => {
