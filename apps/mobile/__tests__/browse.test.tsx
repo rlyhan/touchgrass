@@ -75,6 +75,14 @@ describe("BrowsePage", () => {
     expect(screen.queryByRole("button", { name: "Page 1" })).toBeNull()
   })
 
+  it("lets card taps through while the keyboard is open and dismisses it on scroll", () => {
+    render(<BrowsePage />)
+    const list = screen.UNSAFE_getByType(FlatList)
+
+    expect(list.props.keyboardShouldPersistTaps).toBe("handled")
+    expect(list.props.keyboardDismissMode).toBe("on-drag")
+  })
+
   it("shows the first page of results with page numbers for a query", async () => {
     mockSearchActivities.mockResolvedValue({ items: FIRST_PAGE, total: 13 })
     render(<BrowsePage />)

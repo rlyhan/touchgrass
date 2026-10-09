@@ -20,6 +20,8 @@ export function ActivityListScreen({ activities, header, footer, empty, listRef 
       <ActivityList
         ref={listRef}
         activities={activities}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         ListEmptyComponent={empty ? <>{empty}</> : null}
         ListHeaderComponent={
           <>
