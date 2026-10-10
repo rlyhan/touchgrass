@@ -60,7 +60,7 @@ export default function RecommendationsPage() {
 
   if (status !== "ready") {
     return (
-      <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
         <View className="flex-1 items-center justify-center px-8">
           <GrassLogo />
           {status === "loading" ? (

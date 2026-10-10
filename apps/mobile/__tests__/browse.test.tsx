@@ -34,7 +34,7 @@ import * as BrowseApi from "@/lib/browse/api"
 import { Image } from "expo-image"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
-import BrowsePage from "@/app/browse"
+import BrowsePage from "@/app/(authed)/(tabs)/browse"
 
 const mockSearchActivities = jest.mocked(BrowseApi.searchActivities)
 const mockFetchRandomActivities = jest.mocked(BrowseApi.fetchRandomActivities)

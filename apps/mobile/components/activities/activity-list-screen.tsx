@@ -16,7 +16,7 @@ type Props = {
 
 export function ActivityListScreen({ activities, header, footer, empty, listRef }: Props) {
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       <ActivityList
         ref={listRef}
         activities={activities}

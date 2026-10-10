@@ -60,7 +60,7 @@ const RECS: RecommendedActivity[] = [
   { ...RECOMMENDATIONS[1], dominantPatternId: null },
 ]
 
-import RecommendationsPage from "@/app/(authed)/recommendations"
+import RecommendationsPage from "@/app/(authed)/(tabs)/recommendations"
 
 // ── tests ─────────────────────────────────────────────────────────────────────
 describe("RecommendationsPage", () => {
