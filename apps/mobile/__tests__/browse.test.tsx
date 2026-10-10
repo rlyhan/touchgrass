@@ -22,36 +22,13 @@ jest.mock("expo-image", () => ({
   Image: { prefetch: jest.fn(() => Promise.resolve(true)) },
 }))
 
-jest.mock("lucide-react-native", () => {
-  const { View } = require("react-native")
-  return {
-    ChevronLeft: () => <View />,
-    ChevronRight: () => <View />,
-    Search: () => <View />,
-    X: () => <View />,
-  }
-})
+jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
-jest.mock("react-native-safe-area-context", () => {
-  const { View } = require("react-native")
-  return {
-    SafeAreaView: ({ children, ...p }: React.PropsWithChildren<object>) => (
-      <View {...p}>{children}</View>
-    ),
-  }
-})
+jest.mock("react-native-safe-area-context", () => require("@/test-utils/mocks").safeAreaMock)
 
-jest.mock("@/components/icons/grass-logo", () => {
-  const { View } = require("react-native")
-  return { GrassLogo: (p: object) => <View testID="grass-logo" {...p} /> }
-})
+jest.mock("@/components/icons/grass-logo", () => require("@/test-utils/mocks").grassLogoMock)
 
-jest.mock("@/components/activities/activity-card", () => ({
-  ActivityCard: ({ title }: { title: string }) => {
-    const { Text } = require("react-native")
-    return <Text testID="activity-card">{title}</Text>
-  },
-}))
+jest.mock("@/components/activities/activity-card", () => require("@/test-utils/mocks").activityCardMock)
 
 import * as BrowseApi from "@/lib/browse/api"
 import { Image } from "expo-image"

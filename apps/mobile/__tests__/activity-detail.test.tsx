@@ -27,21 +27,9 @@ jest.mock("@/lib/patterns/use-pattern-weights", () => ({
 }))
 
 // ── heavy native deps ─────────────────────────────────────────────────────────
-jest.mock("react-native-safe-area-context", () => {
-  const { View } = require("react-native")
-  return {
-    SafeAreaView: ({ children, ...p }: React.PropsWithChildren<object>) => (
-      <View {...p}>{children}</View>
-    ),
-  }
-})
+jest.mock("react-native-safe-area-context", () => require("@/test-utils/mocks").safeAreaMock)
 
-jest.mock("@/components/activities/activity-card", () => ({
-  ActivityCard: ({ title }: { title: string }) => {
-    const { Text } = require("react-native")
-    return <Text testID="activity-card">{title}</Text>
-  },
-}))
+jest.mock("@/components/activities/activity-card", () => require("@/test-utils/mocks").activityCardMock)
 
 jest.mock("@/components/ui/primary-button", () => ({
   PrimaryButton: ({ label }: { label: string }) => {
@@ -50,14 +38,7 @@ jest.mock("@/components/ui/primary-button", () => ({
   },
 }))
 
-jest.mock("lucide-react-native", () => {
-  const { View } = require("react-native")
-  return {
-    ArrowLeft: (p: object) => <View {...p} />,
-    Lightbulb: (p: object) => <View testID="lightbulb-icon" {...p} />,
-    ChevronDown: (p: object) => <View testID="chevron-down" {...p} />,
-  }
-})
+jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"

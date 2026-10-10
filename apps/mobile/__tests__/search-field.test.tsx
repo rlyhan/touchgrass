@@ -1,9 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
-jest.mock("lucide-react-native", () => {
-  const { View } = require("react-native")
-  return { Search: () => <View />, X: () => <View /> }
-})
+jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 import { SearchField } from "@/components/ui/search-field"
 

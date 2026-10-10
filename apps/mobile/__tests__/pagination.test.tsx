@@ -1,9 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
-jest.mock("lucide-react-native", () => {
-  const { View } = require("react-native")
-  return { ChevronLeft: () => <View />, ChevronRight: () => <View /> }
-})
+jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 import { getVisiblePages, Pagination } from "@/components/ui/pagination"
 
