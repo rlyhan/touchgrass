@@ -29,12 +29,6 @@ jest.mock("@/lib/recommendations/api", () => {
   }
 })
 
-// ── auth ──────────────────────────────────────────────────────────────────────
-jest.mock("@/lib/auth/client", () => ({
-  signOut: jest.fn(() => Promise.resolve({ data: { success: true }, error: null })),
-  useSession: jest.fn(() => ({ data: { user: { id: "u1" } }, isPending: false })),
-}))
-
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("react-native-safe-area-context", () => require("@/test-utils/mocks").safeAreaMock)
 
@@ -43,7 +37,6 @@ jest.mock("@/components/icons/grass-logo", () => require("@/test-utils/mocks").g
 jest.mock("@/components/activities/activity-card", () => require("@/test-utils/mocks").activityCardMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
-import * as Auth from "@/lib/auth/client"
 import * as Api from "@/lib/recommendations/api"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { RecommendedActivity } from "@touchgrass/types"
@@ -52,7 +45,6 @@ import * as ExpoRouter from "expo-router"
 const mockPush = jest.mocked(ExpoRouter.router.push)
 const mockReplace = jest.mocked(ExpoRouter.router.replace)
 const mockFetchRecommendations = jest.mocked(Api.fetchRecommendations)
-const mockSignOut = jest.mocked(Auth.signOut)
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 const RECS: RecommendedActivity[] = [
@@ -60,7 +52,7 @@ const RECS: RecommendedActivity[] = [
   { ...RECOMMENDATIONS[1], dominantPatternId: null },
 ]
 
-import RecommendationsPage from "@/app/(authed)/recommendations"
+import RecommendationsPage from "@/app/(authed)/(tabs)/recommendations"
 
 // ── tests ─────────────────────────────────────────────────────────────────────
 describe("RecommendationsPage", () => {
@@ -155,18 +147,5 @@ describe("RecommendationsPage", () => {
       expect(screen.getAllByTestId("activity-card")).toHaveLength(2)
     })
     expect(mockFetchRecommendations).toHaveBeenCalledTimes(2)
-  })
-
-  it("signs out and replaces to /sign-in when the footer button is pressed", async () => {
-    mockFetchRecommendations.mockResolvedValue(RECS)
-    render(<RecommendationsPage />)
-
-    const signOutBtn = await screen.findByRole("button", { name: "Sign out" })
-    await act(async () => {
-      fireEvent.press(signOutBtn)
-    })
-
-    expect(mockSignOut).toHaveBeenCalledTimes(1)
-    expect(mockReplace).toHaveBeenCalledWith("/sign-in")
   })
 })
