@@ -85,7 +85,7 @@ export function MenuDrawer({ visible, onClose }: Props) {
           </Pressable>
         </View>
 
-        <View className="mt-auto border-t border-gray-200 pt-2">
+        <View className="mt-6 border-t border-gray-200 pt-2">
           <Pressable
             onPress={handleLogOut}
             disabled={loggingOut}
