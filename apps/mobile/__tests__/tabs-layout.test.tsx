@@ -5,9 +5,7 @@ jest.mock("expo-haptics", () => ({ selectionAsync: jest.fn() }))
 
 jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
-jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
-}))
+jest.mock("react-native-safe-area-context", () => require("@/test-utils/mocks").safeAreaMock)
 
 jest.mock("@/components/navigation/menu-drawer", () => {
   const { Pressable, Text } = require("react-native")

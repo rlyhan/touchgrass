@@ -3,10 +3,14 @@
 import type { PropsWithChildren } from "react"
 import { Text, View } from "react-native"
 
+// Mutable so a test can simulate a device inset, e.g. safeAreaInsets.bottom = 34.
+export const safeAreaInsets = { top: 0, right: 0, bottom: 0, left: 0 }
+
 export const safeAreaMock = {
   SafeAreaView: ({ children, ...props }: PropsWithChildren<object>) => (
     <View {...props}>{children}</View>
   ),
+  useSafeAreaInsets: () => safeAreaInsets,
 }
 
 export const grassLogoMock = {

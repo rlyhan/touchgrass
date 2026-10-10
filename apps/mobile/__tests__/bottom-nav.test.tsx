@@ -4,22 +4,19 @@ jest.mock("expo-haptics", () => ({ selectionAsync: jest.fn() }))
 
 jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
-const mockInsets = { top: 0, right: 0, bottom: 0, left: 0 }
-
-jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => mockInsets,
-}))
+jest.mock("react-native-safe-area-context", () => require("@/test-utils/mocks").safeAreaMock)
 
 import * as Haptics from "expo-haptics"
 
 import { BottomNav } from "@/components/navigation/bottom-nav"
+import { safeAreaInsets } from "@/test-utils/mocks"
 
 const mockSelectionAsync = jest.mocked(Haptics.selectionAsync)
 
 describe("BottomNav", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockInsets.bottom = 0
+    safeAreaInsets.bottom = 0
   })
 
   it("renders a labelled tab for Home and Browse", () => {
@@ -70,7 +67,7 @@ describe("BottomNav", () => {
   })
 
   it("pads the bar above the home indicator", () => {
-    mockInsets.bottom = 34
+    safeAreaInsets.bottom = 34
     render(<BottomNav activeTab="home" onTabPress={jest.fn()} onMenuPress={jest.fn()} />)
 
     expect(screen.getByTestId("bottom-nav")).toHaveStyle({ paddingBottom: 34 })
