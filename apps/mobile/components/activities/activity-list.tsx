@@ -2,7 +2,7 @@ import { router, type Href } from "expo-router"
 import { useCallback, type Ref } from "react"
 import { FlatList, Pressable, View, type FlatListProps } from "react-native"
 
-import { RecommendationCard } from "@/components/recommendations/recommendation-card"
+import { ActivityCard } from "@/components/activities/activity-card"
 import type { Activity, PatternTypeId } from "@touchgrass/types"
 
 export type ListedActivity = Activity & { dominantPatternId?: PatternTypeId | null }
@@ -27,7 +27,7 @@ export function ActivityList({ activities, ref, ...listProps }: Props) {
         accessibilityRole="button"
         accessibilityLabel={`View details for ${activity.title}`}
       >
-        <RecommendationCard
+        <ActivityCard
           title={activity.title}
           imageUrl={activity.imageUrl}
           type={activity.type}

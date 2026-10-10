@@ -23,7 +23,7 @@ const cardShadow = Platform.select({
   default: { boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.12)" } as object,
 })
 
-interface RecommendationCardProps {
+interface ActivityCardProps {
   title: string
   imageUrl: string
   type: string
@@ -32,14 +32,14 @@ interface RecommendationCardProps {
   size?: "default" | "large"
 }
 
-export function RecommendationCard({
+export function ActivityCard({
   title,
   imageUrl,
   type,
   field,
   estimatedTime,
   size = "default",
-}: RecommendationCardProps) {
+}: ActivityCardProps) {
   const TypeIcon = getActivityTypeIcon(type)
   const FieldIcon = getFieldIcon(field)
   const [imageError, setImageError] = useState(false)

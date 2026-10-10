@@ -36,10 +36,10 @@ jest.mock("react-native-safe-area-context", () => {
   }
 })
 
-jest.mock("@/components/recommendations/recommendation-card", () => ({
-  RecommendationCard: ({ title }: { title: string }) => {
+jest.mock("@/components/activities/activity-card", () => ({
+  ActivityCard: ({ title }: { title: string }) => {
     const { Text } = require("react-native")
-    return <Text testID="recommendation-card">{title}</Text>
+    return <Text testID="activity-card">{title}</Text>
   },
 }))
 
@@ -131,7 +131,7 @@ describe("ActivityDetailPage", () => {
       mockUseLocalSearchParams.mockReturnValue({})
       render(<ActivityDetailPage />)
       expect(screen.getByText("Activity not found.")).toBeTruthy()
-      expect(screen.queryByTestId("recommendation-card")).toBeNull()
+      expect(screen.queryByTestId("activity-card")).toBeNull()
     })
 
     it("shows a spinner while fetching, then not-found when the server has no such activity", async () => {
@@ -146,7 +146,7 @@ describe("ActivityDetailPage", () => {
       await waitFor(() => {
         expect(screen.getByText("Activity not found.")).toBeTruthy()
       })
-      expect(screen.queryByTestId("recommendation-card")).toBeNull()
+      expect(screen.queryByTestId("activity-card")).toBeNull()
     })
 
     it("fetches the activity from the network when the cache misses and renders it", async () => {
@@ -194,7 +194,7 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       await waitFor(() => expect(mockFetchActivityBySlug).toHaveBeenCalled())
-      expect(screen.getByTestId("recommendation-card")).toBeTruthy()
+      expect(screen.getByTestId("activity-card")).toBeTruthy()
       expect(screen.queryByText("Couldn't load activity.")).toBeNull()
     })
 
@@ -211,7 +211,7 @@ describe("ActivityDetailPage", () => {
     it("renders the cached card and CTA", () => {
       render(<ActivityDetailPage />)
 
-      expect(screen.getByTestId("recommendation-card")).toBeTruthy()
+      expect(screen.getByTestId("activity-card")).toBeTruthy()
       expect(screen.getByText(ACTIVITY.title)).toBeTruthy()
       // expect(screen.getByTestId("primary-button")).toBeTruthy()
     })

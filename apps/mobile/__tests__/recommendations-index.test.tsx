@@ -52,10 +52,10 @@ jest.mock("@/components/icons/grass-logo", () => {
   }
 })
 
-jest.mock("@/components/recommendations/recommendation-card", () => ({
-  RecommendationCard: ({ title }: { title: string }) => {
+jest.mock("@/components/activities/activity-card", () => ({
+  ActivityCard: ({ title }: { title: string }) => {
     const { Text } = require("react-native")
-    return <Text testID="recommendation-card">{title}</Text>
+    return <Text testID="activity-card">{title}</Text>
   },
 }))
 
@@ -90,7 +90,7 @@ describe("RecommendationsPage", () => {
     render(<RecommendationsPage />)
 
     expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy()
-    expect(screen.queryByTestId("recommendation-card")).toBeNull()
+    expect(screen.queryByTestId("activity-card")).toBeNull()
   })
 
   it("renders one card per recommendation when the fetch resolves", async () => {
@@ -98,7 +98,7 @@ describe("RecommendationsPage", () => {
     render(<RecommendationsPage />)
 
     await waitFor(() => {
-      expect(screen.getAllByTestId("recommendation-card")).toHaveLength(2)
+      expect(screen.getAllByTestId("activity-card")).toHaveLength(2)
     })
 
     expect(screen.getByText(RECS[0].title)).toBeTruthy()
@@ -169,7 +169,7 @@ describe("RecommendationsPage", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getAllByTestId("recommendation-card")).toHaveLength(2)
+      expect(screen.getAllByTestId("activity-card")).toHaveLength(2)
     })
     expect(mockFetchRecommendations).toHaveBeenCalledTimes(2)
   })

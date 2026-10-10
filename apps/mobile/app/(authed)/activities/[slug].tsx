@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { PatternMatchAccordion } from "@/components/patterns/pattern-match-accordion"
-import { RecommendationCard } from "@/components/recommendations/recommendation-card"
+import { ActivityCard } from "@/components/activities/activity-card"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
 import { UnauthenticatedError } from "@/lib/auth/errors"
@@ -145,7 +145,7 @@ export default function ActivityDetailPage() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        <RecommendationCard
+        <ActivityCard
           title={activity.title}
           imageUrl={activity.imageUrl}
           type={activity.type}

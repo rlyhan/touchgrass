@@ -45,10 +45,10 @@ jest.mock("@/components/icons/grass-logo", () => {
   return { GrassLogo: (p: object) => <View testID="grass-logo" {...p} /> }
 })
 
-jest.mock("@/components/recommendations/recommendation-card", () => ({
-  RecommendationCard: ({ title }: { title: string }) => {
+jest.mock("@/components/activities/activity-card", () => ({
+  ActivityCard: ({ title }: { title: string }) => {
     const { Text } = require("react-native")
-    return <Text testID="recommendation-card">{title}</Text>
+    return <Text testID="activity-card">{title}</Text>
   },
 }))
 
