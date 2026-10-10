@@ -32,12 +32,10 @@ describe("(authed) layout gate", () => {
     expect(screen.queryByTestId("stack")).toBeNull()
   })
 
-  it("redirects to /onboarding/name when there is no session", () => {
+  it("redirects to /sign-in when there is no session", () => {
     mockUseSession.mockReturnValue({ data: null, isPending: false })
     render(<AuthedLayout />)
-    expect(screen.getByTestId("redirect").props.children).toBe(
-      "/onboarding/name",
-    )
+    expect(screen.getByTestId("redirect").props.children).toBe("/sign-in")
     expect(screen.queryByTestId("stack")).toBeNull()
   })
 

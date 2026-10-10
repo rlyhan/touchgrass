@@ -32,7 +32,7 @@ jest.mock("@/lib/icons", () => {
 })
 
 import * as Icons from "@/lib/icons"
-import { RecommendationCard } from "@/components/recommendations/recommendation-card"
+import { ActivityCard } from "@/components/activities/activity-card"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
 const mockGetActivityTypeIcon = jest.mocked(Icons.getActivityTypeIcon)
@@ -47,32 +47,32 @@ const BASE_PROPS = {
   estimatedTime: ACTIVITY.estimated_time,
 }
 
-describe("RecommendationCard", () => {
+describe("ActivityCard", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it("renders the title and the type and field labels", () => {
-    render(<RecommendationCard {...BASE_PROPS} />)
+    render(<ActivityCard {...BASE_PROPS} />)
     expect(screen.getByText(BASE_PROPS.title)).toBeTruthy()
     expect(screen.getByText(BASE_PROPS.type)).toBeTruthy()
     expect(screen.getByText(BASE_PROPS.field)).toBeTruthy()
   })
 
   it("renders the estimated-time row when provided", () => {
-    render(<RecommendationCard {...BASE_PROPS} />)
+    render(<ActivityCard {...BASE_PROPS} />)
     expect(screen.getByText(BASE_PROPS.estimatedTime!)).toBeTruthy()
     expect(screen.getByTestId("time-icon")).toBeTruthy()
   })
 
   it("omits the estimated-time row when not provided", () => {
-    render(<RecommendationCard {...BASE_PROPS} estimatedTime={undefined} />)
+    render(<ActivityCard {...BASE_PROPS} estimatedTime={undefined} />)
     expect(screen.queryByText(BASE_PROPS.estimatedTime!)).toBeNull()
     expect(screen.queryByTestId("time-icon")).toBeNull()
   })
 
   it("looks up icons via the activity type and field", () => {
-    render(<RecommendationCard {...BASE_PROPS} />)
+    render(<ActivityCard {...BASE_PROPS} />)
     expect(mockGetActivityTypeIcon).toHaveBeenCalledWith(BASE_PROPS.type)
     expect(mockGetFieldIcon).toHaveBeenCalledWith(BASE_PROPS.field)
     expect(screen.getByTestId("type-icon")).toBeTruthy()
@@ -80,7 +80,7 @@ describe("RecommendationCard", () => {
   })
 
   it("swaps the image for a fallback view when the image errors", () => {
-    render(<RecommendationCard {...BASE_PROPS} />)
+    render(<ActivityCard {...BASE_PROPS} />)
     expect(screen.getByTestId("card-image")).toBeTruthy()
 
     fireEvent.press(screen.getByTestId("card-image"))

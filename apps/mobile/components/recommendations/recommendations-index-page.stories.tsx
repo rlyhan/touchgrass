@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { PrimaryButton } from "@/components/ui/primary-button"
-import { RecommendationCard } from "./recommendation-card"
+import { ActivityCard } from "@/components/activities/activity-card"
 
 const ItemSeparator = () => <View style={{ height: 16 }} />
 
@@ -21,7 +21,7 @@ function LoadedState() {
             accessibilityRole="button"
             accessibilityLabel={`View details for ${item.title}`}
           >
-            <RecommendationCard
+            <ActivityCard
               title={item.title}
               imageUrl={item.imageUrl}
               type={item.type}

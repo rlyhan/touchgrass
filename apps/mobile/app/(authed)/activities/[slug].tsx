@@ -10,12 +10,10 @@ import {
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-import { PatternMatchAccordion } from "@/components/patterns/pattern-match-accordion"
-import { RecommendationCard } from "@/components/recommendations/recommendation-card"
+import { ActivityCard } from "@/components/activities/activity-card"
+import { PatternMatch } from "@/components/patterns/pattern-match"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
-import { resolveDominantPattern } from "@/lib/patterns/cache"
-import { usePatternWeights } from "@/lib/patterns/use-pattern-weights"
 import { UnauthenticatedError } from "@/lib/auth/errors"
 import {
   fetchActivityBySlug,
@@ -23,28 +21,6 @@ import {
 } from "@/lib/recommendations/api"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
-import { PATTERN_TYPES } from "@touchgrass/types/constants"
-
-const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
-
-function PatternMatch({ activity }: { activity: Activity }) {
-  // Hook ensures pattern weights are fetched if not already cached so direct
-  // entries (deep links, refresh) still resolve a dominant pattern.
-  const { weights } = usePatternWeights()
-  // Resolve via the shared cache: returns cached dominant for dashboard-sourced
-  // activities, or computes from weights for direct entries. Threshold-gated.
-  const dominantId = weights ? resolveDominantPattern(activity) : null
-  const pattern = dominantId ? PATTERN_BY_ID[dominantId] : null
-  if (!pattern) return null
-  return (
-    <View className="mt-5">
-      <PatternMatchAccordion
-        patternName={pattern.name}
-        shortDescription={pattern.shortDescription}
-      />
-    </View>
-  )
-}
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
 
@@ -59,7 +35,10 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 }
 
 export default function ActivityDetailPage() {
-  const { slug } = useLocalSearchParams<{ slug: string }>()
+  const params = useLocalSearchParams<{ slug: string; pattern?: string | string[] }>()
+  const { slug } = params
+  // A repeated ?pattern= arrives as an array; use the first value, like URLSearchParams.get.
+  const pattern = Array.isArray(params.pattern) ? params.pattern[0] : params.pattern
 
   const cached = slug ? getCachedActivity(slug) : undefined
   const [activity, setActivity] = useState<Activity | null>(cached ?? null)
@@ -143,7 +122,7 @@ export default function ActivityDetailPage() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        <RecommendationCard
+        <ActivityCard
           title={activity.title}
           imageUrl={activity.imageUrl}
           type={activity.type}
@@ -152,7 +131,7 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        <PatternMatch activity={activity} />
+        {pattern ? <PatternMatch activity={activity} patternId={pattern} /> : null}
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">
