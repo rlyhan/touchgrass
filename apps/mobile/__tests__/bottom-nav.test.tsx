@@ -23,7 +23,7 @@ describe("BottomNav", () => {
   })
 
   it("renders a labelled tab for Home and Browse", () => {
-    render(<BottomNav activeTab="home" onTabPress={jest.fn()} />)
+    render(<BottomNav activeTab="home" onTabPress={jest.fn()} onMenuPress={jest.fn()} />)
 
     expect(screen.getByRole("tab", { name: "Home" })).toBeTruthy()
     expect(screen.getByRole("tab", { name: "Browse" })).toBeTruthy()
@@ -32,7 +32,7 @@ describe("BottomNav", () => {
   })
 
   it("marks only the active tab as selected", () => {
-    render(<BottomNav activeTab="browse" onTabPress={jest.fn()} />)
+    render(<BottomNav activeTab="browse" onTabPress={jest.fn()} onMenuPress={jest.fn()} />)
 
     expect(screen.getByRole("tab", { name: "Browse" })).toBeSelected()
     expect(screen.getByRole("tab", { name: "Home" })).not.toBeSelected()
@@ -40,7 +40,7 @@ describe("BottomNav", () => {
 
   it("reports the pressed tab and gives haptic feedback", () => {
     const onTabPress = jest.fn()
-    render(<BottomNav activeTab="home" onTabPress={onTabPress} />)
+    render(<BottomNav activeTab="home" onTabPress={onTabPress} onMenuPress={jest.fn()} />)
 
     fireEvent.press(screen.getByRole("tab", { name: "Browse" }))
 
@@ -50,7 +50,7 @@ describe("BottomNav", () => {
 
   it("ignores presses on the tab that is already active", () => {
     const onTabPress = jest.fn()
-    render(<BottomNav activeTab="home" onTabPress={onTabPress} />)
+    render(<BottomNav activeTab="home" onTabPress={onTabPress} onMenuPress={jest.fn()} />)
 
     fireEvent.press(screen.getByRole("tab", { name: "Home" }))
 
@@ -58,15 +58,26 @@ describe("BottomNav", () => {
     expect(mockSelectionAsync).not.toHaveBeenCalled()
   })
 
+  it("opens the menu with haptic feedback", () => {
+    const onMenuPress = jest.fn()
+    render(<BottomNav activeTab="home" onTabPress={jest.fn()} onMenuPress={onMenuPress} />)
+
+    fireEvent.press(screen.getByRole("button", { name: "Open menu" }))
+
+    expect(onMenuPress).toHaveBeenCalledTimes(1)
+    expect(mockSelectionAsync).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("menu-icon")).toBeTruthy()
+  })
+
   it("pads the bar above the home indicator", () => {
     mockInsets.bottom = 34
-    render(<BottomNav activeTab="home" onTabPress={jest.fn()} />)
+    render(<BottomNav activeTab="home" onTabPress={jest.fn()} onMenuPress={jest.fn()} />)
 
     expect(screen.getByTestId("bottom-nav")).toHaveStyle({ paddingBottom: 34 })
   })
 
   it("keeps a minimum bottom padding on devices without an inset", () => {
-    render(<BottomNav activeTab="home" onTabPress={jest.fn()} />)
+    render(<BottomNav activeTab="home" onTabPress={jest.fn()} onMenuPress={jest.fn()} />)
 
     expect(screen.getByTestId("bottom-nav")).toHaveStyle({ paddingBottom: 8 })
   })

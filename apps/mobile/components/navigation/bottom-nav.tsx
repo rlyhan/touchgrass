@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics"
-import { Home, Search, type LucideIcon } from "lucide-react-native"
+import { Home, Menu, Search, type LucideIcon } from "lucide-react-native"
 import { Pressable, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
@@ -15,15 +15,21 @@ const TABS: { key: BottomNavTab; label: string; Icon: LucideIcon }[] = [
 type Props = {
   activeTab: BottomNavTab
   onTabPress: (tab: BottomNavTab) => void
+  onMenuPress: () => void
 }
 
-export function BottomNav({ activeTab, onTabPress }: Props) {
+export function BottomNav({ activeTab, onTabPress, onMenuPress }: Props) {
   const { bottom } = useSafeAreaInsets()
 
   function handlePress(tab: BottomNavTab) {
     if (tab === activeTab) return
     Haptics.selectionAsync()
     onTabPress(tab)
+  }
+
+  function handleMenuPress() {
+    Haptics.selectionAsync()
+    onMenuPress()
   }
 
   return (
@@ -48,6 +54,14 @@ export function BottomNav({ activeTab, onTabPress }: Props) {
           </Pressable>
         )
       })}
+      <Pressable
+        onPress={handleMenuPress}
+        className="h-14 w-14 items-center justify-center rounded-xl"
+        accessibilityRole="button"
+        accessibilityLabel="Open menu"
+      >
+        <Menu size={24} strokeWidth={2} color={colors.gray[600]} />
+      </Pressable>
     </View>
   )
 }

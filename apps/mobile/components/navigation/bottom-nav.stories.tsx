@@ -10,6 +10,7 @@ const meta = {
   args: {
     activeTab: "home",
     onTabPress: fn(),
+    onMenuPress: fn(),
   },
   argTypes: {
     activeTab: { control: "radio", options: ["home", "browse"] },
@@ -28,7 +29,7 @@ export const BrowseActive: Story = {
 
 function InteractiveBottomNav() {
   const [tab, setTab] = useState<BottomNavTab>("home")
-  return <BottomNav activeTab={tab} onTabPress={setTab} />
+  return <BottomNav activeTab={tab} onTabPress={setTab} onMenuPress={fn()} />
 }
 
 export const Interactive: Story = {
