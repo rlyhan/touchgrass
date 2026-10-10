@@ -7,10 +7,7 @@ import type {
 import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
-import {
-  setCachedDominantPattern,
-  setCachedPatternWeights,
-} from "@/lib/patterns/cache"
+import { setCachedPatternWeights } from "@/lib/patterns/cache"
 
 export { UnauthenticatedError } from "@/lib/auth/errors"
 
@@ -52,7 +49,6 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   )
   recommendations.forEach((rec, i) => {
     activityCache.set(rec.slug, activities[i])
-    setCachedDominantPattern(rec.slug, rec.dominantPatternId ?? null)
   })
   return recommendations
 }
