@@ -12,8 +12,16 @@ function matchesQuery(activity: Activity, query: string): boolean {
   )
 }
 
-// Mock-backed until browse moves to the API; the signature mirrors the planned
-// GET /activities/search?q=&offset=&limit= endpoint.
+// Mock-backed until browse moves to the API; signatures mirror the planned
+// GET /activities/random and GET /activities/search?q=&offset=&limit= endpoints.
+export async function fetchRandomActivities(count: number): Promise<Activity[]> {
+  const picked = new Set<Activity>()
+  while (picked.size < Math.min(count, RECOMMENDATIONS.length)) {
+    picked.add(RECOMMENDATIONS[Math.floor(Math.random() * RECOMMENDATIONS.length)])
+  }
+  return Array.from(picked)
+}
+
 export async function searchActivities(
   query: string,
   { offset, limit }: { offset: number; limit: number },

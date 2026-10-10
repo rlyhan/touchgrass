@@ -13,6 +13,7 @@ jest.mock("@/lib/auth/client", () => ({
 
 // ── search api ────────────────────────────────────────────────────────────────
 jest.mock("@/lib/browse/api", () => ({
+  fetchRandomActivities: jest.fn(),
   searchActivities: jest.fn(),
 }))
 
@@ -59,6 +60,7 @@ import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import BrowsePage from "@/app/browse"
 
 const mockSearchActivities = jest.mocked(BrowseApi.searchActivities)
+const mockFetchRandomActivities = jest.mocked(BrowseApi.fetchRandomActivities)
 const mockPrefetch = jest.mocked(Image.prefetch)
 
 const FIRST_PAGE = RECOMMENDATIONS.slice(0, 10)
@@ -77,6 +79,7 @@ describe("BrowsePage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPrefetch.mockResolvedValue(true)
+    mockFetchRandomActivities.mockResolvedValue(RECOMMENDATIONS.slice(20, 30))
   })
 
   it("shows ten random activities and no page numbers before searching", async () => {
