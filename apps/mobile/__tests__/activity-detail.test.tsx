@@ -340,6 +340,20 @@ describe("ActivityDetailPage", () => {
       expect(screen.queryByText(/You were matched/)).toBeNull()
     })
 
+    it("uses the first value when the pattern param is repeated", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: ["4-HH", "9-HH"] })
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+    })
+
+    it("hides the accordion when the first repeated value doesn't match the viewer", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: ["9-HH", "4-HH"] })
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByText(/You were matched/)).toBeNull()
+    })
+
     it("hides the accordion while the viewer's weights are loading", () => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "4-HH" })
       mockUsePatternWeights.mockReturnValue({ weights: undefined, status: "loading" })

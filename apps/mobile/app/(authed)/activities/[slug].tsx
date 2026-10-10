@@ -58,7 +58,10 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 }
 
 export default function ActivityDetailPage() {
-  const { slug, pattern } = useLocalSearchParams<{ slug: string; pattern?: string }>()
+  const params = useLocalSearchParams<{ slug: string; pattern?: string | string[] }>()
+  const { slug } = params
+  // A repeated ?pattern= arrives as an array; use the first value, like URLSearchParams.get.
+  const pattern = Array.isArray(params.pattern) ? params.pattern[0] : params.pattern
 
   const cached = slug ? getCachedActivity(slug) : undefined
   const [activity, setActivity] = useState<Activity | null>(cached ?? null)
