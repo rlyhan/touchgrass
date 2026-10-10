@@ -10,40 +10,17 @@ import {
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-import { PatternMatchAccordion } from "@/components/patterns/pattern-match-accordion"
 import { ActivityCard } from "@/components/activities/activity-card"
+import { PatternMatch } from "@/components/patterns/pattern-match"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
 import { UnauthenticatedError } from "@/lib/auth/errors"
-import { usePatternWeights } from "@/lib/patterns/use-pattern-weights"
 import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
-import { PATTERN_TYPES } from "@touchgrass/types/constants"
-import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
-
-const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
-
-// The pattern arrives as a query param from the recommendations list. It is
-// only shown if it matches the viewer's own weights, so shared or edited links
-// can't claim a match for someone else.
-function PatternMatch({ activity, patternId }: { activity: Activity; patternId: string }) {
-  const { weights } = usePatternWeights()
-  if (!weights || getDominantPatternId(weights, activity) !== patternId) return null
-  const pattern = PATTERN_BY_ID[patternId]
-  if (!pattern) return null
-  return (
-    <View className="mt-5">
-      <PatternMatchAccordion
-        patternName={pattern.name}
-        shortDescription={pattern.shortDescription}
-      />
-    </View>
-  )
-}
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
 
