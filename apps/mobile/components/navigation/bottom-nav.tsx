@@ -12,6 +12,8 @@ const TABS: { key: BottomNavTab; label: string; Icon: LucideIcon }[] = [
   { key: "browse", label: "Browse", Icon: Search },
 ]
 
+const CELL = "h-14 w-14 items-center justify-center rounded-xl"
+
 type Props = {
   activeTab: BottomNavTab
   onTabPress: (tab: BottomNavTab) => void
@@ -45,7 +47,7 @@ export function BottomNav({ activeTab, onTabPress, onMenuPress }: Props) {
           <Pressable
             key={key}
             onPress={() => handlePress(key)}
-            className={`h-14 w-14 items-center justify-center rounded-xl ${active ? "bg-green-800" : ""}`}
+            className={`${CELL} ${active ? "bg-green-800" : ""}`}
             accessibilityRole="tab"
             accessibilityLabel={label}
             accessibilityState={{ selected: active }}
@@ -56,7 +58,7 @@ export function BottomNav({ activeTab, onTabPress, onMenuPress }: Props) {
       })}
       <Pressable
         onPress={handleMenuPress}
-        className="h-14 w-14 items-center justify-center rounded-xl"
+        className={CELL}
         accessibilityRole="button"
         accessibilityLabel="Open menu"
       >
