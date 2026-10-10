@@ -1,4 +1,4 @@
-import type { ReactNode, Ref } from "react"
+import type { ReactElement, ReactNode, Ref } from "react"
 import { FlatList, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -10,7 +10,7 @@ type Props = {
   activities: ListedActivity[]
   header?: ReactNode
   footer?: ReactNode
-  empty?: ReactNode
+  empty?: ReactElement | null
   listRef?: Ref<FlatList<ListedActivity>>
 }
 
@@ -22,7 +22,7 @@ export function ActivityListScreen({ activities, header, footer, empty, listRef 
         activities={activities}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        ListEmptyComponent={empty ? <>{empty}</> : null}
+        ListEmptyComponent={empty}
         ListHeaderComponent={
           <>
             <View className="items-center">
