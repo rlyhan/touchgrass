@@ -46,13 +46,6 @@ function LoadedState() {
             </Text>
           </>
         }
-        ListFooterComponent={
-          <View className="mt-10 items-center">
-            <Pressable accessibilityRole="button" accessibilityLabel="Sign out">
-              <Text className="text-sm font-medium text-gray-500">Sign out</Text>
-            </Pressable>
-          </View>
-        }
       />
     </SafeAreaView>
   )
@@ -80,13 +73,6 @@ function ErrorState() {
         <View className="mt-8 w-full">
           <PrimaryButton label="Try again" onPress={() => { }} />
         </View>
-        <Pressable
-          className="mt-6"
-          accessibilityRole="button"
-          accessibilityLabel="Sign out"
-        >
-          <Text className="text-sm font-medium text-gray-500">Sign out</Text>
-        </Pressable>
       </View>
     </SafeAreaView>
   )

@@ -1,14 +1,9 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { FlatList } from "react-native"
 
-// ── router / auth ─────────────────────────────────────────────────────────────
+// ── router ────────────────────────────────────────────────────────────────────
 jest.mock("expo-router", () => ({
   router: { push: jest.fn(), replace: jest.fn() },
-}))
-
-jest.mock("@/lib/auth/client", () => ({
-  signOut: jest.fn(() => Promise.resolve({ data: { success: true }, error: null })),
-  useSession: jest.fn(() => ({ data: null, isPending: false })),
 }))
 
 // ── search api ────────────────────────────────────────────────────────────────
