@@ -22,7 +22,7 @@ jest.mock("@/components/navigation/menu-drawer", () => {
 })
 
 const mockNavigate = jest.fn()
-const mockTabState = { index: 0, routes: [{ name: "recommendations/index" }, { name: "browse" }] }
+const mockTabState = { index: 0, routes: [{ name: "recommendations/index" }, { name: "browse/index" }] }
 
 jest.mock("expo-router", () => {
   const { View } = require("react-native")
@@ -60,7 +60,7 @@ describe("(tabs) layout", () => {
 
     fireEvent.press(screen.getByRole("tab", { name: "Browse" }))
 
-    expect(mockNavigate).toHaveBeenCalledWith("browse")
+    expect(mockNavigate).toHaveBeenCalledWith("browse/index")
   })
 
   it("navigates to recommendations from Browse", () => {

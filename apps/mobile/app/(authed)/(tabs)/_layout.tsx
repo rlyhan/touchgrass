@@ -7,7 +7,7 @@ import { MenuDrawer } from "@/components/navigation/menu-drawer"
 
 const TAB_ROUTES: Record<BottomNavTab, string> = {
   home: "recommendations/index",
-  browse: "browse",
+  browse: "browse/index",
 }
 
 function TabBar({ state, navigation }: BottomTabBarProps) {
