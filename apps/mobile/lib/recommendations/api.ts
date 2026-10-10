@@ -44,12 +44,9 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
     setCachedPatternWeights(body.patternWeights)
   }
   const recommendations = body.recommendations ?? []
-  const activities: Activity[] = recommendations.map(
-    ({ dominantPatternId: _dom, ...activity }) => activity,
-  )
-  recommendations.forEach((rec, i) => {
-    activityCache.set(rec.slug, activities[i])
-  })
+  for (const { dominantPatternId: _dominantPatternId, ...activity } of recommendations) {
+    activityCache.set(activity.slug, activity)
+  }
   return recommendations
 }
 
