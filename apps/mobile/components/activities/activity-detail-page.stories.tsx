@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
 import type { ActivityInstruction, ActivityTip } from "@touchgrass/types"
-import { RecommendationCard } from "./recommendation-card"
+import { ActivityCard } from "./activity-card"
 
 // ── shared fixtures ───────────────────────────────────────────────────────────
 const ACTIVITY = {
@@ -126,7 +126,7 @@ function LoadedState({
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        <RecommendationCard {...ACTIVITY} size="large" />
+        <ActivityCard {...ACTIVITY} size="large" />
 
         {description && description.length > 0 ? (
           <View className="mt-6">

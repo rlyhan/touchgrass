@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 import { GrassLogo } from "@/components/icons/grass-logo"
 import { PrimaryButton } from "@/components/ui/primary-button"
-import { RecommendationCard } from "./recommendation-card"
+import { ActivityCard } from "@/components/activities/activity-card"
 
 const ItemSeparator = () => <View style={{ height: 16 }} />
 
@@ -21,7 +21,7 @@ function LoadedState() {
             accessibilityRole="button"
             accessibilityLabel={`View details for ${item.title}`}
           >
-            <RecommendationCard
+            <ActivityCard
               title={item.title}
               imageUrl={item.imageUrl}
               type={item.type}
@@ -45,13 +45,6 @@ function LoadedState() {
               Your recommendations
             </Text>
           </>
-        }
-        ListFooterComponent={
-          <View className="mt-10 items-center">
-            <Pressable accessibilityRole="button" accessibilityLabel="Sign out">
-              <Text className="text-sm font-medium text-gray-500">Sign out</Text>
-            </Pressable>
-          </View>
         }
       />
     </SafeAreaView>
@@ -80,13 +73,6 @@ function ErrorState() {
         <View className="mt-8 w-full">
           <PrimaryButton label="Try again" onPress={() => { }} />
         </View>
-        <Pressable
-          className="mt-6"
-          accessibilityRole="button"
-          accessibilityLabel="Sign out"
-        >
-          <Text className="text-sm font-medium text-gray-500">Sign out</Text>
-        </Pressable>
       </View>
     </SafeAreaView>
   )

@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-native"
 
-import { RecommendationCard } from "./recommendation-card"
+import { ActivityCard } from "./activity-card"
 
 const meta = {
-  title: "Recommendations/RecommendationCard",
-  component: RecommendationCard,
+  title: "Activities/ActivityCard",
+  component: ActivityCard,
   args: {
     title: "Beginner sourdough at a neighborhood class",
     imageUrl:
@@ -20,7 +20,7 @@ const meta = {
     field: { control: "text" },
     estimatedTime: { control: "text" },
   },
-} satisfies Meta<typeof RecommendationCard>
+} satisfies Meta<typeof ActivityCard>
 
 export default meta
 

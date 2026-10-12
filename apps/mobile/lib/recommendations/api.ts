@@ -1,12 +1,13 @@
-import type { Activity, RecommendationsResponse } from "@touchgrass/types"
+import type {
+  Activity,
+  RecommendationsResponse,
+  RecommendedActivity,
+} from "@touchgrass/types"
 
 import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
-import {
-  setCachedDominantPattern,
-  setCachedPatternWeights,
-} from "@/lib/patterns/cache"
+import { setCachedPatternWeights } from "@/lib/patterns/cache"
 
 export { UnauthenticatedError } from "@/lib/auth/errors"
 
@@ -23,7 +24,7 @@ export class ProfileNotFoundError extends Error {
   }
 }
 
-export async function fetchRecommendations(): Promise<Activity[]> {
+export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   const response = await authedFetch(apiUrl("/recommendations"))
 
   if (response.status === 401) {
@@ -43,14 +44,10 @@ export async function fetchRecommendations(): Promise<Activity[]> {
     setCachedPatternWeights(body.patternWeights)
   }
   const recommendations = body.recommendations ?? []
-  const activities: Activity[] = recommendations.map(
-    ({ dominantPatternId: _dom, ...activity }) => activity,
-  )
-  recommendations.forEach((rec, i) => {
-    activityCache.set(rec.slug, activities[i])
-    setCachedDominantPattern(rec.slug, rec.dominantPatternId ?? null)
-  })
-  return activities
+  for (const { dominantPatternId: _dominantPatternId, ...activity } of recommendations) {
+    activityCache.set(activity.slug, activity)
+  }
+  return recommendations
 }
 
 export async function fetchActivityBySlug(slug: string): Promise<Activity | null> {
