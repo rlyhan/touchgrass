@@ -23,7 +23,7 @@ const cardShadow = Platform.select({
   default: { boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.12)" } as object,
 })
 
-interface RecommendationCardProps {
+interface ActivityCardProps {
   title: string
   imageUrl: string
   type: string
@@ -32,14 +32,14 @@ interface RecommendationCardProps {
   size?: "default" | "large"
 }
 
-export function RecommendationCard({
+export function ActivityCard({
   title,
   imageUrl,
   type,
   field,
   estimatedTime,
   size = "default",
-}: RecommendationCardProps) {
+}: ActivityCardProps) {
   const TypeIcon = getActivityTypeIcon(type)
   const FieldIcon = getFieldIcon(field)
   const [imageError, setImageError] = useState(false)
@@ -49,7 +49,7 @@ export function RecommendationCard({
     <View className="rounded-2xl bg-white" style={cardShadow}>
       <View className="overflow-hidden rounded-2xl bg-white">
         <View
-          className="relative w-full"
+          className="relative w-full bg-gray-100"
           style={isLarge ? { aspectRatio: 4 / 3 } : { height: 160 }}
         >
           {imageError ? (
@@ -57,6 +57,7 @@ export function RecommendationCard({
           ) : (
             <Image
               source={{ uri: imageUrl }}
+              cachePolicy="memory-disk"
               contentFit="cover"
               style={{ width: "100%", height: "100%" }}
               onError={() => setImageError(true)}

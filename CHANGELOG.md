@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.4.0] - 2026-10-10 — Feat: Browse page
+
+Adds a public browse screen with paginated search, and limits the pattern match rationale to the user's own recommendations.
+
+### Mobile (`apps/mobile`)
+
+- Added a public `/browse` screen showing ten random activities, reachable from a "Browse more activities" button on recommendations.
+- Added search by title, field and type, paginated 10 per page with page numbers, a no-results message and a `SearchField` with a clear button.
+- Search runs through a mock-backed `searchActivities(query, { offset, limit })` that mirrors the planned API endpoint, ignoring responses for superseded queries.
+- Lists wait for their first three images (capped at 1.5s), and card images use the memory cache so they no longer blink when lists swap.
+- Pattern match accordion now shows only for activities opened from recommendations (via a `?pattern=` param), verified against the viewer's own weights.
+- Added a session-aware `AuthButton` that shows a retry message when sign-out fails instead of hanging.
+- Fixed a web hydration mismatch from picking random activities during static rendering.
+- Moved shared list and card components to `components/activities` and extracted browse logic into `useActivitySearch` and `useRandomActivities` hooks.
+
+## [1.3.3] - 2026-10-04 — Fix: Onboarding access by auth and profile state
+
+Routes onboarding visitors by session and profile state.
+
+### Mobile (`apps/mobile`)
+
+- Gated post-sign-up onboarding steps on the session with `Stack.Protected`; users with a profile redirect to `/recommendations`.
+- Fixed native users being sent away from onboarding right after sign-up by refetching the session.
+- Centralised onboarding paths in a shared `ONBOARDING_ROUTES` config.
+
 ## [1.3.2] - 2026-06-16 — Chore: Document activity sub-type definitions and align mock affinities
 
 Establishes canonical, strict definitions for every activity sub-type used across the recommendation engine, and re-classifies the mock catalog's `type` and `related_types` to conform to those definitions so secondary pattern affinity reflects each activity's true character.
