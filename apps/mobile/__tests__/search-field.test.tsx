@@ -29,4 +29,25 @@ describe("SearchField", () => {
     fireEvent.press(screen.getByRole("button", { name: "Clear search" }))
     expect(onChangeText).toHaveBeenCalledWith("")
   })
+
+  it("still calls the caller's focus and blur handlers", () => {
+    const onFocus = jest.fn()
+    const onBlur = jest.fn()
+    render(
+      <SearchField
+        label="Search activities"
+        value=""
+        onChangeText={jest.fn()}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      />,
+    )
+
+    const input = screen.getByLabelText("Search activities")
+    fireEvent(input, "focus")
+    fireEvent(input, "blur")
+
+    expect(onFocus).toHaveBeenCalledTimes(1)
+    expect(onBlur).toHaveBeenCalledTimes(1)
+  })
 })
