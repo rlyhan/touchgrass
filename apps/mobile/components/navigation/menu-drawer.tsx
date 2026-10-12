@@ -61,49 +61,54 @@ export function MenuDrawer({ visible, onClose }: Props) {
         accessibilityRole="button"
         accessibilityLabel="Close menu"
       />
+      {/* Reanimated drops className on web, so styling lives on the inner View. */}
       <Animated.View
         entering={SlideInRight.duration(220)}
-        className="ml-auto h-full bg-white px-6"
-        style={{ width: "80%", maxWidth: 360, paddingTop: top + 16, paddingBottom: bottom + 16 }}
+        style={{ marginLeft: "auto", height: "100%", width: "80%", maxWidth: 360 }}
       >
-        <View className="flex-row items-start">
-          {name ? (
-            <Text
-              testID="menu-user-name"
-              className="flex-1 pr-4 pt-2 text-2xl font-bold tracking-tight text-gray-900"
+        <View
+          className="flex-1 bg-white px-6"
+          style={{ paddingTop: top + 16, paddingBottom: bottom + 16 }}
+        >
+          <View className="flex-row items-start">
+            {name ? (
+              <Text
+                testID="menu-user-name"
+                className="flex-1 pr-4 pt-2 text-2xl font-bold tracking-tight text-gray-900"
+              >
+                {name}
+              </Text>
+            ) : null}
+            <Pressable
+              onPress={handleClose}
+              className="-mr-2 ml-auto h-11 w-11 items-center justify-center"
+              accessibilityRole="button"
+              accessibilityLabel="Close menu"
             >
-              {name}
-            </Text>
-          ) : null}
-          <Pressable
-            onPress={handleClose}
-            className="-mr-2 ml-auto h-11 w-11 items-center justify-center"
-            accessibilityRole="button"
-            accessibilityLabel="Close menu"
-          >
-            <X size={24} strokeWidth={2} color={colors.gray[600]} />
-          </Pressable>
-        </View>
+              <X size={24} strokeWidth={2} color={colors.gray[600]} />
+            </Pressable>
+          </View>
 
-        <View className="mt-6 border-t border-gray-200 pt-2">
-          <Pressable
-            onPress={handleLogOut}
-            disabled={loggingOut}
-            className="flex-row items-center gap-3 py-4"
-            accessibilityRole="button"
-            accessibilityLabel={loggingOut ? "Logging out" : "Log out"}
-            accessibilityState={{ disabled: loggingOut }}
-          >
-            <LogOut size={22} strokeWidth={2} color={colors.gray[900]} />
-            <Text className="text-base font-medium text-gray-900">
-              {loggingOut ? "Logging out…" : "Log out"}
-            </Text>
-          </Pressable>
-          {logOutFailed ? (
-            <Text accessibilityRole="alert" className="text-sm text-red-600">
-              Couldn&apos;t log out. Try again.
-            </Text>
-          ) : null}
+          <View className="mt-6 border-t border-gray-200 pt-2">
+            <Pressable
+              onPress={handleLogOut}
+              disabled={loggingOut}
+              className="flex-row items-center gap-3 py-4"
+              accessibilityRole="button"
+              accessibilityLabel={loggingOut ? "Logging out" : "Log out"}
+              accessibilityState={{ disabled: loggingOut }}
+            >
+              <LogOut size={22} strokeWidth={2} color={colors.gray[900]} />
+              <Text className="text-base font-medium text-gray-900">
+                {loggingOut ? "Logging out…" : "Log out"}
+              </Text>
+            </Pressable>
+            {logOutFailed ? (
+              <Text accessibilityRole="alert" className="text-sm text-red-600">
+                Couldn&apos;t log out. Try again.
+              </Text>
+            ) : null}
+          </View>
         </View>
       </Animated.View>
     </Modal>
