@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.5.0] - 2026-10-13 — Feat: Bottom nav and Sanity-backed browse
+
+Adds a bottom nav with a menu drawer for signed-in users, imports the full activity catalogue into Sanity with a separate QA dataset, and moves browse onto the API so it shows Sanity content.
+
+### API (`packages/core`)
+
+- Added public `GET /activities/search?q=&offset=&limit=` and `GET /activities/random?count=` endpoints, served from the merged Sanity + mock catalogue with Zod-validated params (`limit` and `count` capped at 50).
+- Neither endpoint requires a session, since results are the same for every user and the content is already public; both sit behind the read rate limiter.
+- Both routes are registered before `/activities/:slug` so `search` and `random` aren't treated as slugs.
+- Deploying requires `fly deploy` on each Fly app; the web and mobile clients get 404s from browse until the API is updated.
+
+### Mobile (`apps/mobile`)
+
+- Added a bottom nav for signed-in users with Home (`/recommendations`) and Browse (`/browse`) tabs, built as an Expo Router tabs layout under `(authed)/(tabs)` with light haptics on press. It's hidden on the activity detail page.
+- Added a Menu cell that opens a right-side drawer showing the user's name and a Log out action, replacing the footer `AuthButton`.
+- Browse now sits behind the auth gate, no longer public as it was in 1.4.0.
+- Browse search and the random set now load from the API, so cards show Sanity images and Sanity-only activities appear; app code no longer imports `@touchgrass/mocks`.
+- Search is debounced by 300ms, so typing sends one request instead of one per keystroke, with the spinner shown while waiting so "no results" doesn't flash.
+- Fixed the menu drawer panel's styling on web and the search field's focus ring, which now follows the rounded container.
+
+### CMS (`apps/sanity`)
+
+- Added a second Studio workspace, **Touchgrass (QA)**, for the new `qa` dataset, switchable from the workspace picker. Production keeps the `default` workspace name and moves to `/production`.
+- Added `scripts/import-mock-activities.ts`, a one-off import of the mock catalogue that skips existing slugs, reads `SANITY_PROJECT_ID` / `SANITY_DATASET` from `.env.local`, and is a dry run unless `--commit` is passed.
+- Both `production` and `qa` now hold all 142 activities. `attend-a-live-sporting-event` has no image because its mock URL returns 404.
+- Run `npm run deploy` in `apps/sanity` to publish the QA workspace to the hosted Studio.
+
 ## [1.4.0] - 2026-10-10 — Feat: Browse page
 
 Adds a public browse screen with paginated search, and limits the pattern match rationale to the user's own recommendations.

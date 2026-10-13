@@ -43,15 +43,46 @@ function listedTitles(): string[] {
   return screen.UNSAFE_getByType(FlatList).props.data.map((a: { title: string }) => a.title)
 }
 
-function typeQuery(text: string) {
+const SEARCH_DEBOUNCE_MS = 300
+
+function changeSearchText(text: string) {
   fireEvent.changeText(screen.getByLabelText("Search activities"), text)
+}
+
+function typeQuery(text: string) {
+  changeSearchText(text)
+  jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS)
 }
 
 describe("BrowsePage", () => {
   beforeEach(() => {
+    jest.useFakeTimers()
     jest.clearAllMocks()
     mockPrefetch.mockResolvedValue(true)
     mockFetchRandomActivities.mockResolvedValue(RECOMMENDATIONS.slice(20, 30))
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("waits for typing to pause before searching", async () => {
+    mockSearchActivities.mockResolvedValue({ items: [], total: 0 })
+    render(<BrowsePage />)
+    await act(async () => {})
+
+    await act(async () => {
+      changeSearchText("g")
+      changeSearchText("gu")
+      changeSearchText("guitar")
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS - 1)
+    })
+    expect(mockSearchActivities).not.toHaveBeenCalled()
+    expect(screen.queryByText("No activities match “guitar”")).toBeNull()
+
+    await act(async () => jest.advanceTimersByTime(1))
+    expect(mockSearchActivities).toHaveBeenCalledTimes(1)
+    expect(mockSearchActivities).toHaveBeenCalledWith("guitar", { offset: 0, limit: 10 })
   })
 
   it("shows ten random activities and no page numbers before searching", async () => {
@@ -134,21 +165,16 @@ describe("BrowsePage", () => {
   })
 
   it("shows the page anyway if the images take longer than the timeout", async () => {
-    jest.useFakeTimers()
-    try {
-      mockSearchActivities.mockResolvedValue({ items: FIRST_PAGE, total: 10 })
-      render(<BrowsePage />)
-      await act(async () => {})
-      mockPrefetch.mockReturnValueOnce(new Promise(() => {}))
+    mockSearchActivities.mockResolvedValue({ items: FIRST_PAGE, total: 10 })
+    render(<BrowsePage />)
+    await act(async () => {})
+    mockPrefetch.mockReturnValueOnce(new Promise(() => {}))
 
-      await act(async () => typeQuery("guitar"))
-      expect(listedTitles()).toEqual([])
+    await act(async () => typeQuery("guitar"))
+    expect(listedTitles()).toEqual([])
 
-      await act(async () => jest.advanceTimersByTime(1500))
-      expect(listedTitles()).toEqual(FIRST_PAGE.map((a) => a.title))
-    } finally {
-      jest.useRealTimers()
-    }
+    await act(async () => jest.advanceTimersByTime(1500))
+    expect(listedTitles()).toEqual(FIRST_PAGE.map((a) => a.title))
   })
 
   it("waits for the random set's images before showing it", async () => {

@@ -1,10 +1,11 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { searchActivities } from "@/lib/browse/api"
 import { prefetchLeadImages } from "@/lib/images/prefetch"
 import type { Activity } from "@touchgrass/types"
 
 const SEARCH_PAGE_SIZE = 10
+const SEARCH_DEBOUNCE_MS = 300
 
 export function useActivitySearch() {
   const [query, setQuery] = useState("")
@@ -13,6 +14,9 @@ export function useActivitySearch() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const latestRequest = useRef(0)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  useEffect(() => () => clearTimeout(debounceTimer.current), [])
 
   async function loadPage(text: string, pageNumber: number) {
     const requestId = ++latestRequest.current
@@ -38,17 +42,21 @@ export function useActivitySearch() {
   function changeQuery(text: string) {
     setQuery(text)
     setPage(1)
+    clearTimeout(debounceTimer.current)
+    latestRequest.current++
     if (!text.trim()) {
-      latestRequest.current++
       setResults([])
       setTotal(0)
       setLoading(false)
       return
     }
-    loadPage(text, 1)
+    // Show the spinner while waiting so "no results" doesn't flash before the search runs.
+    setLoading(true)
+    debounceTimer.current = setTimeout(() => loadPage(text, 1), SEARCH_DEBOUNCE_MS)
   }
 
   function changePage(nextPage: number) {
+    clearTimeout(debounceTimer.current)
     setPage(nextPage)
     loadPage(query, nextPage)
   }
