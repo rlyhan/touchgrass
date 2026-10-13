@@ -121,6 +121,47 @@ test("GET /activities/search is not routed to the slug lookup", async () => {
   assert.equal(getActivityBySlug.mock.callCount(), 0)
 })
 
+type RandomBody = { activities: Activity[] }
+
+test("GET /activities/random returns the requested number of distinct activities", async () => {
+  const res = await fetch(`${baseUrl}/activities/random?count=2`)
+
+  assert.equal(res.status, 200)
+  const { activities } = (await res.json()) as RandomBody
+  const slugs = activities.map((a) => a.slug)
+  assert.equal(slugs.length, 2)
+  assert.equal(new Set(slugs).size, 2)
+  assert.ok(slugs.every((slug) => searchable.some((a) => a.slug === slug)))
+})
+
+test("GET /activities/random returns every activity when count exceeds the pool", async () => {
+  const res = await fetch(`${baseUrl}/activities/random?count=50`)
+
+  assert.equal(res.status, 200)
+  const { activities } = (await res.json()) as RandomBody
+  assert.deepEqual(
+    activities.map((a) => a.slug).sort(),
+    searchable.map((a) => a.slug).sort(),
+  )
+})
+
+test("GET /activities/random returns 400 when count is out of range", async () => {
+  const res = await fetch(`${baseUrl}/activities/random?count=0`)
+
+  assert.equal(res.status, 400)
+  assert.equal(loadRecommendations.mock.callCount(), 0)
+})
+
+test("GET /activities/random works without a session and is not routed to the slug lookup", async () => {
+  getSessionUserId.mock.mockImplementation(async () => null)
+
+  const res = await fetch(`${baseUrl}/activities/random`)
+
+  assert.equal(res.status, 200)
+  assert.equal(getSessionUserId.mock.callCount(), 0)
+  assert.equal(getActivityBySlug.mock.callCount(), 0)
+})
+
 test("GET /activities/:slug returns 200 with the activity when found", async () => {
   const res = await fetch(`${baseUrl}/activities/${activity.slug}`)
 

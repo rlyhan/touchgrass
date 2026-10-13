@@ -86,3 +86,33 @@ export function searchActivitiesHandler({ loadRecommendations }: SearchActivitie
     })
   }
 }
+
+const randomQuerySchema = z.object({
+  count: z.coerce.number().int().min(1).max(50).default(10),
+})
+
+export function randomActivitiesHandler({
+  loadRecommendations,
+}: {
+  loadRecommendations: LoadRecommendations
+}) {
+  return async function handler(req: Request, res: Response): Promise<void> {
+    const parsedQuery = randomQuerySchema.safeParse(req.query)
+    if (!parsedQuery.success) {
+      res.status(400).json({
+        errors: parsedQuery.error.issues.map(({ path, message }) => ({
+          path,
+          message,
+        })),
+      })
+      return
+    }
+
+    const pool = [...(await loadRecommendations())]
+    const activities: Activity[] = []
+    while (activities.length < parsedQuery.data.count && pool.length > 0) {
+      activities.push(...pool.splice(Math.floor(Math.random() * pool.length), 1))
+    }
+    res.status(200).json({ activities })
+  }
+}

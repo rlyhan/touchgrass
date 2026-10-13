@@ -1,4 +1,3 @@
-import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 
 import { apiUrl } from "@/lib/config"
@@ -8,14 +7,14 @@ export type SearchPage = {
   total: number
 }
 
-// Mock-backed until browse moves to the API; signature mirrors the planned
-// GET /activities/random endpoint.
 export async function fetchRandomActivities(count: number): Promise<Activity[]> {
-  const picked = new Set<Activity>()
-  while (picked.size < Math.min(count, RECOMMENDATIONS.length)) {
-    picked.add(RECOMMENDATIONS[Math.floor(Math.random() * RECOMMENDATIONS.length)])
+  const response = await fetch(apiUrl(`/activities/random?count=${count}`))
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch random activities (${response.status})`)
   }
-  return Array.from(picked)
+  const body = (await response.json()) as { activities: Activity[] }
+  return body.activities
 }
 
 export async function searchActivities(

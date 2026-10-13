@@ -14,6 +14,7 @@ import {
   type GetActivityDeps,
   type SearchActivitiesDeps,
   getActivityHandler,
+  randomActivitiesHandler,
   searchActivitiesHandler,
 } from "./activities/route.js"
 import {
@@ -83,8 +84,9 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   app.post("/profiles", ...maybeLimit(profileLimiter), createProfileHandler(deps))
   app.get("/recommendations", ...maybeLimit(readLimiter), getRecommendationsHandler(deps))
   app.get("/pattern-weights", ...maybeLimit(readLimiter), getPatternWeightsHandler(deps))
-  // Must be registered before /activities/:slug, which would otherwise match "search".
+  // Must be registered before /activities/:slug, which would otherwise match "search" and "random".
   app.get("/activities/search", ...maybeLimit(readLimiter), searchActivitiesHandler(deps))
+  app.get("/activities/random", ...maybeLimit(readLimiter), randomActivitiesHandler(deps))
   app.get("/activities/:slug", ...maybeLimit(readLimiter), getActivityHandler(deps))
 
   app.use((_req: Request, res: Response) => {
