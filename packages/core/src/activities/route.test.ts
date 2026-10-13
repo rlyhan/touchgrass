@@ -32,6 +32,13 @@ const getActivityBySlug = mock.fn<(slug: string) => Promise<Activity | null>>(
   async (slug) => (slug === activity.slug ? activity : null),
 )
 
+const searchable: Activity[] = [
+  activity,
+  { ...activity, slug: "hike-a-coastal-trail", title: "Hike a Coastal Trail", type: "Active" },
+  { ...activity, slug: "learn-guitar-chords", title: "Learn Guitar Chords", field: "Music" },
+]
+const loadRecommendations = mock.fn<() => Promise<Activity[]>>(async () => searchable)
+
 let server: Server
 let baseUrl: string
 
@@ -41,7 +48,7 @@ before(() => {
       insertProfile,
       getProfileByAuthUserId,
       getSessionUserId,
-      loadRecommendations: async () => [],
+      loadRecommendations,
       getActivityBySlug,
     },
     { disableRateLimits: true },
@@ -62,6 +69,56 @@ beforeEach(() => {
   getActivityBySlug.mock.mockImplementation(async (slug) =>
     slug === activity.slug ? activity : null,
   )
+  loadRecommendations.mock.resetCalls()
+})
+
+type SearchBody = { items: Activity[]; total: number }
+
+test("GET /activities/search matches title, field and type case-insensitively", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?q=${encodeURIComponent("  MUSIC ")}`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.deepEqual(body.items.map((a) => a.slug), ["learn-guitar-chords"])
+  assert.equal(body.total, 1)
+})
+
+test("GET /activities/search pages results with offset and limit", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?q=a&offset=1&limit=1`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.deepEqual(body.items.map((a) => a.slug), ["hike-a-coastal-trail"])
+  assert.equal(body.total, 3)
+})
+
+test("GET /activities/search returns 400 for an empty query", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?q=%20%20`)
+
+  assert.equal(res.status, 400)
+  assert.equal(loadRecommendations.mock.callCount(), 0)
+})
+
+test("GET /activities/search returns 400 when limit is out of range", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?q=a&limit=500`)
+
+  assert.equal(res.status, 400)
+  assert.equal(loadRecommendations.mock.callCount(), 0)
+})
+
+test("GET /activities/search works without a session", async () => {
+  getSessionUserId.mock.mockImplementation(async () => null)
+
+  const res = await fetch(`${baseUrl}/activities/search?q=a`)
+
+  assert.equal(res.status, 200)
+  assert.equal(getSessionUserId.mock.callCount(), 0)
+})
+
+test("GET /activities/search is not routed to the slug lookup", async () => {
+  await fetch(`${baseUrl}/activities/search?q=a`)
+
+  assert.equal(getActivityBySlug.mock.callCount(), 0)
 })
 
 test("GET /activities/:slug returns 200 with the activity when found", async () => {
