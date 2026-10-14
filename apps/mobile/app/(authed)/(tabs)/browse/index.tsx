@@ -1,9 +1,10 @@
 import { useRef, useState } from "react"
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native"
+import { ActivityIndicator, FlatList, Text, View } from "react-native"
 
 import type { ListedActivity } from "@/components/activities/activity-list"
 import { ActivityListScreen } from "@/components/activities/activity-list-screen"
 import { Pagination } from "@/components/ui/pagination"
+import { Pill } from "@/components/ui/pill"
 import { SearchField } from "@/components/ui/search-field"
 import { useActivitySearch } from "@/lib/browse/use-activity-search"
 import { useRandomActivities } from "@/lib/browse/use-random-activities"
@@ -103,20 +104,16 @@ export default function BrowsePage() {
           <View className="mb-4 flex flex-row gap-2">
             {FILTERS.map((filter) => {
               const open = filter.key === openFilterKey
-              const Chevron = open ? ChevronUp : ChevronDown
               return (
-                <Pressable
+                <Pill
                   key={filter.key}
+                  label={filter.btnLabel}
+                  active={open}
+                  trailingIcon={open ? ChevronUp : ChevronDown}
                   onPress={() => setOpenFilterKey(open ? null : filter.key)}
                   accessibilityRole="button"
                   accessibilityState={{ expanded: open }}
-                  className={`flex flex-row items-center gap-2 rounded-2xl py-2 pl-4 pr-2 ${
-                    open ? "bg-emerald-800" : "bg-gray-100"
-                  }`}
-                >
-                  <Text className={open ? "text-white" : "text-gray-700"}>{filter.btnLabel}</Text>
-                  <Chevron size={18} color={open ? colors.white : colors.gray[600]} />
-                </Pressable>
+                />
               )
             })}
           </View>
@@ -124,24 +121,19 @@ export default function BrowsePage() {
             <View className="mb-6 flex-row flex-wrap gap-2">
               {openFilter.options.map((option) => {
                 const selected = selectedOptions[openFilter.key]?.includes(option) ?? false
-                const Icon = openFilter.getIcon(option)
                 return (
-                  <Pressable
+                  <Pill
                     key={option}
+                    label={option}
+                    active={selected}
+                    size="sm"
+                    leadingIcon={openFilter.getIcon(option)}
+                    trailingIcon={selected ? X : undefined}
                     onPress={() => toggleOption(openFilter.key, option)}
                     accessibilityRole="togglebutton"
                     accessibilityLabel={selected ? `Remove ${option} filter` : option}
                     accessibilityState={{ selected }}
-                    className={`flex-row items-center gap-1.5 rounded-full py-1.5 pl-3 ${
-                      selected ? "bg-emerald-800 pr-2" : "bg-gray-100 pr-3"
-                    }`}
-                  >
-                    <Icon size={14} color={selected ? colors.white : colors.gray[600]} />
-                    <Text className={`text-sm ${selected ? "text-white" : "text-gray-700"}`}>
-                      {option}
-                    </Text>
-                    {selected ? <X size={14} color={colors.white} /> : null}
-                  </Pressable>
+                  />
                 )
               })}
             </View>
