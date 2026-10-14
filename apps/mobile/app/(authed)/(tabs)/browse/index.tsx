@@ -3,15 +3,15 @@ import { ActivityIndicator, FlatList, Text, View } from "react-native"
 
 import type { ListedActivity } from "@/components/activities/activity-list"
 import { ActivityListScreen } from "@/components/activities/activity-list-screen"
+import { FilterButton } from "@/components/browse/filter-button"
+import { FilterOption } from "@/components/browse/filter-option"
 import { Pagination } from "@/components/ui/pagination"
-import { Pill } from "@/components/ui/pill"
 import { SearchField } from "@/components/ui/search-field"
 import { useActivitySearch } from "@/lib/browse/use-activity-search"
 import { useRandomActivities } from "@/lib/browse/use-random-activities"
 import { getActivityTypeIcon, getFieldIcon, TimeIcon } from "@/lib/icons"
 import { colors } from "@/lib/theme/colors"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
-import { ChevronDown, ChevronUp, X } from "lucide-react-native"
 
 const FILTERS = [
   {
@@ -105,37 +105,26 @@ export default function BrowsePage() {
             {FILTERS.map((filter) => {
               const open = filter.key === openFilterKey
               return (
-                <Pill
+                <FilterButton
                   key={filter.key}
                   label={filter.btnLabel}
-                  active={open}
-                  trailingIcon={open ? ChevronUp : ChevronDown}
-                  onPress={() => setOpenFilterKey(open ? null : filter.key)}
-                  accessibilityRole="button"
-                  accessibilityState={{ expanded: open }}
+                  open={open}
+                  onToggle={() => setOpenFilterKey(open ? null : filter.key)}
                 />
               )
             })}
           </View>
           {openFilter ? (
             <View className="mb-6 flex-row flex-wrap gap-2">
-              {openFilter.options.map((option) => {
-                const selected = selectedOptions[openFilter.key]?.includes(option) ?? false
-                return (
-                  <Pill
-                    key={option}
-                    label={option}
-                    active={selected}
-                    size="sm"
-                    leadingIcon={openFilter.getIcon(option)}
-                    trailingIcon={selected ? X : undefined}
-                    onPress={() => toggleOption(openFilter.key, option)}
-                    accessibilityRole="togglebutton"
-                    accessibilityLabel={selected ? `Remove ${option} filter` : option}
-                    accessibilityState={{ selected }}
-                  />
-                )
-              })}
+              {openFilter.options.map((option) => (
+                <FilterOption
+                  key={option}
+                  label={option}
+                  icon={openFilter.getIcon(option)}
+                  selected={selectedOptions[openFilter.key]?.includes(option) ?? false}
+                  onToggle={() => toggleOption(openFilter.key, option)}
+                />
+              ))}
             </View>
           ) : null}
         </>
