@@ -9,7 +9,7 @@ import { Pagination } from "@/components/ui/pagination"
 import { SearchField } from "@/components/ui/search-field"
 import { useActivitySearch } from "@/lib/browse/use-activity-search"
 import { useRandomActivities } from "@/lib/browse/use-random-activities"
-import { getActivityTypeIcon, getFieldIcon, TimeIcon } from "@/lib/icons"
+import { getActivityTypeIcon, getFieldIcon } from "@/lib/icons"
 import { colors } from "@/lib/theme/colors"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
@@ -25,12 +25,6 @@ const FILTERS = [
     btnLabel: "Field",
     options: [...ACTIVITY_FIELDS].sort(),
     getIcon: getFieldIcon,
-  },
-  {
-    key: "time",
-    btnLabel: "Time",
-    options: ["Under 1 hour", "1–3 hours", "Half day", "Full day"],
-    getIcon: () => TimeIcon,
   },
 ]
 
