@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.6.0] - 2026-10-15 — Feat: Browse filters by activity type and field
+
+Adds multi-select Activity type and Field filters to browse, applied by the API.
+
+### API (`packages/core`)
+
+- `GET /activities/search` accepts comma-separated `type` and `field` filters, matched against an activity's primary type and field.
+- `q` is now optional, so results can be filtered without a search term.
+- Requires `fly deploy` on each Fly app; older APIs reject filtered requests.
+
+### Mobile (`apps/mobile`)
+
+- Added Activity type and Field filters to browse, with selectable option pills that load filtered, paginated results.
+- Added `Pill`, `FilterButton` and `FilterOption` components.
+
+### Docs (`context`)
+
+- Added a test naming rule to the coding standards.
+
 ## [1.5.0] - 2026-10-13 — Feat: Bottom nav and Sanity-backed browse
 
 Adds a bottom nav with a menu drawer for signed-in users, imports the full activity catalogue into Sanity with a separate QA dataset, and moves browse onto the API so it shows Sanity content.
