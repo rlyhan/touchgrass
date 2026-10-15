@@ -33,21 +33,8 @@ export default function BrowsePage() {
   const search = useActivitySearch()
   const listRef = useRef<FlatList<ListedActivity>>(null)
   const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({})
 
   const openFilter = FILTERS.find((filter) => filter.key === openFilterKey)
-
-  function toggleOption(filterKey: string, option: string) {
-    setSelectedOptions((prev) => {
-      const current = prev[filterKey] ?? []
-      return {
-        ...prev,
-        [filterKey]: current.includes(option)
-          ? current.filter((o) => o !== option)
-          : [...current, option],
-      }
-    })
-  }
 
   function handlePageChange(nextPage: number) {
     listRef.current?.scrollToOffset({ offset: 0, animated: true })
@@ -65,7 +52,9 @@ export default function BrowsePage() {
       empty={
         showNoResults ? (
           <Text className="text-center text-base text-gray-500">
-            No activities match &ldquo;{search.query.trim()}&rdquo;
+            {search.query.trim()
+              ? `No activities match “${search.query.trim()}”`
+              : "No activities match the selected filters"}
           </Text>
         ) : null
       }
@@ -115,8 +104,8 @@ export default function BrowsePage() {
                   key={option}
                   label={option}
                   icon={openFilter.getIcon(option)}
-                  selected={selectedOptions[openFilter.key]?.includes(option) ?? false}
-                  onToggle={() => toggleOption(openFilter.key, option)}
+                  selected={search.filters[openFilter.key]?.includes(option) ?? false}
+                  onToggle={() => search.toggleFilter(openFilter.key, option)}
                 />
               ))}
             </View>

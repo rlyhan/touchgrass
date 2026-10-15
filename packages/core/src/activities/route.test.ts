@@ -92,8 +92,40 @@ test("GET /activities/search pages results with offset and limit", async () => {
   assert.equal(body.total, 3)
 })
 
-test("GET /activities/search returns 400 for an empty query", async () => {
+test("GET /activities/search returns every activity when the query is empty", async () => {
   const res = await fetch(`${baseUrl}/activities/search?q=%20%20`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.equal(body.total, searchable.length)
+})
+
+test("GET /activities/search filters by any of the selected types", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?type=Active,Analytical`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.deepEqual(body.items.map((a) => a.slug), ["hike-a-coastal-trail"])
+})
+
+test("GET /activities/search requires a match on both type and field", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?type=Reflective&field=Music`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.deepEqual(body.items.map((a) => a.slug), ["learn-guitar-chords"])
+})
+
+test("GET /activities/search combines filters with the text query", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?q=stargaze&field=Music`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.equal(body.total, 0)
+})
+
+test("GET /activities/search returns 400 for an unknown filter value", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?field=Juggling`)
 
   assert.equal(res.status, 400)
   assert.equal(loadRecommendations.mock.callCount(), 0)

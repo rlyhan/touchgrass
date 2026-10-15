@@ -2,6 +2,7 @@ import type { Request, Response } from "express"
 import { z } from "zod"
 
 import type { Activity } from "@touchgrass/types"
+import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
 import type { LoadRecommendations } from "../recommendations/source.js"
 
@@ -54,8 +55,18 @@ export type SearchActivitiesDeps = {
   loadRecommendations: LoadRecommendations
 }
 
+function commaSeparated<T extends string>(values: readonly T[]) {
+  return z
+    .string()
+    .transform((value) => value.split(",").filter(Boolean))
+    .pipe(z.array(z.enum(values)))
+    .optional()
+}
+
 const searchQuerySchema = z.object({
-  q: z.string().trim().min(1).max(100),
+  q: z.string().trim().max(100).default(""),
+  type: commaSeparated(ACTIVITY_TYPES),
+  field: commaSeparated(ACTIVITY_FIELDS),
   offset: z.coerce.number().int().min(0).default(0),
   limit: z.coerce.number().int().min(1).max(50).default(10),
 })
@@ -73,12 +84,15 @@ export function searchActivitiesHandler({ loadRecommendations }: SearchActivitie
       return
     }
 
-    const { q, offset, limit } = parsedQuery.data
+    const { q, type, field, offset, limit } = parsedQuery.data
     const query = q.toLowerCase()
-    const matches = (await loadRecommendations()).filter((activity) =>
-      [activity.title, activity.field, activity.type].some((value) =>
-        value.toLowerCase().includes(query),
-      ),
+    const matches = (await loadRecommendations()).filter(
+      (activity) =>
+        (!type?.length || type.includes(activity.type)) &&
+        (!field?.length || field.includes(activity.field)) &&
+        [activity.title, activity.field, activity.type].some((value) =>
+          value.toLowerCase().includes(query),
+        ),
     )
     res.status(200).json({
       items: matches.slice(offset, offset + limit),
