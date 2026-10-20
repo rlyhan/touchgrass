@@ -10,6 +10,7 @@ import {
 
 const SECONDARY_WEIGHT = 0.2
 const MAX_RECOMMENDATIONS = 10
+const RECOMMENDED_SD_MULTIPLIER = 0.5
 const TOP_ACTIVITY_TYPES_COUNT = 6
 
 /*
@@ -48,20 +49,31 @@ export function scoreRecommendation(userPatternWeights: Record<PatternTypeId, nu
  * Returns scored, diversified recommendations for a user.
  * Converts BFAS traits → OCEAN → NEO pattern weights, scores each recommendation
  * (including motivation boost), then applies interest-aware diversification and bucket
- * ordering before capping the result.
+ * ordering before capping the result. Also returns the slugs browse labels as recommended:
+ * every activity scoring at least half a standard deviation above the user's mean score.
  */
 export function getRecommendations(
     userTraits: BFASScores,
     motivations: Motivation[],
     interests: ActivityField[],
     activities: Activity[],
-): ScoredRecommendation[] {
+): { recommendations: ScoredRecommendation[]; recommendedSlugs: string[] } {
     const bfasToOCEAN = getOCEANScores(userTraits)
     const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
 
     const scoredRecommendations = activities.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
+    const ordered = diversifyAndOrder(scoredRecommendations, interests)
 
-    return diversifyAndOrder(scoredRecommendations, interests).slice(0, MAX_RECOMMENDATIONS)
+    const scores = scoredRecommendations.map((s) => s.score)
+    const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length
+    const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
+
+    return {
+        recommendations: ordered.slice(0, MAX_RECOMMENDATIONS),
+        recommendedSlugs: scoredRecommendations
+            .filter((s) => s.score >= mean + sd * RECOMMENDED_SD_MULTIPLIER)
+            .map((s) => s.rec.slug),
+    }
 }
 
 /* Returns the top-scoring activity types for a user based on their BFAS traits. */

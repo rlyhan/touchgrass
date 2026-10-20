@@ -84,6 +84,15 @@ test("getMotivationAndActivitySharedPatterns returns empty when primary type is 
   assert.deepEqual(result, [])
 })
 
+test("getMotivationAndActivitySharedPatterns returns empty when no activity type matches, even if patterns overlap", () => {
+  // Analytical shares 9-HH with Creative, but neither the primary nor any related type is a creative type
+  const result = getMotivationAndActivitySharedPatterns({
+    activity: makeRec("Analytical", ["Intellectual", "Educational", "Reflective", "Disciplined"]),
+    motivations: [creativeMotivation],
+  })
+  assert.deepEqual(result, [])
+})
+
 test("getMotivationAndActivitySharedPatterns returns patterns when primary type matches a motivation (e.g. Creative → composing music)", () => {
   const result = getMotivationAndActivitySharedPatterns({
     activity: makeRec("Creative"),

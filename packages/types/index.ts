@@ -236,6 +236,7 @@ export type RecommendedActivity = Activity & {
 export type RecommendationsResponse = {
   recommendations: RecommendedActivity[]
   patternWeights: UserPatternWeights
+  recommendedSlugs: string[]
 }
 
 export type PatternWeightsResponse = {

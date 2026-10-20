@@ -7,12 +7,12 @@ import type {
 } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 import type { Profile } from "../db/schema.js"
-import { getRecommendations } from "../lib/recommendation-algorithm.js"
 import {
   getDominantPatternId,
   getOCEANScores,
   getUserPatternWeights,
 } from "../lib/helpers/index.js"
+import { getRecommendations } from "../lib/recommendation-algorithm.js"
 import type { LoadRecommendations } from "./source.js"
 
 export type GetRecommendationsDeps = {
@@ -46,17 +46,17 @@ export function getRecommendationsHandler({
       (ACTIVITY_FIELDS as readonly string[]).includes(i),
     )
     const patternWeights = getUserPatternWeights(getOCEANScores(personality))
-    const recommendations: RecommendationsResponse["recommendations"] =
-      getRecommendations(
-        personality,
-        motivations,
-        interests,
-        await loadRecommendations(),
-      ).map((s) => ({
-        ...s.rec,
-        dominantPatternId: getDominantPatternId(patternWeights, s.rec),
-      }))
-    const body: RecommendationsResponse = { recommendations, patternWeights }
+    const { recommendations: scored, recommendedSlugs } = getRecommendations(
+      personality,
+      motivations,
+      interests,
+      await loadRecommendations(),
+    )
+    const recommendations: RecommendationsResponse["recommendations"] = scored.map((s) => ({
+      ...s.rec,
+      dominantPatternId: getDominantPatternId(patternWeights, s.rec),
+    }))
+    const body: RecommendationsResponse = { recommendations, patternWeights, recommendedSlugs }
     res.status(200).json(body)
   }
 }

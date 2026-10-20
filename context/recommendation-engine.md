@@ -104,6 +104,7 @@ Each pattern type belongs to a group that intersects two OCEAN traits, with a hi
 ## Outputs
 
 - `getRecommendations` returns the top 3 best-match recommendations (`ScoredRecommendation[]`) after scoring and diversification.
+- It also returns `recommendedSlugs`, which browse labels "Recommended for you": every activity whose final score (step 4, base + motivation boost) is at least half a standard deviation above the user's mean score across the catalogue, without diversification. The cutoff is relative to each user because the motivation boost grows with the number of motivations selected, so absolute final scores aren't comparable across users.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity (`ScoredActivityType[]`), independent of any specific recommendation list.
 
 ---
