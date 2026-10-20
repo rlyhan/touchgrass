@@ -30,6 +30,7 @@ interface ActivityCardProps {
   field: string
   estimatedTime?: string
   size?: "default" | "large"
+  recommended?: boolean
 }
 
 export function ActivityCard({
@@ -39,6 +40,7 @@ export function ActivityCard({
   field,
   estimatedTime,
   size = "default",
+  recommended = false,
 }: ActivityCardProps) {
   const TypeIcon = getActivityTypeIcon(type)
   const FieldIcon = getFieldIcon(field)
@@ -68,6 +70,11 @@ export function ActivityCard({
             locations={[0, 0.5, 1]}
             style={{ position: "absolute", inset: 0 }}
           />
+          {recommended ? (
+            <View className="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1">
+              <Text className="text-xs font-semibold text-white">Recommended for you</Text>
+            </View>
+          ) : null}
           {isLarge ? (
             <View className="absolute bottom-0 left-0 right-0 p-5">
               <Text className="text-2xl font-bold leading-tight text-white">

@@ -5,7 +5,10 @@ import { FlatList, Pressable, View, type FlatListProps } from "react-native"
 import { ActivityCard } from "@/components/activities/activity-card"
 import type { Activity, PatternTypeId } from "@touchgrass/types"
 
-export type ListedActivity = Activity & { dominantPatternId?: PatternTypeId | null }
+export type ListedActivity = Activity & {
+  dominantPatternId?: PatternTypeId | null
+  recommended?: boolean
+}
 
 type Props = Omit<FlatListProps<ListedActivity>, "data" | "renderItem" | "keyExtractor"> & {
   activities: ListedActivity[]
@@ -33,6 +36,7 @@ export function ActivityList({ activities, ref, ...listProps }: Props) {
           type={activity.type}
           field={activity.field}
           estimatedTime={activity.estimated_time}
+          recommended={activity.recommended}
         />
       </Pressable>
     ),

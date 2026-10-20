@@ -26,6 +26,7 @@ jest.mock("@/components/icons/grass-logo", () => require("@/test-utils/mocks").g
 jest.mock("@/components/activities/activity-card", () => require("@/test-utils/mocks").activityCardMock)
 
 import * as BrowseApi from "@/lib/browse/api"
+import { clearRecommendedSlugs, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import { Image } from "expo-image"
@@ -61,6 +62,7 @@ describe("BrowsePage", () => {
     jest.clearAllMocks()
     mockPrefetch.mockResolvedValue(true)
     mockFetchRandomActivities.mockResolvedValue(RECOMMENDATIONS.slice(20, 30))
+    clearRecommendedSlugs()
   })
 
   afterEach(() => {
@@ -93,6 +95,21 @@ describe("BrowsePage", () => {
     expect(listedTitles()).toHaveLength(10)
     expect(mockSearchActivities).not.toHaveBeenCalled()
     expect(screen.queryByRole("button", { name: "Page 1" })).toBeNull()
+  })
+
+  it("flags only the activities in the user's recommended slugs", async () => {
+    const randomActivities = RECOMMENDATIONS.slice(20, 30)
+    const recommendedSlugs = [randomActivities[0].slug, randomActivities[3].slug]
+    render(<BrowsePage />)
+    await act(async () => {})
+
+    await act(async () => setRecommendedSlugs(recommendedSlugs))
+
+    const flaggedSlugs = screen
+      .UNSAFE_getByType(FlatList)
+      .props.data.filter((a: { recommended: boolean }) => a.recommended)
+      .map((a: { slug: string }) => a.slug)
+    expect(flaggedSlugs).toEqual(recommendedSlugs)
   })
 
   it("lets card taps through while the keyboard is open and dismisses it on scroll", async () => {

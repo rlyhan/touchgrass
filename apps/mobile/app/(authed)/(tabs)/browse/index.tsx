@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { ActivityIndicator, FlatList, Text, View } from "react-native"
 
 import type { ListedActivity } from "@/components/activities/activity-list"
@@ -10,6 +10,7 @@ import { SearchField } from "@/components/ui/search-field"
 import { useActivitySearch } from "@/lib/browse/use-activity-search"
 import { useRandomActivities } from "@/lib/browse/use-random-activities"
 import { getActivityTypeIcon, getFieldIcon } from "@/lib/icons"
+import { useRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { colors } from "@/lib/theme/colors"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
@@ -31,10 +32,21 @@ const FILTERS = [
 export default function BrowsePage() {
   const randomActivities = useRandomActivities()
   const search = useActivitySearch()
+  const recommendedSlugs = useRecommendedSlugs()
   const listRef = useRef<FlatList<ListedActivity>>(null)
   const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
 
   const openFilter = FILTERS.find((filter) => filter.key === openFilterKey)
+
+  const shownActivities = search.searching ? search.results : randomActivities
+  const activities = useMemo(
+    () =>
+      (shownActivities ?? []).map((activity) => ({
+        ...activity,
+        recommended: recommendedSlugs.has(activity.slug),
+      })),
+    [shownActivities, recommendedSlugs],
+  )
 
   function handlePageChange(nextPage: number) {
     listRef.current?.scrollToOffset({ offset: 0, animated: true })
@@ -48,7 +60,7 @@ export default function BrowsePage() {
   return (
     <ActivityListScreen
       listRef={listRef}
-      activities={search.searching ? search.results : (randomActivities ?? [])}
+      activities={activities}
       empty={
         showNoResults ? (
           <Text className="text-center text-base text-gray-500">

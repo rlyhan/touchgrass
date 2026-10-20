@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { signOut, useSession } from "@/lib/auth/client"
 import { clearPatternWeightsCache } from "@/lib/patterns/cache"
+import { clearRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { colors } from "@/lib/theme/colors"
 
 type Props = {
@@ -41,8 +42,9 @@ export function MenuDrawer({ visible, onClose }: Props) {
       setLogOutFailed(true)
       return
     }
-    // Drop cached pattern weights so the next user doesn't inherit them.
+    // Drop cached per-user data so the next user doesn't inherit it.
     clearPatternWeightsCache()
+    clearRecommendedSlugs()
     onClose()
     router.replace("/sign-in" as Href)
   }
