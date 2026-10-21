@@ -1,42 +1,11 @@
-import { Activity, ActivityField, BFASScores, Motivation, PatternTypeId, ScoredActivityType, ScoredRecommendation } from "@touchgrass/types";
-import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants";
-import {
-    calculateActivityPatternAffinity,
-    calculateMotivationBoost,
-    diversifyAndOrder,
-    getOCEANScores,
-    getUserPatternWeights,
-} from "./helpers/index.js";
+import { Activity, ActivityField, BFASScores, Motivation, PatternTypeId, ScoredRecommendation } from "@touchgrass/types";
+import { calculateMotivationBoost, diversifyAndOrder } from "./helpers/index.js";
+import { calculateRecommendationBaseScore } from "./recommendations/personality/base-score.js";
+import { getOCEANScores } from "./recommendations/personality/ocean.js";
+import { getUserPatternWeights } from "./recommendations/personality/patterns.js";
 
-const SECONDARY_WEIGHT = 0.2
 const MAX_RECOMMENDATIONS = 10
 const RECOMMENDED_SD_MULTIPLIER = 0.5
-const TOP_ACTIVITY_TYPES_COUNT = 6
-
-/*
- * Calculates the base score for a recommendation based on pattern affinity.
- * Primary affinity is the anchor; secondary affinity adds a small bonus on top
- * so a strong primary match isn't dragged down by a weaker secondary match.
- *
- * eg. "Spend a Month Visiting Antique Markets" -> type: Exploratory, related_types: Social, Reflective
- * User's match with primary patterns = 0.63, secondary patterns = 0.59
- * Base score = 0.63 + (0.59 * 0.2) = 0.748
- */
-export function calculateRecommendationBaseScore(
-    userPatternWeights: Record<PatternTypeId, number>,
-    recommendation: Activity,
-): number {
-    const primaryPatterns = ACTIVITY_TYPE_PATTERNS[recommendation.type] ?? []
-    const primaryAffinity = calculateActivityPatternAffinity(userPatternWeights, primaryPatterns)
-
-    const secondaryPatterns = (recommendation.related_types ?? []).flatMap(
-        (t) => ACTIVITY_TYPE_PATTERNS[t] ?? []
-    )
-    if (secondaryPatterns.length === 0) return primaryAffinity
-
-    const secondaryAffinity = calculateActivityPatternAffinity(userPatternWeights, secondaryPatterns)
-    return primaryAffinity + secondaryAffinity * SECONDARY_WEIGHT
-}
 
 /* Combines base pattern affinity with motivation boost to produce a final score. */
 export function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, recommendation: Activity, motivations: Motivation[]): ScoredRecommendation {
@@ -74,25 +43,4 @@ export function getRecommendations(
             .filter((s) => s.score >= mean + sd * RECOMMENDED_SD_MULTIPLIER)
             .map((s) => s.rec.slug),
     }
-}
-
-/* Returns the top-scoring activity types for a user based on their BFAS traits. */
-export function getTopActivityTypes(
-    userTraits: BFASScores,
-    count: number = TOP_ACTIVITY_TYPES_COUNT,
-): ScoredActivityType[] {
-    const bfasToOCEAN = getOCEANScores(userTraits)
-    const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
-
-    const scored: ScoredActivityType[] = ACTIVITY_TYPES.map((type) => ({
-        type,
-        score: calculateActivityPatternAffinity(
-            userPatternWeights,
-            ACTIVITY_TYPE_PATTERNS[type] ?? [],
-        ),
-    }))
-
-    scored.sort((a, b) => b.score - a.score)
-
-    return scored.slice(0, count)
 }
