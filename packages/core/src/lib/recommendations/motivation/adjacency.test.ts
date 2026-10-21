@@ -7,7 +7,7 @@ import {
   calculatePatternDistance,
   getAdjacentPatterns,
   MATCH_WEIGHTS,
-} from "./patterns.js"
+} from "./adjacency.js"
 
 // ─── calculatePatternDistance ────────────────────────────────────────────────
 

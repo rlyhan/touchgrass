@@ -6,7 +6,7 @@ import type { Activity, ActivityField, BFASScores, PatternTypeId } from "@touchg
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import { getRecommendations, scoreRecommendation } from "./recommendation-algorithm.js"
-import { calculateMotivationBoost } from "./helpers/index.js"
+import { calculateMotivationBoost } from "./recommendations/motivation/boost.js"
 import { calculateRecommendationBaseScore } from "./recommendations/personality/base-score.js"
 import { getOCEANScores } from "./recommendations/personality/ocean.js"
 import { getUserPatternWeights } from "./recommendations/personality/patterns.js"

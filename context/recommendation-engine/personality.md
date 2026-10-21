@@ -88,5 +88,5 @@ Primary affinity is the anchor; secondary affinity can only add a bonus (up to +
 - **Missing pattern weights count as 0**, and an empty pattern list gives an affinity of 0. (`patterns.test.ts`, `base-score.test.ts`)
 - **Related types are pooled, not averaged per type.** More related types means each one counts for less. (`base-score.test.ts`)
 - **A pattern shared by several related types counts once per type.** Creative and Artistic both include `4-HH`, so with both as related types `4-HH` is weighted twice in the secondary pool. `getDominantPatternId` deduplicates; the base score doesn't. (`base-score.test.ts`, `dominant-pattern.test.ts`)
-- **The same pattern can belong to unrelated types** (e.g. `9-HH` is in both Creative and Analytical). This matters for motivations, which match by type, not pattern. (`helpers/motivation.test.ts`)
+- **The same pattern can belong to unrelated types** (e.g. `9-HH` is in both Creative and Analytical). This matters for motivations, which match by type, not pattern. (`motivation/boost.test.ts`)
 - **Personality alone doesn't earn the browse label.** An activity with a strong base score but no motivation boost usually falls below the user's `recommendedSlugs` cutoff (covered in `recommendation-algorithm.test.ts`).

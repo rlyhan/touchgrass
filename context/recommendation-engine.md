@@ -12,6 +12,7 @@ The recommendation engine is responsible for generating personalised activity su
 Each factor has its own doc covering what it affects, what it never affects, and its edge cases:
 
 - [Personality](recommendation-engine/personality.md) — BFAS → OCEAN → pattern weights → base score (steps 1–3 below)
+- [Motivation](recommendation-engine/motivation.md) — motivation boost added to the base score (step 4 below)
 
 ---
 
@@ -33,25 +34,15 @@ Each factor has its own doc covering what it affects, what it never affects, and
 
 ## Algorithm Flow
 
-Implemented in [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts). Personality lives in [`packages/core/src/lib/recommendations/personality/`](../packages/core/src/lib/recommendations/personality/); motivation and diversification helpers are still in [`packages/core/src/lib/helpers/`](../packages/core/src/lib/helpers/) (`patterns.ts`, `motivation.ts`, `diversify.ts`).
+Implemented in [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts). Personality and motivation live in [`packages/core/src/lib/recommendations/`](../packages/core/src/lib/recommendations/) (`personality/`, `motivation/`); diversification is still in [`packages/core/src/lib/helpers/diversify.ts`](../packages/core/src/lib/helpers/diversify.ts).
 
 ### 1–3. Personality → base score
 
 BFAS scores are converted to OCEAN, then to a weight for each of the 40 pattern types, then to a base score per activity (`primary + secondary × 0.2`). See [Personality](recommendation-engine/personality.md) for the full method, scale reference and edge cases.
 
-### 4. Apply motivation boost
+### 4. Motivation boost → final score
 
-Each motivation has a set of `associated_activity_types`. The boost rewards activities whose type/related_types overlap with the user's selected motivations.
-
-1. Find the **shared patterns** — the union of pattern IDs from any activity type that appears in both the recommendation's type/related_types and the motivation's associated types.
-2. For each shared target pattern, accumulate:
-   - `userWeight[target] × 1.0` (exact match)
-   - `userWeight[adjacent] × 0.65` for each distance-1 neighbour in the same pattern group (strong adjacent)
-   - `userWeight[adjacent] × 0.5` for each distance-2 neighbour (weak adjacent)
-3. **Motivation boost** = sum / `normalizationFactor` (default 5), keeping it modest relative to the base score.
-4. **Final score** = `base + motivationBoost`
-
-The adjacent-pattern step means a user who fits a neighbouring pattern still benefits even if they don't perfectly match the target, weighted proportionally by their actual pattern weight. Done by `calculateMotivationBoost` and helpers `getMotivationAndActivitySharedPatterns` / `getAdjacentPatterns` in `helpers/motivation.ts` and `helpers/patterns.ts`.
+Activities whose type or related types match a selected motivation get a boost built from the user's weights for those types' patterns and their neighbouring patterns. **Final score** = `base + motivationBoost`. See [Motivation](recommendation-engine/motivation.md) for the full method, scale reference and edge cases.
 
 ### 5. Diversify and order
 
