@@ -1,5 +1,5 @@
 import { Activity, ActivityField, BFASScores, Motivation, PatternTypeId, ScoredRecommendation } from "@touchgrass/types";
-import { diversifyAndOrder } from "./helpers/index.js";
+import { diversifyAndOrder } from "./recommendations/diversify.js";
 import { calculateMotivationBoost } from "./recommendations/motivation/boost.js";
 import { calculateRecommendationBaseScore } from "./recommendations/personality/base-score.js";
 import { getOCEANScores } from "./recommendations/personality/ocean.js";

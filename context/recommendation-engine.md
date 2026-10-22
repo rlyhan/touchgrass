@@ -13,6 +13,7 @@ Each factor has its own doc covering what it affects, what it never affects, and
 
 - [Personality](recommendation-engine/personality.md) — BFAS → OCEAN → pattern weights → base score (steps 1–3 below)
 - [Motivation](recommendation-engine/motivation.md) — motivation boost added to the base score (step 4 below)
+- [Interests](recommendation-engine/interests.md) — buckets and the interest pass that order the recommendations screen (step 5 below)
 
 ---
 
@@ -34,7 +35,7 @@ Each factor has its own doc covering what it affects, what it never affects, and
 
 ## Algorithm Flow
 
-Implemented in [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts). Personality and motivation live in [`packages/core/src/lib/recommendations/`](../packages/core/src/lib/recommendations/) (`personality/`, `motivation/`); diversification is still in [`packages/core/src/lib/helpers/diversify.ts`](../packages/core/src/lib/helpers/diversify.ts).
+Implemented in [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts). Each factor lives in its own folder under [`packages/core/src/lib/recommendations/`](../packages/core/src/lib/recommendations/) (`personality/`, `motivation/`, `interests/`), and the final ordering is in `diversify.ts` there.
 
 ### 1–3. Personality → base score
 
@@ -46,25 +47,14 @@ Activities whose type or related types match a selected motivation get a boost b
 
 ### 5. Diversify and order
 
-After scoring, `diversifyAndOrder` (in `helpers/diversify.ts`) produces the final ordered list before the top 10 (`MAX_RECOMMENDATIONS`) are taken.
+`diversifyAndOrder` (in `diversify.ts`) produces the final order before the top 10 (`MAX_RECOMMENDATIONS`) are taken:
 
-**Bucket classification** — each recommendation is placed into one of three buckets based on score and whether its `field` is one of the user's interests:
+1. **Buckets** — each activity goes into top, middle or bottom by score and whether its field is an interest ([Interests](recommendation-engine/interests.md)).
+2. **Interest pass** — the best top-bucket activity for each interest, in the order the interests were tapped in onboarding ([Interests](recommendation-engine/interests.md)).
+3. **Activity-type pass** — from the remaining top bucket plus middle activities with `sortScore ≥ 0.6`, the first activity of each type not yet picked.
+4. **The rest** — appended top → middle → bottom, each sorted by `sortScore` descending.
 
-| Condition | Bucket | sortScore |
-|-----------|--------|-----------|
-| score ≥ 0.6 AND field in interests | top | score |
-| score ≥ 0.6 AND field not in interests | middle | score |
-| score in [0.4, 0.6) AND field in interests | middle | score + 0.1 |
-| everything else | bottom | score |
-
-The +0.1 boost is applied only to `sortScore` (used for ordering) — the original `score` is preserved.
-
-**Two-pass slot filling:**
-
-- **Pass 1 — Interest diversification** (runs when the user has ≥ 1 interest): for each user interest (in input order), pick the highest-`sortScore` Top-bucket recommendation whose `field` matches. Records each chosen activity type for Pass 2.
-- **Pass 2 — Activity-type diversification** (always runs): walk the remaining high-sortScore pool (Top ∪ Middle with `sortScore ≥ 0.6`) and pick the first recommendation for each previously-unseen activity type.
-
-Remaining recommendations are appended in bucket order (Top → Middle → Bottom), sorted by `sortScore` descending within each bucket. The final list is stripped back to `ScoredRecommendation[]` (bucket metadata discarded).
+The bucket metadata is dropped from the result, which keeps each activity's original `score`.
 
 ---
 
