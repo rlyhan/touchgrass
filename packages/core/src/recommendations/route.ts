@@ -8,7 +8,7 @@ import type {
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 import type { Profile } from "../db/schema.js"
 import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
-import { getRecommendations } from "../lib/recommendation-algorithm.js"
+import { getRecommendations } from "../lib/recommendations/get-recommendations.js"
 import { getOCEANScores } from "../lib/recommendations/personality/ocean.js"
 import { getUserPatternWeights } from "../lib/recommendations/personality/patterns.js"
 import type { LoadRecommendations } from "./source.js"

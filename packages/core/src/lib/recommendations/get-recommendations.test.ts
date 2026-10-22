@@ -2,14 +2,13 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import type { Activity, ActivityField, BFASScores, PatternTypeId } from "@touchgrass/types"
-import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
+import type { ActivityField, BFASScores } from "@touchgrass/types"
+import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
-import { getRecommendations, scoreRecommendation } from "./recommendation-algorithm.js"
-import { calculateMotivationBoost } from "./recommendations/motivation/boost.js"
-import { calculateRecommendationBaseScore } from "./recommendations/personality/base-score.js"
-import { getOCEANScores } from "./recommendations/personality/ocean.js"
-import { getUserPatternWeights } from "./recommendations/personality/patterns.js"
+import { getRecommendations } from "./get-recommendations.js"
+import { getOCEANScores } from "./personality/ocean.js"
+import { getUserPatternWeights } from "./personality/patterns.js"
+import { scoreRecommendation } from "./score.js"
 
 const mockUserBfas: BFASScores = {
   Openness: 97,
@@ -48,39 +47,6 @@ function recommendedCutoff(scores: number[]): number {
   const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
   return mean + sd * 0.5
 }
-
-test("getRecommendations doesn't put activities in recommendedSlugs just because many motivations inflate every score", () => {
-  const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
-  const allMotivations = [...MOTIVATION_OPTIONS]
-  const oneMotivationCutoff = recommendedCutoff(
-    RECOMMENDATIONS.map((rec) => scoreRecommendation(weights, rec, [creativeMotivation]).score),
-  )
-  const allMotivationScores = RECOMMENDATIONS.map((rec) => scoreRecommendation(weights, rec, allMotivations).score)
-
-  assert.ok(RECOMMENDATIONS.every((rec) => calculateMotivationBoost(weights, rec, allMotivations) > 0))
-  assert.ok(allMotivationScores.every((score) => score >= oneMotivationCutoff))
-
-  const { recommendedSlugs } = getRecommendations(mockUserBfas, allMotivations, [], RECOMMENDATIONS)
-  assert.ok(recommendedSlugs.length < RECOMMENDATIONS.length / 2)
-})
-
-test("getRecommendations returns the same recommendedSlugs whatever the user's interests", () => {
-  const withoutInterests = getRecommendations(mockUserBfas, [creativeMotivation], [], RECOMMENDATIONS)
-  const withEveryInterest = getRecommendations(mockUserBfas, [creativeMotivation], [...ACTIVITY_FIELDS], RECOMMENDATIONS)
-
-  assert.deepEqual(withEveryInterest.recommendedSlugs, withoutInterests.recommendedSlugs)
-})
-
-test("getRecommendations leaves the best personality fit out of recommendedSlugs when it gets no motivation boost", () => {
-  const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
-  const [strongestUnboostedFit] = RECOMMENDATIONS.filter(
-    (rec) => calculateMotivationBoost(weights, rec, [creativeMotivation]) === 0,
-  ).sort((a, b) => calculateRecommendationBaseScore(weights, b) - calculateRecommendationBaseScore(weights, a))
-
-  const { recommendedSlugs } = getRecommendations(mockUserBfas, [creativeMotivation], [], RECOMMENDATIONS)
-  assert.ok(strongestUnboostedFit)
-  assert.equal(recommendedSlugs.includes(strongestUnboostedFit.slug), false)
-})
 
 test("getRecommendations only returns items from the available recommendation pool", () => {
   const scored = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS).recommendations
@@ -148,54 +114,4 @@ test("getRecommendations: Art interest + explore_creative motivation surfaces Ar
     ({ rec }) => rec.field === "Art" && creativeTypes.has(rec.type),
   ).length
   assert.ok(artCreativeCount >= 1, `expected >= 1 Art-field creative-type rec, got ${artCreativeCount}`)
-})
-
-const makeRec = (
-  type: Activity["type"],
-  related_types?: Activity["related_types"],
-): Activity => ({
-  slug: "test",
-  title: "Test",
-  imageUrl: "",
-  field: "Art",
-  estimated_time: "1h",
-  type,
-  related_types,
-})
-
-// Creative patterns: ['4-HH', '9-HH', '7-LH']
-
-// ─── scoreRecommendation ─────────────────────────────────────────────────────
-
-test("scoreRecommendation returns the recommendation object unchanged", () => {
-  const weights = {} as Record<PatternTypeId, number>
-  const rec = makeRec("Creative")
-  const { rec: returnedRec } = scoreRecommendation(weights, rec, [])
-  assert.equal(returnedRec, rec)
-})
-
-test("scoreRecommendation returns baseScore as the score when no motivations are given", () => {
-  const weights = { "4-HH": 0.6, "9-HH": 0.9, "7-LH": 0.3 } as Record<PatternTypeId, number>
-  const rec = makeRec("Creative")
-  const { score } = scoreRecommendation(weights, rec, [])
-  // baseScore = (0.6+0.9+0.3)/3 = 0.6; motivationBoost = 0
-  assert.ok(Math.abs(score - 0.6) < 1e-9, `expected 0.6, got ${score}`)
-})
-
-test("scoreRecommendation adds motivation boost to base score", () => {
-  // Creative patterns ['4-HH','9-HH','7-LH'] all weight 1.0 → baseScore = 1.0
-  // sharedPatterns with creativeMotivation = ['4-HH','9-HH','7-LH']
-  // exactBoost = 1+1+1 = 3.0; adjacentBoost = 0; motivationBoost = 3.0/5 = 0.6
-  // expected score = 1.0 + 0.6 = 1.6
-  const weights = { "4-HH": 1, "9-HH": 1, "7-LH": 1 } as Record<PatternTypeId, number>
-  const { score } = scoreRecommendation(weights, makeRec("Creative"), [creativeMotivation])
-  assert.ok(Math.abs(score - 1.6) < 1e-9, `expected 1.6, got ${score}`)
-})
-
-test("scoreRecommendation score is higher with a matching motivation than without", () => {
-  const weights = { "4-HH": 0.8, "9-HH": 0.8, "7-LH": 0.8 } as Record<PatternTypeId, number>
-  const rec = makeRec("Creative")
-  const withoutBoost = scoreRecommendation(weights, rec, [])
-  const withBoost = scoreRecommendation(weights, rec, [creativeMotivation])
-  assert.ok(withBoost.score > withoutBoost.score, `expected boost to raise score`)
 })

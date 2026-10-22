@@ -67,7 +67,7 @@ Then divide the total by `normalizationFactor` (default `5`). Done by `calculate
 
 - **Matching is by activity type, not by pattern.** Analytical and Creative both include `9-HH`, but an Analytical activity gets no boost from `explore_creative` because none of its types are creative types. (`boost.test.ts`)
 - **No matching type means a boost of 0**, so the final score equals the base score. (`boost.test.ts`)
-- **The boost adds up across motivations instead of averaging.** Each extra motivation can only add shared patterns, so users who select more motivations get higher final scores across the board. This is why `recommendedSlugs` uses a cutoff relative to each user rather than a fixed score. (`boost.test.ts`, `recommendation-algorithm.test.ts`)
+- **The boost adds up across motivations instead of averaging.** Each extra motivation can only add shared patterns, so users who select more motivations get higher final scores across the board. This is why `recommendedSlugs` uses a cutoff relative to each user rather than a fixed score. (`boost.test.ts`, `factor-contracts.test.ts`)
 - **Selecting the same motivation twice changes nothing**, because types and shared patterns are deduplicated. (`boost.test.ts`)
 - **Every pattern weight contributes; there's no threshold.** A weak exact match still adds, and a strong neighbour can lift a weak target via adjacency. (`boost.test.ts`)
-- **The boost usually outweighs personality.** One matching type gives a neutral user about +0.84, more than the typical spread of base scores, so a strong personality fit with no matching type typically ranks below a weaker fit that matches a motivation. (`recommendation-algorithm.test.ts`)
+- **The boost usually outweighs personality.** One matching type gives a neutral user about +0.84, more than the typical spread of base scores, so a strong personality fit with no matching type typically ranks below a weaker fit that matches a motivation. (`factor-contracts.test.ts`)

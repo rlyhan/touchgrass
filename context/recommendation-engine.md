@@ -27,7 +27,7 @@ Each factor has its own doc covering what it affects, what it never affects, and
 
 ## Outputs
 
-- `getRecommendations` returns the top 3 best-match recommendations (`ScoredRecommendation[]`) after scoring and diversification.
+- `getRecommendations` returns the top 10 best-match recommendations (`ScoredRecommendation[]`) after scoring and diversification — the recommendations screen.
 - It also returns `recommendedSlugs`, which browse labels "Recommended for you": every activity whose final score (step 4, base + motivation boost) is at least half a standard deviation above the user's mean score across the catalogue, without diversification. The cutoff is relative to each user because the motivation boost grows with the number of motivations selected, so absolute final scores aren't comparable across users.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity — see [Personality](recommendation-engine/personality.md).
 
@@ -35,7 +35,15 @@ Each factor has its own doc covering what it affects, what it never affects, and
 
 ## Algorithm Flow
 
-Implemented in [`packages/core/src/lib/recommendation-algorithm.ts`](../packages/core/src/lib/recommendation-algorithm.ts). Each factor lives in its own folder under [`packages/core/src/lib/recommendations/`](../packages/core/src/lib/recommendations/) (`personality/`, `motivation/`, `interests/`), and the final ordering is in `diversify.ts` there.
+Everything lives in [`packages/core/src/lib/recommendations/`](../packages/core/src/lib/recommendations/):
+
+| Path | Role |
+|---|---|
+| `personality/`, `motivation/`, `interests/` | One folder per factor (see Factors above) |
+| `score.ts` | `scoreRecommendation` — the only place factors combine (`base + boost`) |
+| `diversify.ts` | `diversifyAndOrder` — final order for the recommendations screen |
+| `get-recommendations.ts` | `getRecommendations` — runs the steps below, takes the top 10 and computes `recommendedSlugs` |
+| `factor-contracts.test.ts` | Rules that span factors: interests never change `recommendedSlugs`, many motivations don't inflate it, personality alone doesn't earn it |
 
 ### 1–3. Personality → base score
 

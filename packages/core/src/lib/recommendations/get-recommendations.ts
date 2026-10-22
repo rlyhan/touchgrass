@@ -1,19 +1,11 @@
-import { Activity, ActivityField, BFASScores, Motivation, PatternTypeId, ScoredRecommendation } from "@touchgrass/types";
-import { diversifyAndOrder } from "./recommendations/diversify.js";
-import { calculateMotivationBoost } from "./recommendations/motivation/boost.js";
-import { calculateRecommendationBaseScore } from "./recommendations/personality/base-score.js";
-import { getOCEANScores } from "./recommendations/personality/ocean.js";
-import { getUserPatternWeights } from "./recommendations/personality/patterns.js";
+import { Activity, ActivityField, BFASScores, Motivation, ScoredRecommendation } from "@touchgrass/types";
+import { diversifyAndOrder } from "./diversify.js";
+import { getOCEANScores } from "./personality/ocean.js";
+import { getUserPatternWeights } from "./personality/patterns.js";
+import { scoreRecommendation } from "./score.js";
 
 const MAX_RECOMMENDATIONS = 10
 const RECOMMENDED_SD_MULTIPLIER = 0.5
-
-/* Combines base pattern affinity with motivation boost to produce a final score. */
-export function scoreRecommendation(userPatternWeights: Record<PatternTypeId, number>, recommendation: Activity, motivations: Motivation[]): ScoredRecommendation {
-    const baseScore = calculateRecommendationBaseScore(userPatternWeights, recommendation)
-    const motivationBoost = calculateMotivationBoost(userPatternWeights, recommendation, motivations)
-    return { rec: recommendation, score: baseScore + motivationBoost }
-}
 
 /*
  * Returns scored, diversified recommendations for a user.

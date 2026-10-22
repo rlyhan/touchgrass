@@ -43,7 +43,7 @@ Each scored activity is placed in a bucket by `classifyBucket`:
 
 ## Edge cases
 
-- **Interests never change a score.** The +0.1 only applies to `sortScore` (`diversify.test.ts`, `buckets.test.ts`), and `recommendedSlugs` is identical with no interests or every interest (`recommendation-algorithm.test.ts`).
+- **Interests never change a score.** The +0.1 only applies to `sortScore` (`diversify.test.ts`, `buckets.test.ts`), and `recommendedSlugs` is identical with no interests or every interest (`factor-contracts.test.ts`).
 - **Without interests, there's no top bucket and no interest pass.** (`buckets.test.ts`, `interest-pass.test.ts`, `diversify.test.ts`)
 - **The 0.6 cutoff rarely filters anything in practice.** It was written when scores ran 0–1, but the motivation boost lifts every boosted activity well above it, and most unboosted ones are above it too. So nearly every interest-field activity lands in top, whatever its score, and the 0.4–0.6 band only catches interest-field activities with no motivation boost and a poor personality fit. This is why weak interest-field activities can outrank much stronger non-interest ones on the recommendations screen. Documented here, not tested, because it depends on real score ranges; fixing the bucket scale is a separate change.
 - **Interest picks follow tap order, not score.** The first interest tapped in onboarding gets the first slot, even if another interest's best activity scores higher. This isn't a deliberate ranking by the user; ordering picks by score would remove it but changes the recommendations screen, so it's a separate fix. (`interest-pass.test.ts`)

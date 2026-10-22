@@ -6,7 +6,7 @@ import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/consta
 
 // The recommendation algorithm looks up each activity's primary `type` and every
 // `related_types` entry in ACTIVITY_TYPE_PATTERNS, falling back to [] on a miss
-// (recommendation-algorithm.ts). A typo'd type therefore contributes zero pattern
+// (personality/base-score.ts, motivation/boost.ts). A typo'd type therefore contributes zero pattern
 // affinity *silently* rather than erroring — exactly the failure mode a bulk hand-edit
 // of the mock catalog can introduce. These tests guard the catalog's value integrity.
 
