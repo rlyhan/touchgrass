@@ -2,19 +2,19 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import type { Activity, Motivation, PatternTypeId } from "@touchgrass/types"
-import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
+import { MOTIVATION_OPTIONS, PATTERN_TYPES } from "@touchgrass/types/constants"
 
 import {
   calculateMotivationBoost,
   getMotivationAndActivitySharedPatterns,
-} from "./motivation.js"
+} from "./boost.js"
 
 // Minimal Activity factory — only the fields the functions under test care about
 const makeRec = (
   type: Activity["type"],
   related_types?: Activity["related_types"],
 ): Activity => ({
-  id: "test",
+  slug: "test",
   title: "Test",
   imageUrl: "",
   field: "Art",
@@ -24,6 +24,9 @@ const makeRec = (
 })
 
 const creativeMotivation: Motivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
+const socialMotivation: Motivation = MOTIVATION_OPTIONS.find((m) => m.value === "connect_with_people")!
+
+const neutralWeights = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, 0.5])) as Record<PatternTypeId, number>
 
 // ─── calculateMotivationBoost ────────────────────────────────────────────────
 // Creative activity type maps to patterns ['4-HH', '9-HH', '7-LH'] via ACTIVITY_TYPE_PATTERNS.
@@ -64,6 +67,24 @@ test("calculateMotivationBoost respects a custom normalization factor", () => {
   // exactBoost = 1.0 * 1.0 = 1.0; normalised by factor 10 → 0.1
   const boost = calculateMotivationBoost({ "4-HH": 1.0 } as Record<PatternTypeId, number>, makeRec("Creative"), [creativeMotivation], 10)
   assert.ok(Math.abs(boost - 0.1) < 1e-9, `expected 0.1, got ${boost}`)
+})
+
+test("calculateMotivationBoost adds up across motivations rather than averaging them", () => {
+  // Creative matches explore_creative and Social matches connect_with_people; their patterns don't
+  // overlap, so selecting both gives the sum of each motivation's boost, not the average.
+  const rec = makeRec("Creative", ["Social"])
+  const creativeOnly = calculateMotivationBoost(neutralWeights, rec, [creativeMotivation])
+  const socialOnly = calculateMotivationBoost(neutralWeights, rec, [socialMotivation])
+  const both = calculateMotivationBoost(neutralWeights, rec, [creativeMotivation, socialMotivation])
+  assert.ok(Math.abs(both - (creativeOnly + socialOnly)) < 1e-9, `expected ${creativeOnly + socialOnly}, got ${both}`)
+})
+
+test("calculateMotivationBoost ignores a motivation selected twice", () => {
+  const rec = makeRec("Creative")
+  assert.equal(
+    calculateMotivationBoost(neutralWeights, rec, [creativeMotivation, creativeMotivation]),
+    calculateMotivationBoost(neutralWeights, rec, [creativeMotivation]),
+  )
 })
 
 // ─── getMotivationAndActivitySharedPatterns ─────────────────────────────────────────────

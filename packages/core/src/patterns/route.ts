@@ -2,7 +2,8 @@ import type { Request, Response } from "express"
 
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import type { Profile } from "../db/schema.js"
-import { getOCEANScores, getUserPatternWeights } from "../lib/helpers/index.js"
+import { getOCEANScores } from "../lib/recommendations/personality/ocean.js"
+import { getUserPatternWeights } from "../lib/recommendations/personality/patterns.js"
 
 export type GetPatternWeightsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
