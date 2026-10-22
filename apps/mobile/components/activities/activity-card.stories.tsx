@@ -19,6 +19,7 @@ const meta = {
     type: { control: "text" },
     field: { control: "text" },
     estimatedTime: { control: "text" },
+    recommended: { control: "boolean" },
   },
 } satisfies Meta<typeof ActivityCard>
 
@@ -47,6 +48,12 @@ export const Creative: Story = {
     type: "Artistic",
     field: "Art",
     estimatedTime: "30 min",
+  },
+}
+
+export const Recommended: Story = {
+  args: {
+    recommended: true,
   },
 }
 

@@ -1,0 +1,78 @@
+import { strict as assert } from "node:assert"
+import { test } from "node:test"
+
+import type { BFASScores } from "@touchgrass/types"
+import { ACTIVITY_TYPES } from "@touchgrass/types/constants"
+
+import { getTopActivityTypes } from "./top-activity-types.js"
+
+const mockUserBfas: BFASScores = {
+  Openness: 97,
+  Intellect: 61,
+  Industriousness: 63,
+  Orderliness: 60,
+  Enthusiasm: 16,
+  Assertiveness: 19,
+  Compassion: 91,
+  Politeness: 83,
+  Volatility: 68,
+  Withdrawal: 63,
+}
+
+test("getTopActivityTypes returns 6 activity types by default", () => {
+  const top = getTopActivityTypes(mockUserBfas)
+  assert.equal(top.length, 6)
+})
+
+test("getTopActivityTypes honours a custom count", () => {
+  const top = getTopActivityTypes(mockUserBfas, 3)
+  assert.equal(top.length, 3)
+})
+
+test("getTopActivityTypes returns results sorted by descending score", () => {
+  const top = getTopActivityTypes(mockUserBfas)
+  for (let i = 1; i < top.length; i++) {
+    const prev = top[i - 1]
+    const curr = top[i]
+    assert.ok(
+      prev !== undefined && curr !== undefined && prev.score >= curr.score,
+      `expected scores to be non-increasing, got ${prev?.score} then ${curr?.score}`,
+    )
+  }
+})
+
+test("getTopActivityTypes returns distinct activity types from the known pool", () => {
+  const top = getTopActivityTypes(mockUserBfas)
+  const knownTypes = new Set<string>(ACTIVITY_TYPES)
+  const seen = new Set<string>()
+  for (const { type } of top) {
+    assert.ok(knownTypes.has(type), `unknown activity type: ${type}`)
+    assert.ok(!seen.has(type), `duplicate activity type: ${type}`)
+    seen.add(type)
+  }
+})
+
+test("getTopActivityTypes ranks types whose patterns match the user higher than mismatched ones", () => {
+  // Low Extraversion + High Openness → Reflective (4-LH, 10-HH, 6-HH) should
+  // clearly outrank Active (2-HH, 3-HL, 1-HL), which all rely on high Extraversion.
+  const introvertedOpenUser: BFASScores = {
+    Openness: 100,
+    Intellect: 100,
+    Industriousness: 50,
+    Orderliness: 50,
+    Enthusiasm: 0,
+    Assertiveness: 0,
+    Compassion: 50,
+    Politeness: 50,
+    Volatility: 50,
+    Withdrawal: 50,
+  }
+  const top = getTopActivityTypes(introvertedOpenUser, ACTIVITY_TYPES.length)
+  const reflectiveIndex = top.findIndex((t) => t.type === "Reflective")
+  const activeIndex = top.findIndex((t) => t.type === "Active")
+  assert.ok(reflectiveIndex !== -1 && activeIndex !== -1)
+  assert.ok(
+    reflectiveIndex < activeIndex,
+    `expected Reflective (#${reflectiveIndex}) to rank above Active (#${activeIndex})`,
+  )
+})
