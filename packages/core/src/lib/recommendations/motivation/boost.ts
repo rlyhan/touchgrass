@@ -1,6 +1,6 @@
 import { Activity, ActivityType, Motivation, PatternTypeId } from '@touchgrass/types'
 import { ACTIVITY_TYPE_PATTERNS } from '@touchgrass/types/constants'
-import { getAdjacentPatterns, MATCH_WEIGHTS } from './patterns.js'
+import { getAdjacentPatterns, MATCH_WEIGHTS } from './adjacency.js'
 
 /*
  * Calculates score boost based on alignment between user pattern weights and the patterns

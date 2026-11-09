@@ -79,6 +79,14 @@ describe("ActivityCard", () => {
     expect(screen.getByTestId("field-icon")).toBeTruthy()
   })
 
+  it("shows the recommended label only when recommended", () => {
+    const { rerender } = render(<ActivityCard {...BASE_PROPS} />)
+    expect(screen.queryByText("Recommended for you")).toBeNull()
+
+    rerender(<ActivityCard {...BASE_PROPS} recommended />)
+    expect(screen.getByText("Recommended for you")).toBeTruthy()
+  })
+
   it("swaps the image for a fallback view when the image errors", () => {
     render(<ActivityCard {...BASE_PROPS} />)
     expect(screen.getByTestId("card-image")).toBeTruthy()

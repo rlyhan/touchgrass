@@ -8,6 +8,7 @@ import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
 import { setCachedPatternWeights } from "@/lib/patterns/cache"
+import { setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 
 export { UnauthenticatedError } from "@/lib/auth/errors"
 
@@ -43,6 +44,7 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   if (body.patternWeights) {
     setCachedPatternWeights(body.patternWeights)
   }
+  setRecommendedSlugs(body.recommendedSlugs ?? [])
   const recommendations = body.recommendations ?? []
   for (const { dominantPatternId: _dominantPatternId, ...activity } of recommendations) {
     activityCache.set(activity.slug, activity)

@@ -1,35 +1,41 @@
-import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
+
+import { apiUrl } from "@/lib/config"
 
 export type SearchPage = {
   items: Activity[]
   total: number
 }
 
-function matchesQuery(activity: Activity, query: string): boolean {
-  return [activity.title, activity.field, activity.type].some((value) =>
-    value.toLowerCase().includes(query),
-  )
+export async function fetchRandomActivities(count: number): Promise<Activity[]> {
+  const response = await fetch(apiUrl(`/activities/random?count=${count}`))
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch random activities (${response.status})`)
+  }
+  const body = (await response.json()) as { activities: Activity[] }
+  return body.activities
 }
 
-// Mock-backed until browse moves to the API; signatures mirror the planned
-// GET /activities/random and GET /activities/search?q=&offset=&limit= endpoints.
-export async function fetchRandomActivities(count: number): Promise<Activity[]> {
-  const picked = new Set<Activity>()
-  while (picked.size < Math.min(count, RECOMMENDATIONS.length)) {
-    picked.add(RECOMMENDATIONS[Math.floor(Math.random() * RECOMMENDATIONS.length)])
-  }
-  return Array.from(picked)
-}
+export type SearchFilters = Record<string, string[]>
 
 export async function searchActivities(
   query: string,
+  filters: SearchFilters,
   { offset, limit }: { offset: number; limit: number },
 ): Promise<SearchPage> {
-  const normalised = query.trim().toLowerCase()
-  const matches = RECOMMENDATIONS.filter((activity) => matchesQuery(activity, normalised))
-  return {
-    items: matches.slice(offset, offset + limit),
-    total: matches.length,
+  const params = new URLSearchParams({
+    q: query.trim(),
+    offset: String(offset),
+    limit: String(limit),
+  })
+  for (const [key, values] of Object.entries(filters)) {
+    if (values.length) params.set(key, values.join(","))
   }
+  const response = await fetch(apiUrl(`/activities/search?${params}`))
+
+  if (!response.ok) {
+    throw new Error(`Failed to search activities (${response.status})`)
+  }
+  return (await response.json()) as SearchPage
 }

@@ -58,6 +58,7 @@
 * Mock all native/Expo deps at the top of each test file (expo-image, expo-linear-gradient, lucide, etc.)
 * Structure with `describe` + `it`; reset state with `beforeEach(() => jest.clearAllMocks())`
 * Assert with `screen.getByText`, `screen.getByTestId`, `screen.queryBy*`
+* Name test values after what they hold, not their role in the test — `creativeFilmAndMusic`, not `expected`, `result` or `data`
 
 #### Storybook
 

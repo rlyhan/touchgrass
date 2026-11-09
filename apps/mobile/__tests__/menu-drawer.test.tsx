@@ -14,12 +14,17 @@ jest.mock("@/lib/patterns/cache", () => ({
   clearPatternWeightsCache: jest.fn(),
 }))
 
+jest.mock("@/lib/recommendations/recommended-slugs", () => ({
+  clearRecommendedSlugs: jest.fn(),
+}))
+
 jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 jest.mock("react-native-safe-area-context", () => require("@/test-utils/mocks").safeAreaMock)
 
 import * as Auth from "@/lib/auth/client"
 import * as PatternsCache from "@/lib/patterns/cache"
+import * as RecommendedSlugs from "@/lib/recommendations/recommended-slugs"
 import * as ExpoRouter from "expo-router"
 
 import { MenuDrawer } from "@/components/navigation/menu-drawer"
@@ -27,6 +32,7 @@ import { MenuDrawer } from "@/components/navigation/menu-drawer"
 const mockSignOut = jest.mocked(Auth.signOut)
 const mockUseSession = jest.mocked(Auth.useSession)
 const mockClearCache = jest.mocked(PatternsCache.clearPatternWeightsCache)
+const mockClearRecommendedSlugs = jest.mocked(RecommendedSlugs.clearRecommendedSlugs)
 const mockReplace = jest.mocked(ExpoRouter.router.replace)
 
 function sessionWithName(name: string | undefined) {
@@ -99,6 +105,7 @@ describe("MenuDrawer", () => {
 
     expect(mockSignOut).toHaveBeenCalledTimes(1)
     expect(mockClearCache).toHaveBeenCalled()
+    expect(mockClearRecommendedSlugs).toHaveBeenCalled()
     expect(onClose).toHaveBeenCalled()
     expect(mockReplace).toHaveBeenCalledWith("/sign-in")
   })
@@ -113,6 +120,7 @@ describe("MenuDrawer", () => {
     expect(onClose).not.toHaveBeenCalled()
     expect(mockReplace).not.toHaveBeenCalled()
     expect(mockClearCache).not.toHaveBeenCalled()
+    expect(mockClearRecommendedSlugs).not.toHaveBeenCalled()
     expect(screen.getByText("Couldn't log out. Try again.")).toBeTruthy()
     expect(screen.getByRole("button", { name: "Log out" })).toBeEnabled()
   })

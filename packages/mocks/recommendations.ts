@@ -2085,7 +2085,7 @@ export const RECOMMENDATIONS: Activity[] = [
   {
     slug: "start-a-vinyl-record-collection",
     title: "Start a Vinyl Record Collection",
-    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&fit=crop&auto=format",
+    imageUrl: "https://images.unsplash.com/photo-1596633313465-1256feb1c6d9?w=800&fit=crop&auto=format",
     type: "Reflective",
     field: "Collecting",
     estimated_time: "Ongoing",

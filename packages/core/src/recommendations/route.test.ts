@@ -131,6 +131,16 @@ test("GET /recommendations includes patternWeights for all 40 patterns in [0, 1]
   }
 })
 
+test("GET /recommendations includes recommendedSlugs from the activity pool", async () => {
+  const res = await fetch(`${baseUrl}/recommendations`)
+  const body = (await res.json()) as RecommendationsResponse
+
+  const poolSlugs = new Set(RECOMMENDATIONS.map((a) => a.slug))
+  assert.ok(body.recommendedSlugs.length > 0)
+  assert.ok(body.recommendedSlugs.length < RECOMMENDATIONS.length)
+  assert.ok(body.recommendedSlugs.every((slug) => poolSlugs.has(slug)))
+})
+
 test("GET /recommendations returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
