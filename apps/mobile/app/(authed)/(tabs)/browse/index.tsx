@@ -41,10 +41,12 @@ export default function BrowsePage() {
   const shownActivities = search.searching ? search.results : randomActivities
   const activities = useMemo(
     () =>
-      (shownActivities ?? []).map((activity) => ({
-        ...activity,
-        recommended: recommendedSlugs.has(activity.slug),
-      })),
+      (shownActivities ?? [])
+        .map((activity) => ({
+          ...activity,
+          recommended: recommendedSlugs.has(activity.slug),
+        }))
+        .sort((a, b) => Number(b.recommended) - Number(a.recommended)),
     [shownActivities, recommendedSlugs],
   )
 

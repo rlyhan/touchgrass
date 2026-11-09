@@ -112,6 +112,17 @@ describe("BrowsePage", () => {
     expect(flaggedSlugs).toEqual(recommendedSlugs)
   })
 
+  it("lists recommended activities first within a page, otherwise keeping the page's order", async () => {
+    const [first, second, third, fourth] = FIRST_PAGE
+    mockSearchActivities.mockResolvedValue({ items: [first, second, third, fourth], total: 4 })
+    setRecommendedSlugs([second.slug, fourth.slug])
+    render(<BrowsePage />)
+
+    await act(async () => typeQuery("guitar"))
+
+    expect(listedTitles()).toEqual([second.title, fourth.title, first.title, third.title])
+  })
+
   it("lets card taps through while the keyboard is open and dismisses it on scroll", async () => {
     render(<BrowsePage />)
     await act(async () => {})
