@@ -7,7 +7,7 @@ Replaces browse's "Recommended for you" badge with labels explaining why an acti
 ### API (`packages/core`)
 
 - `GET /activities/search` type filters now match an activity's `related_types` as well as its primary type ("Creative" goes from 6 results to 36).
-- `GET /recommendations` returns `matchLabels`, keyed by slug: `strong`, `personality` (base score strictly above the user's mean + 1 SD), `motivation` (recommended, and two or more selected motivations share a type with it, named on the label) or `good` (any other recommended activity). Interests never change a label.
+- `GET /recommendations` returns `matchLabels`, keyed by slug: `strong`, `personality` (base score strictly above the user's mean + 1 SD, and a pattern the user scores 0.6+ on), `motivation` (recommended, and two or more selected motivations share a type with it, named on the label) or `good` (any other recommended activity). Interests never change a label.
 - The recommended cutoff and the new personality cutoff live in their own helpers in `get-recommendations.ts`; scoring and `recommendedSlugs` are unchanged.
 - Requires `fly deploy` on each Fly app. Older APIs omit `matchLabels`, so cards show no label until the API is updated.
 

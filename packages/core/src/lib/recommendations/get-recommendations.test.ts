@@ -10,6 +10,7 @@ import { calculateRecommendationBaseScore } from "./personality/base-score.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
 import { scoreRecommendation } from "./score.js"
+import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
 
 const mockUserBfas: BFASScores = {
   Openness: 97,
@@ -65,10 +66,12 @@ function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
   const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
   const mean = baseScores.reduce((sum, score) => sum + score, 0) / baseScores.length
   const sd = Math.sqrt(baseScores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / baseScores.length)
-  return RECOMMENDATIONS.filter((_, i) => baseScores[i]! > mean + sd).map((rec) => rec.slug)
+  return RECOMMENDATIONS.filter((rec, i) => baseScores[i]! > mean + sd && getDominantPatternId(weights, rec) !== null).map(
+    (rec) => rec.slug,
+  )
 }
 
-test("getRecommendations gives a personality label to exactly the activities whose base score is over one SD above the mean", () => {
+test("getRecommendations gives a personality label to exactly the activities over one SD above the mean base score with a high-scoring pattern", () => {
   const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
 
   const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
@@ -118,6 +121,32 @@ test("getRecommendations labels the rest of recommendedSlugs a good match and le
     if (recommendedSlugs.includes(rec.slug)) assert.ok(kind !== undefined, rec.slug)
     else assert.ok(kind === undefined || kind === "personality", rec.slug)
   }
+})
+
+test("getRecommendations gives no personality label to a user with middling scores and no high-scoring pattern", () => {
+  const middlingUser: BFASScores = {
+    Openness: 62,
+    Intellect: 58,
+    Industriousness: 45,
+    Orderliness: 42,
+    Enthusiasm: 44,
+    Assertiveness: 40,
+    Compassion: 56,
+    Politeness: 54,
+    Volatility: 52,
+    Withdrawal: 48,
+  }
+  const weights = getUserPatternWeights(getOCEANScores(middlingUser))
+  const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
+  const mean = baseScores.reduce((sum, score) => sum + score, 0) / baseScores.length
+  const sd = Math.sqrt(baseScores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / baseScores.length)
+
+  assert.ok(Object.values(weights).every((weight) => weight < 0.6))
+  assert.ok(baseScores.some((score) => score > mean + sd))
+
+  const { matchLabels } = getRecommendations(middlingUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality" || label.kind === "strong")
+  assert.equal(personalityKinds.length, 0)
 })
 
 test("getRecommendations gives no personality label to a user who scores 50 on every aspect", () => {

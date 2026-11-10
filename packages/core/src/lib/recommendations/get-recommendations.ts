@@ -4,6 +4,7 @@ import { calculateRecommendationBaseScore } from "./personality/base-score.js";
 import { getOCEANScores } from "./personality/ocean.js";
 import { getUserPatternWeights } from "./personality/patterns.js";
 import { scoreRecommendation } from "./score.js";
+import { getDominantPatternId } from "@touchgrass/types/dominant-pattern";
 
 const MAX_RECOMMENDATIONS = 10
 const RECOMMENDED_SD_MULTIPLIER = 0.5
@@ -97,10 +98,11 @@ function getHighScoringSlugs(scoredRecommendations: ScoredRecommendation[]): Set
 }
 
 /*
- * Strong personality: every activity whose base score (personality only, no motivation boost) is well above this user's average.
+ * Strong personality: every activity whose base score (personality only, no motivation boost) is well above this user's average,
+ * and where the user scored highly (MIN_DOMINANT_WEIGHT) on at least one of the activity's patterns.
  * 1. Average every base score (the mean), then measure how spread out they are (the standard deviation, SD).
  * 2. Cutoff = mean + 1 × SD; an activity must score strictly above it, so a user with no spread (e.g. 50 on every aspect) gets none.
- * The cutoff is relative to each user, so "strong" means strong for this user. It typically keeps about a fifth of the catalogue.
+ * The pattern check keeps "You scored highly as …" true: a user with middling scores can clear the relative cutoff without any high pattern.
  */
 function getStrongPersonalitySlugs(userPatternWeights: Record<PatternTypeId, number>, activities: Activity[]): Set<string> {
     const baseScoredActivities = activities.map((rec) => ({ rec, baseScore: calculateRecommendationBaseScore(userPatternWeights, rec) }))
@@ -108,7 +110,11 @@ function getStrongPersonalitySlugs(userPatternWeights: Record<PatternTypeId, num
     const baseSd = Math.sqrt(baseScoredActivities.reduce((sum, { baseScore }) => sum + (baseScore - baseMean) ** 2, 0) / baseScoredActivities.length)
     return new Set(
         baseScoredActivities
-            .filter(({ baseScore }) => baseScore > baseMean + baseSd * STRONG_PERSONALITY_SD_MULTIPLIER)
+            .filter(
+                ({ rec, baseScore }) =>
+                    baseScore > baseMean + baseSd * STRONG_PERSONALITY_SD_MULTIPLIER &&
+                    getDominantPatternId(userPatternWeights, rec) !== null,
+            )
             .map(({ rec }) => rec.slug),
     )
 }
