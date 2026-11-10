@@ -54,7 +54,7 @@ export function getRecommendations(
  * 2. "personality" — passes the strong personality cutoff, whether or not it's high scoring.
  * 3. "motivation" — high scoring, and two or more selected motivations share a type with it.
  *    Limited to high scoring activities because every activity overlaps at least two of the seven motivations.
- * 4. "good" — any other high scoring activity.
+ * 4. "good" — any other high scoring activity that shares at least one motivation, so every label has a reason to show.
  * Each label carries its reasons: the user's best pattern for personality, and each overlapping motivation (by value) with
  * the activity types it shares. Activities with none of these labels are left out.
  */
@@ -83,7 +83,7 @@ function getMatchLabels(
         if (patternId && isStrongMotivation) matchLabels[rec.slug] = { kind: "strong", patternId, sharedActivityTypesByMotivation }
         else if (patternId) matchLabels[rec.slug] = { kind: "personality", patternId }
         else if (isStrongMotivation) matchLabels[rec.slug] = { kind: "motivation", sharedActivityTypesByMotivation }
-        else if (isRecommended) matchLabels[rec.slug] = { kind: "good", sharedActivityTypesByMotivation }
+        else if (isRecommended && overlappingMotivationCount >= 1) matchLabels[rec.slug] = { kind: "good", sharedActivityTypesByMotivation }
     })
     return matchLabels
 }

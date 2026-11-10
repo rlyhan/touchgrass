@@ -141,13 +141,15 @@ test("GET /recommendations includes recommendedSlugs from the activity pool", as
   assert.ok(body.recommendedSlugs.every((slug) => poolSlugs.has(slug)))
 })
 
-test("GET /recommendations labels every recommended activity in matchLabels", async () => {
+test("GET /recommendations only labels activities from the pool, and only personality matches outside recommendedSlugs", async () => {
   const res = await fetch(`${baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse
 
   const poolSlugs = new Set(RECOMMENDATIONS.map((a) => a.slug))
   assert.ok(Object.keys(body.matchLabels).every((slug) => poolSlugs.has(slug)))
-  assert.ok(body.recommendedSlugs.every((slug) => body.matchLabels[slug] !== undefined))
+  const recommended = new Set(body.recommendedSlugs)
+  assert.ok(Object.values(body.matchLabels).length > 0)
+  assert.ok(Object.entries(body.matchLabels).every(([slug, label]) => recommended.has(slug) || label.kind === "personality"))
 })
 
 test("GET /recommendations returns 401 when there is no session", async () => {

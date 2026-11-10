@@ -148,22 +148,23 @@ test("getRecommendations lists each overlapping motivation by value with only th
   }
 })
 
-test("getRecommendations gives a good match at most one motivation as its reason", () => {
-  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-  const goodMatches = Object.values(matchLabels).filter((label) => label.kind === "good")
-
-  assert.ok(goodMatches.length > 0)
-  assert.ok(goodMatches.every((label) => Object.keys(label.sharedActivityTypesByMotivation).length <= 1))
-})
-
-test("getRecommendations labels the rest of recommendedSlugs a good match and leaves other activities unlabelled", () => {
+test("getRecommendations labels the rest of recommendedSlugs that share a motivation a good match and leaves other activities unlabelled", () => {
   const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
 
   for (const rec of RECOMMENDATIONS) {
     const kind = matchLabels[rec.slug]?.kind
-    if (recommendedSlugs.includes(rec.slug)) assert.ok(kind !== undefined, rec.slug)
+    const sharesMotivation = overlappingMotivationLabels(rec, creativeAdventureAndPeople).length > 0
+    if (recommendedSlugs.includes(rec.slug) && sharesMotivation) assert.ok(kind !== undefined, rec.slug)
     else assert.ok(kind === undefined || kind === "personality", rec.slug)
   }
+})
+
+test("getRecommendations explains each good match with exactly one shared motivation", () => {
+  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const goodMatches = Object.values(matchLabels).filter((label) => label.kind === "good")
+
+  assert.ok(goodMatches.length > 0)
+  assert.ok(goodMatches.every((label) => Object.keys(label.sharedActivityTypesByMotivation).length === 1))
 })
 
 test("getRecommendations gives no personality label to a user with middling scores and no high-scoring pattern", () => {
