@@ -42,6 +42,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
+import { clearRecommendedSlugs, setMatchLabels } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -295,7 +296,7 @@ describe("ActivityDetailPage", () => {
     })
   })
 
-  describe("pattern-match accordion", () => {
+  describe("why this matches you", () => {
     const mockUsePatternWeights = jest.mocked(
       require("@/lib/patterns/use-pattern-weights").usePatternWeights,
     )
@@ -306,11 +307,43 @@ describe("ActivityDetailPage", () => {
       mockUsePatternWeights.mockReturnValue({ weights: { "4-HH": 0.9 }, status: "ready" })
     })
 
+    afterEach(() => {
+      clearRecommendedSlugs()
+    })
+
+    it("shows the pattern from a personality label without a pattern param or loading weights", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Why this matches you")).toBeTruthy()
+      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+      expect(mockUsePatternWeights).not.toHaveBeenCalled()
+    })
+
+    it("shows the pattern and a row per shared motivation for a strong label", () => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
+      setMatchLabels({
+        [ACTIVITY.slug]: {
+          kind: "strong",
+          patternId: "4-HH",
+          sharedActivityTypesByMotivation: { explore_creative: ["Artistic", "Creative"], connect_with_people: ["Social"] },
+        },
+      })
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+      expect(screen.getByText("Explore my creative side")).toBeTruthy()
+      expect(screen.getByText("Artistic and Creative")).toBeTruthy()
+      expect(screen.getByText("Connect with people and share experiences")).toBeTruthy()
+      expect(screen.getByText("Social")).toBeTruthy()
+    })
+
     it("hides the accordion and skips loading weights when no pattern param is passed", () => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.queryByText("Why this matches you")).toBeNull()
       expect(mockUsePatternWeights).not.toHaveBeenCalled()
     })
 
@@ -318,7 +351,7 @@ describe("ActivityDetailPage", () => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "nope" })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.queryByText("Why this matches you")).toBeNull()
     })
 
     it("uses the first value when the pattern param is repeated", () => {
@@ -332,7 +365,7 @@ describe("ActivityDetailPage", () => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: ["9-HH", "4-HH"] })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.queryByText("Why this matches you")).toBeNull()
     })
 
     it("hides the accordion while the viewer's weights are loading", () => {
@@ -340,7 +373,7 @@ describe("ActivityDetailPage", () => {
       mockUsePatternWeights.mockReturnValue({ weights: undefined, status: "loading" })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.queryByText("Why this matches you")).toBeNull()
     })
 
     it("hides the accordion when the pattern param doesn't match the viewer's weights", () => {
@@ -348,7 +381,7 @@ describe("ActivityDetailPage", () => {
       mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "9-HH" })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.queryByText("Why this matches you")).toBeNull()
     })
 
     it("renders the match copy and reveals the short description on expand", () => {
@@ -360,7 +393,7 @@ describe("ActivityDetailPage", () => {
         name: "Expand pattern details",
       })
       expect(
-        screen.getByText(/You were matched because you scored highly as a/),
+        screen.getByText(/You scored highly as/),
       ).toBeTruthy()
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
       const expectedDescription =

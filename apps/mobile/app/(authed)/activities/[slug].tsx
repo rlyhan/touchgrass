@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { ActivityCard } from "@/components/activities/activity-card"
-import { PatternMatch } from "@/components/patterns/pattern-match"
+import { MatchReasons } from "@/components/activities/match-reasons"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
 import { UnauthenticatedError } from "@/lib/auth/errors"
@@ -19,6 +19,7 @@ import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
+import { useMatchLabels } from "@/lib/recommendations/recommended-slugs"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
 
@@ -39,6 +40,7 @@ export default function ActivityDetailPage() {
   const { slug } = params
   // A repeated ?pattern= arrives as an array; use the first value, like URLSearchParams.get.
   const pattern = Array.isArray(params.pattern) ? params.pattern[0] : params.pattern
+  const matchLabel = useMatchLabels()[slug ?? ""]
 
   const cached = slug ? getCachedActivity(slug) : undefined
   const [activity, setActivity] = useState<Activity | null>(cached ?? null)
@@ -131,7 +133,7 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        {pattern ? <PatternMatch activity={activity} patternId={pattern} /> : null}
+        <MatchReasons activity={activity} matchLabel={matchLabel} linkedPatternId={pattern} />
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">
