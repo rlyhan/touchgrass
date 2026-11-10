@@ -4,7 +4,7 @@ Personality produces each activity's **base score**: how well the activity's typ
 
 Code: [`packages/core/src/lib/recommendations/personality/`](../../packages/core/src/lib/recommendations/personality/), with a `.test.ts` next to each file.
 
-- **Affects:** every activity's base score, the "You were matched because…" pattern, `getTopActivityTypes`, the `personality` match label.
+- **Affects:** every activity's base score, the "You were matched because…" pattern, `getTopActivityTypes`, the `personality` and `strong` match labels.
 - **Never affected by:** motivations or interests.
 
 ---

@@ -30,8 +30,10 @@ Each factor has its own doc covering what it affects, what it never affects, and
 - `getRecommendations` returns the top 10 best-match recommendations (`ScoredRecommendation[]`) after scoring and diversification — the recommendations screen.
 - It also returns `recommendedSlugs`, which browse labels "Recommended for you" and lists first on each page: every activity whose final score (step 4, base + motivation boost) is at least half a standard deviation above the user's mean score across the catalogue, without diversification. The cutoff is relative to each user because the motivation boost grows with the number of motivations selected, so absolute final scores aren't comparable across users.
 - It also returns `matchLabels`, keyed by slug, giving the reason an activity matches. Activities with none of these are left out. The first that applies wins:
-  1. `personality` — base score (steps 1–3) strictly above the user's mean base score plus one standard deviation. Any activity can get it, recommended or not.
-  2. `good` — any other activity in `recommendedSlugs`.
+  1. `strong` — qualifies for both `personality` and `motivation`.
+  2. `personality` — base score (steps 1–3) strictly above the user's mean base score plus one standard deviation. Any activity can get it, recommended or not.
+  3. `motivation` — in `recommendedSlugs`, and two or more selected motivations list the activity's `type` or one of its `related_types` in their `associated_activity_types`. It carries those motivations' labels. It's limited to `recommendedSlugs` because every activity overlaps at least two of the seven motivations.
+  4. `good` — any other activity in `recommendedSlugs`.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity — see [Personality](recommendation-engine/personality.md).
 
 ---

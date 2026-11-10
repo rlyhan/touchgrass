@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import type { ActivityField, BFASScores } from "@touchgrass/types"
+import type { Activity, ActivityField, BFASScores, Motivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import { getRecommendations } from "./get-recommendations.js"
@@ -53,6 +53,13 @@ const creativeAdventureAndPeople = MOTIVATION_OPTIONS.filter((m) =>
   ["explore_creative", "seek_adventure", "connect_with_people"].includes(m.value),
 )
 
+function overlappingMotivationLabels(activity: Activity, motivations: Motivation[]): string[] {
+  const types = [activity.type, ...(activity.related_types ?? [])]
+  return motivations
+    .filter((m) => m.associated_activity_types.some((t) => types.includes(t)))
+    .map((m) => m.label)
+}
+
 function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
   const weights = getUserPatternWeights(getOCEANScores(bfas))
   const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
@@ -66,10 +73,41 @@ test("getRecommendations gives a personality label to exactly the activities who
 
   const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
   const personalityLabelledSlugs = RECOMMENDATIONS.map((rec) => rec.slug).filter((slug) =>
-    matchLabels[slug]?.kind === "personality",
+    ["personality", "strong"].includes(matchLabels[slug]?.kind ?? ""),
   )
   assert.ok(strongPersonalitySlugs.length > 0)
   assert.deepEqual(personalityLabelledSlugs, strongPersonalitySlugs)
+})
+
+test("getRecommendations gives a motivation label only to recommended activities overlapping two or more motivations, naming them", () => {
+  const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const motivationLabelled = RECOMMENDATIONS.filter((rec) => ["motivation", "strong"].includes(matchLabels[rec.slug]?.kind ?? ""))
+
+  assert.ok(motivationLabelled.length > 0)
+  for (const rec of RECOMMENDATIONS) {
+    const overlaps = overlappingMotivationLabels(rec, creativeAdventureAndPeople)
+    const qualifies = recommendedSlugs.includes(rec.slug) && overlaps.length >= 2
+    assert.equal(motivationLabelled.includes(rec), qualifies, rec.slug)
+    const label = matchLabels[rec.slug]
+    if (label?.kind === "motivation") assert.deepEqual(label.motivations, overlaps)
+  }
+})
+
+test("getRecommendations labels activities that qualify for both the personality and motivation labels as strong", () => {
+  const everyMotivation = [...MOTIVATION_OPTIONS]
+  const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
+
+  const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, everyMotivation, [], RECOMMENDATIONS)
+  const strongMatchSlugs = RECOMMENDATIONS.map((rec) => rec.slug).filter((slug) => matchLabels[slug]?.kind === "strong")
+  const bothSlugs = RECOMMENDATIONS.filter(
+    (rec) =>
+      strongPersonalitySlugs.includes(rec.slug) &&
+      recommendedSlugs.includes(rec.slug) &&
+      overlappingMotivationLabels(rec, everyMotivation).length >= 2,
+  ).map((rec) => rec.slug)
+
+  assert.ok(bothSlugs.length > 0)
+  assert.deepEqual(strongMatchSlugs, bothSlugs)
 })
 
 test("getRecommendations labels the rest of recommendedSlugs a good match and leaves other activities unlabelled", () => {
@@ -86,7 +124,7 @@ test("getRecommendations gives no personality label to a user who scores 50 on e
   const neutralUser = Object.fromEntries(Object.keys(mockUserBfas).map((aspect) => [aspect, 50])) as BFASScores
 
   const { matchLabels } = getRecommendations(neutralUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-  const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality")
+  const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality" || label.kind === "strong")
   assert.equal(personalityKinds.length, 0)
 })
 

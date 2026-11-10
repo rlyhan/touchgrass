@@ -8,6 +8,7 @@ import { scoreRecommendation } from "./score.js";
 const MAX_RECOMMENDATIONS = 10
 const RECOMMENDED_SD_MULTIPLIER = 0.5
 const STRONG_PERSONALITY_SD_MULTIPLIER = 1
+const STRONG_MOTIVATION_MIN_OVERLAPS = 2
 
 /*
  * Returns scored, diversified recommendations for a user.
@@ -36,7 +37,7 @@ export function getRecommendations(
     const strongPersonalitySlugSet = getStrongPersonalitySlugs(userPatternWeights, activities)
 
     // Give each activity the match label browse shows.
-    const matchLabels = getMatchLabels(activities, highScoringSlugSet, strongPersonalitySlugSet)
+    const matchLabels = getMatchLabels(activities, motivations, highScoringSlugSet, strongPersonalitySlugSet)
 
     // Return the top MAX_RECOMMENDATIONS for the recommendations screen, the slugs browse marks as recommended, and each activity's match label.
     return {
@@ -48,21 +49,30 @@ export function getRecommendations(
 
 /*
  * Match labels: the reason browse gives for each activity, keyed by slug. The first that applies wins:
- * 1. "personality" — passes the strong personality cutoff, whether or not it's high scoring.
- * 2. "good" — any other high scoring activity.
- * Activities with neither are left out.
+ * 1. "strong" — qualifies for both "personality" and "motivation".
+ * 2. "personality" — passes the strong personality cutoff, whether or not it's high scoring.
+ * 3. "motivation" — high scoring, and two or more selected motivations share a type with it (named on the label).
+ *    Limited to high scoring activities because every activity overlaps at least two of the seven motivations.
+ * 4. "good" — any other high scoring activity.
+ * Activities with none of these are left out.
  */
 function getMatchLabels(
     activities: Activity[],
+    motivations: Motivation[],
     highScoringSlugSet: Set<string>,
     strongPersonalitySlugSet: Set<string>,
 ): Record<string, MatchLabel> {
     const matchLabels: Record<string, MatchLabel> = {}
     activities.forEach((rec) => {
+        const activityTypes = [rec.type, ...(rec.related_types ?? [])]
+        const overlappingMotivations = motivations.filter((m) => m.associated_activity_types.some((t) => activityTypes.includes(t)))
         const isStrongPersonality = strongPersonalitySlugSet.has(rec.slug)
         const isRecommended = highScoringSlugSet.has(rec.slug)
+        const isStrongMotivation = isRecommended && overlappingMotivations.length >= STRONG_MOTIVATION_MIN_OVERLAPS
 
-        if (isStrongPersonality) matchLabels[rec.slug] = { kind: "personality" }
+        if (isStrongPersonality && isStrongMotivation) matchLabels[rec.slug] = { kind: "strong" }
+        else if (isStrongPersonality) matchLabels[rec.slug] = { kind: "personality" }
+        else if (isStrongMotivation) matchLabels[rec.slug] = { kind: "motivation", motivations: overlappingMotivations.map((m) => m.label) }
         else if (isRecommended) matchLabels[rec.slug] = { kind: "good" }
     })
     return matchLabels

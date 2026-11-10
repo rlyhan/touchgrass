@@ -234,7 +234,9 @@ export type RecommendedActivity = Activity & {
 }
 
 export type MatchLabel =
+  | { kind: "strong" }
   | { kind: "personality" }
+  | { kind: "motivation"; motivations: string[] }
   | { kind: "good" }
 
 export type RecommendationsResponse = {
