@@ -105,7 +105,7 @@ describe("BrowsePage", () => {
     await act(async () => {})
 
     await act(async () =>
-      setMatchLabels({ [goodMatchSlug]: { kind: "good" }, [personalityMatchSlug]: { kind: "personality" } }),
+      setMatchLabels({ [goodMatchSlug]: { kind: "good", sharedActivityTypesByMotivation: {} }, [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" } }),
     )
 
     const labelsBySlug = Object.fromEntries(
@@ -115,8 +115,8 @@ describe("BrowsePage", () => {
         .map((a: { slug: string; matchLabel: object }) => [a.slug, a.matchLabel]),
     )
     expect(labelsBySlug).toEqual({
-      [goodMatchSlug]: { kind: "good" },
-      [personalityMatchSlug]: { kind: "personality" },
+      [goodMatchSlug]: { kind: "good", sharedActivityTypesByMotivation: {} },
+      [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" },
     })
   })
 

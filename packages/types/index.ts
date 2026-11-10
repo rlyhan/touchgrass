@@ -244,11 +244,14 @@ export type RecommendedActivity = Activity & {
 
 export type SharedActivityTypesByMotivation = Partial<Record<MotivationValue, ActivityType[]>>
 
+type PersonalityReason = { patternId: PatternTypeId }
+type MotivationReason = { sharedActivityTypesByMotivation: SharedActivityTypesByMotivation }
+
 export type MatchLabel =
-  | { kind: "strong" }
-  | { kind: "personality" }
-  | { kind: "motivation"; motivations: string[] }
-  | { kind: "good" }
+  | ({ kind: "strong" } & PersonalityReason & MotivationReason)
+  | ({ kind: "personality" } & PersonalityReason)
+  | ({ kind: "motivation" } & MotivationReason)
+  | ({ kind: "good" } & MotivationReason)
 
 export type RecommendationsResponse = {
   recommendations: RecommendedActivity[]

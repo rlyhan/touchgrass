@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import type { Activity, ActivityField, BFASScores, Motivation } from "@touchgrass/types"
+import type { Activity, ActivityField, ActivityType, BFASScores, Motivation, SharedActivityTypesByMotivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import { getRecommendations, getSharedActivityTypesBetweenActivityAndUserMotivations } from "./get-recommendations.js"
@@ -61,6 +61,10 @@ function overlappingMotivationLabels(activity: Activity, motivations: Motivation
     .map((m) => m.label)
 }
 
+function motivationLabelsOf(sharedActivityTypesByMotivation: SharedActivityTypesByMotivation): string[] {
+  return MOTIVATION_OPTIONS.filter((m) => sharedActivityTypesByMotivation[m.value]).map((m) => m.label)
+}
+
 function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
   const weights = getUserPatternWeights(getOCEANScores(bfas))
   const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
@@ -92,7 +96,7 @@ test("getRecommendations gives a motivation label only to recommended activities
     const qualifies = recommendedSlugs.includes(rec.slug) && overlaps.length >= 2
     assert.equal(motivationLabelled.includes(rec), qualifies, rec.slug)
     const label = matchLabels[rec.slug]
-    if (label?.kind === "motivation") assert.deepEqual(label.motivations, overlaps)
+    if (label?.kind === "motivation") assert.deepEqual(motivationLabelsOf(label.sharedActivityTypesByMotivation), overlaps)
   }
 })
 
@@ -111,6 +115,45 @@ test("getRecommendations labels activities that qualify for both the personality
 
   assert.ok(bothSlugs.length > 0)
   assert.deepEqual(strongMatchSlugs, bothSlugs)
+})
+
+test("getRecommendations names the user's best pattern as the reason for every personality and strong label", () => {
+  const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
+  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+  const withPattern = RECOMMENDATIONS.flatMap((rec) => {
+    const label = matchLabels[rec.slug]
+    return label?.kind === "personality" || label?.kind === "strong" ? [{ rec, patternId: label.patternId }] : []
+  })
+
+  assert.ok(withPattern.some(({ rec }) => matchLabels[rec.slug]?.kind === "strong"))
+  for (const { rec, patternId } of withPattern) {
+    assert.equal(patternId, getDominantPatternId(weights, rec), rec.slug)
+  }
+})
+
+test("getRecommendations lists each overlapping motivation by value with only the activity types it shares", () => {
+  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+
+  for (const rec of RECOMMENDATIONS) {
+    const label = matchLabels[rec.slug]
+    if (!label || label.kind === "personality") continue
+    const activityTypes = [rec.type, ...(rec.related_types ?? [])]
+    assert.deepEqual(motivationLabelsOf(label.sharedActivityTypesByMotivation), overlappingMotivationLabels(rec, MOTIVATION_OPTIONS), rec.slug)
+    for (const motivation of MOTIVATION_OPTIONS) {
+      const sharedActivityTypes: ActivityType[] | undefined = label.sharedActivityTypesByMotivation[motivation.value]
+      if (sharedActivityTypes) {
+        assert.deepEqual(sharedActivityTypes, motivation.associated_activity_types.filter((t) => activityTypes.includes(t)), rec.slug)
+      }
+    }
+  }
+})
+
+test("getRecommendations gives a good match at most one motivation as its reason", () => {
+  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const goodMatches = Object.values(matchLabels).filter((label) => label.kind === "good")
+
+  assert.ok(goodMatches.length > 0)
+  assert.ok(goodMatches.every((label) => Object.keys(label.sharedActivityTypesByMotivation).length <= 1))
 })
 
 test("getRecommendations labels the rest of recommendedSlugs a good match and leaves other activities unlabelled", () => {

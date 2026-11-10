@@ -32,8 +32,11 @@ Each factor has its own doc covering what it affects, what it never affects, and
 - It also returns `matchLabels`, keyed by slug, giving the reason an activity matches. Browse shows it on each card as "Strong match", "Strong personality match", "Strong motivation match: …" (naming the motivations) or "Good match". Activities with none of these are left out. The first that applies wins:
   1. `strong` — qualifies for both `personality` and `motivation`.
   2. `personality` — base score (steps 1–3) strictly above the user's mean base score plus one standard deviation, and the user scores at least `MIN_DOMINANT_WEIGHT` (0.6) on one of the activity's patterns. Any activity can get it, recommended or not.
-  3. `motivation` — in `recommendedSlugs`, and two or more selected motivations list the activity's `type` or one of its `related_types` in their `associated_activity_types`. It carries those motivations' labels. It's limited to `recommendedSlugs` because every activity overlaps at least two of the seven motivations.
+  3. `motivation` — in `recommendedSlugs`, and two or more selected motivations list the activity's `type` or one of its `related_types` in their `associated_activity_types`. It's limited to `recommendedSlugs` because every activity overlaps at least two of the seven motivations.
   4. `good` — any other activity in `recommendedSlugs`.
+- Each label carries its reasons, worked out in `getMatchLabels` so the label and its explanation always agree:
+  - `personality` and `strong` carry `patternId`: the user's highest-weighted pattern among the activity's patterns (always 0.6 or more).
+  - `motivation`, `strong` and `good` carry `sharedActivityTypesByMotivation`: each selected motivation that overlaps the activity, keyed by its value, with only the activity types they share (e.g. `{ seek_adventure: ["Outdoorsy"] }`). A `good` label has at most one, because two or more would make it `motivation`.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity — see [Personality](recommendation-engine/personality.md).
 
 ---

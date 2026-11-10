@@ -53,19 +53,19 @@ export const Creative: Story = {
 
 export const GoodMatch: Story = {
   args: {
-    matchLabel: { kind: "good" },
+    matchLabel: { kind: "good", sharedActivityTypesByMotivation: {} },
   },
 }
 
 export const StrongMatch: Story = {
   args: {
-    matchLabel: { kind: "strong" },
+    matchLabel: { kind: "strong", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
   },
 }
 
 export const StrongPersonalityMatch: Story = {
   args: {
-    matchLabel: { kind: "personality" },
+    matchLabel: { kind: "personality", patternId: "4-LH" },
   },
 }
 
@@ -73,11 +73,11 @@ export const StrongMotivationMatch: Story = {
   args: {
     matchLabel: {
       kind: "motivation",
-      motivations: [
-        "Explore my creative side",
-        "Connect with people and share experiences",
-        "Work toward goals and personal growth",
-      ],
+      sharedActivityTypesByMotivation: {
+        explore_creative: ["Creative"],
+        connect_with_people: ["Collaborative"],
+        grow_and_achieve: ["Disciplined"],
+      },
     },
   },
 }
