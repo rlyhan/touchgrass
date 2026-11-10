@@ -6,6 +6,7 @@ import type { ActivityField, BFASScores } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import { getRecommendations } from "./get-recommendations.js"
+import { calculateRecommendationBaseScore } from "./personality/base-score.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
 import { scoreRecommendation } from "./score.js"
@@ -47,6 +48,47 @@ function recommendedCutoff(scores: number[]): number {
   const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
   return mean + sd * 0.5
 }
+
+const creativeAdventureAndPeople = MOTIVATION_OPTIONS.filter((m) =>
+  ["explore_creative", "seek_adventure", "connect_with_people"].includes(m.value),
+)
+
+function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
+  const weights = getUserPatternWeights(getOCEANScores(bfas))
+  const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
+  const mean = baseScores.reduce((sum, score) => sum + score, 0) / baseScores.length
+  const sd = Math.sqrt(baseScores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / baseScores.length)
+  return RECOMMENDATIONS.filter((_, i) => baseScores[i]! > mean + sd).map((rec) => rec.slug)
+}
+
+test("getRecommendations gives a personality label to exactly the activities whose base score is over one SD above the mean", () => {
+  const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
+
+  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const personalityLabelledSlugs = RECOMMENDATIONS.map((rec) => rec.slug).filter((slug) =>
+    matchLabels[slug]?.kind === "personality",
+  )
+  assert.ok(strongPersonalitySlugs.length > 0)
+  assert.deepEqual(personalityLabelledSlugs, strongPersonalitySlugs)
+})
+
+test("getRecommendations labels the rest of recommendedSlugs a good match and leaves other activities unlabelled", () => {
+  const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+
+  for (const rec of RECOMMENDATIONS) {
+    const kind = matchLabels[rec.slug]?.kind
+    if (recommendedSlugs.includes(rec.slug)) assert.ok(kind !== undefined, rec.slug)
+    else assert.ok(kind === undefined || kind === "personality", rec.slug)
+  }
+})
+
+test("getRecommendations gives no personality label to a user who scores 50 on every aspect", () => {
+  const neutralUser = Object.fromEntries(Object.keys(mockUserBfas).map((aspect) => [aspect, 50])) as BFASScores
+
+  const { matchLabels } = getRecommendations(neutralUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality")
+  assert.equal(personalityKinds.length, 0)
+})
 
 test("getRecommendations only returns items from the available recommendation pool", () => {
   const scored = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS).recommendations

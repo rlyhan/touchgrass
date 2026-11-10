@@ -28,7 +28,10 @@ Each factor has its own doc covering what it affects, what it never affects, and
 ## Outputs
 
 - `getRecommendations` returns the top 10 best-match recommendations (`ScoredRecommendation[]`) after scoring and diversification — the recommendations screen.
-- It also returns `recommendedSlugs`, which browse labels "Recommended for you": every activity whose final score (step 4, base + motivation boost) is at least half a standard deviation above the user's mean score across the catalogue, without diversification. The cutoff is relative to each user because the motivation boost grows with the number of motivations selected, so absolute final scores aren't comparable across users.
+- It also returns `recommendedSlugs`, which browse labels "Recommended for you" and lists first on each page: every activity whose final score (step 4, base + motivation boost) is at least half a standard deviation above the user's mean score across the catalogue, without diversification. The cutoff is relative to each user because the motivation boost grows with the number of motivations selected, so absolute final scores aren't comparable across users.
+- It also returns `matchLabels`, keyed by slug, giving the reason an activity matches. Activities with none of these are left out. The first that applies wins:
+  1. `personality` — base score (steps 1–3) strictly above the user's mean base score plus one standard deviation. Any activity can get it, recommended or not.
+  2. `good` — any other activity in `recommendedSlugs`.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity — see [Personality](recommendation-engine/personality.md).
 
 ---
@@ -42,8 +45,8 @@ Everything lives in [`packages/core/src/lib/recommendations/`](../packages/core/
 | `personality/`, `motivation/`, `interests/` | One folder per factor (see Factors above) |
 | `score.ts` | `scoreRecommendation` — the only place factors combine (`base + boost`) |
 | `diversify.ts` | `diversifyAndOrder` — final order for the recommendations screen |
-| `get-recommendations.ts` | `getRecommendations` — runs the steps below, takes the top 10 and computes `recommendedSlugs` |
-| `factor-contracts.test.ts` | Rules that span factors: interests never change `recommendedSlugs`, many motivations don't inflate it, personality alone doesn't earn it |
+| `get-recommendations.ts` | `getRecommendations` — runs the steps below, takes the top 10 and computes `recommendedSlugs` and `matchLabels` |
+| `factor-contracts.test.ts` | Rules that span factors: interests never change `recommendedSlugs` or `matchLabels`, many motivations don't inflate `recommendedSlugs`, personality alone doesn't earn it |
 
 ### 1–3. Personality → base score
 

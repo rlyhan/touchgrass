@@ -233,10 +233,15 @@ export type RecommendedActivity = Activity & {
   dominantPatternId: PatternTypeId | null
 }
 
+export type MatchLabel =
+  | { kind: "personality" }
+  | { kind: "good" }
+
 export type RecommendationsResponse = {
   recommendations: RecommendedActivity[]
   patternWeights: UserPatternWeights
   recommendedSlugs: string[]
+  matchLabels: Record<string, MatchLabel>
 }
 
 export type PatternWeightsResponse = {

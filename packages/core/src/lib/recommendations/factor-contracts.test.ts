@@ -55,6 +55,13 @@ test("getRecommendations returns the same recommendedSlugs whatever the user's i
   assert.deepEqual(withEveryInterest.recommendedSlugs, withoutInterests.recommendedSlugs)
 })
 
+test("getRecommendations returns the same matchLabels whatever the user's interests", () => {
+  const withoutInterests = getRecommendations(mockUserBfas, [creativeMotivation], [], RECOMMENDATIONS)
+  const withEveryInterest = getRecommendations(mockUserBfas, [creativeMotivation], [...ACTIVITY_FIELDS], RECOMMENDATIONS)
+
+  assert.deepEqual(withEveryInterest.matchLabels, withoutInterests.matchLabels)
+})
+
 test("getRecommendations leaves the best personality fit out of recommendedSlugs when it gets no motivation boost", () => {
   const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
   const [strongestUnboostedFit] = RECOMMENDATIONS.filter(

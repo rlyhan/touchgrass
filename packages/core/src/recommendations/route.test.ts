@@ -141,6 +141,15 @@ test("GET /recommendations includes recommendedSlugs from the activity pool", as
   assert.ok(body.recommendedSlugs.every((slug) => poolSlugs.has(slug)))
 })
 
+test("GET /recommendations labels every recommended activity in matchLabels", async () => {
+  const res = await fetch(`${baseUrl}/recommendations`)
+  const body = (await res.json()) as RecommendationsResponse
+
+  const poolSlugs = new Set(RECOMMENDATIONS.map((a) => a.slug))
+  assert.ok(Object.keys(body.matchLabels).every((slug) => poolSlugs.has(slug)))
+  assert.ok(body.recommendedSlugs.every((slug) => body.matchLabels[slug] !== undefined))
+})
+
 test("GET /recommendations returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
