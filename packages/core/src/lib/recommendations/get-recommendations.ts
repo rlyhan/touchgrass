@@ -20,20 +20,33 @@ export function getRecommendations(
     interests: ActivityField[],
     activities: Activity[],
 ): { recommendations: ScoredRecommendation[]; recommendedSlugs: string[] } {
+    // Get the user's alignment to each NEO pattern from their BFAS scores.
     const bfasToOCEAN = getOCEANScores(userTraits)
     const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
 
+    // Score every activity (personality + motivation), then order them for the recommendations screen.
     const scoredRecommendations = activities.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
-    const ordered = diversifyAndOrder(scoredRecommendations, interests)
+    const orderedRecommendations = diversifyAndOrder(scoredRecommendations, interests)
 
-    const scores = scoredRecommendations.map((s) => s.score)
-    const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length
-    const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
-
+    // Return the top MAX_RECOMMENDATIONS for the recommendations screen, and the slugs browse marks as recommended.
     return {
-        recommendations: ordered.slice(0, MAX_RECOMMENDATIONS),
-        recommendedSlugs: scoredRecommendations
-            .filter((s) => s.score >= mean + sd * RECOMMENDED_SD_MULTIPLIER)
-            .map((s) => s.rec.slug),
+        recommendations: orderedRecommendations.slice(0, MAX_RECOMMENDATIONS),
+        recommendedSlugs: getHighScoringSlugs(scoredRecommendations),
     }
+}
+
+/*
+ * High scoring: every activity in the catalogue whose final score is well above this user's average,
+ * for browse. Separate from the top MAX_RECOMMENDATIONS on the recommendations screen, which are diversified.
+ * 1. Average every final score (the mean), then measure how spread out they are (the standard deviation, SD).
+ * 2. Cutoff = mean + 0.5 × SD; every activity scoring at or above it is high scoring.
+ * The cutoff is relative to each user because more motivations raise every score. It typically keeps about a third of the catalogue.
+ */
+function getHighScoringSlugs(scoredRecommendations: ScoredRecommendation[]): string[] {
+    const finalScores = scoredRecommendations.map((s) => s.score)
+    const finalMean = finalScores.reduce((sum, score) => sum + score, 0) / finalScores.length
+    const finalSd = Math.sqrt(finalScores.reduce((sum, score) => sum + (score - finalMean) ** 2, 0) / finalScores.length)
+    return scoredRecommendations
+        .filter((s) => s.score >= finalMean + finalSd * RECOMMENDED_SD_MULTIPLIER)
+        .map((s) => s.rec.slug)
 }
