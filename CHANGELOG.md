@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.7.0] - 2026-11-10 — Feat: Browse match labels and wider type filter
+
+Replaces browse's "Recommended for you" badge with labels explaining why an activity matches, lists recommended activities first on each page, and fixes the activity type filter missing most matches.
+
+### API (`packages/core`)
+
+- `GET /activities/search` type filters now match an activity's `related_types` as well as its primary type ("Creative" goes from 6 results to 36).
+- `GET /recommendations` returns `matchLabels`, keyed by slug: `strong`, `personality` (base score strictly above the user's mean + 1 SD), `motivation` (recommended, and two or more selected motivations share a type with it, named on the label) or `good` (any other recommended activity). Interests never change a label.
+- The recommended cutoff and the new personality cutoff live in their own helpers in `get-recommendations.ts`; scoring and `recommendedSlugs` are unchanged.
+- Requires `fly deploy` on each Fly app. Older APIs omit `matchLabels`, so cards show no label until the API is updated.
+
+### Mobile (`apps/mobile`)
+
+- Browse cards show "Strong match", "Strong personality match", "Strong motivation match: …" or "Good match" in place of "Recommended for you". The badge can wrap for long motivation names.
+- Activities in `recommendedSlugs` are listed first within each page, keeping the page's order otherwise. Sorting across pages isn't included.
+- Match labels are stored with the recommended slugs when recommendations load, and cleared on sign-out.
+
+### Docs (`context`)
+
+- Documented `matchLabels` and which labels each factor affects.
+
 ## [1.6.0] - 2026-10-15 — Feat: Browse filters by activity type and field
 
 Adds multi-select Activity type and Field filters to browse, applied by the API.
