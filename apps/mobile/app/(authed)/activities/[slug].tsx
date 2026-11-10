@@ -19,7 +19,7 @@ import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
-import { useMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { useDashboardPatternIds, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
 
@@ -36,11 +36,9 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 }
 
 export default function ActivityDetailPage() {
-  const params = useLocalSearchParams<{ slug: string; pattern?: string | string[] }>()
-  const { slug } = params
-  // A repeated ?pattern= arrives as an array; use the first value, like URLSearchParams.get.
-  const pattern = Array.isArray(params.pattern) ? params.pattern[0] : params.pattern
+  const { slug } = useLocalSearchParams<{ slug: string }>()
   const matchLabel = useMatchLabels()[slug ?? ""]
+  const dashboardPatternId = useDashboardPatternIds()[slug ?? ""]
 
   const cached = slug ? getCachedActivity(slug) : undefined
   const [activity, setActivity] = useState<Activity | null>(cached ?? null)
@@ -133,7 +131,7 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        <MatchReasons activity={activity} matchLabel={matchLabel} linkedPatternId={pattern} />
+        <MatchReasons matchLabel={matchLabel} dashboardPatternId={dashboardPatternId} />
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">

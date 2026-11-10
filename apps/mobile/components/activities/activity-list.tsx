@@ -3,10 +3,9 @@ import { useCallback, type Ref } from "react"
 import { FlatList, Pressable, View, type FlatListProps } from "react-native"
 
 import { ActivityCard } from "@/components/activities/activity-card"
-import type { Activity, MatchLabel, PatternTypeId } from "@touchgrass/types"
+import type { Activity, MatchLabel } from "@touchgrass/types"
 
 export type ListedActivity = Activity & {
-  dominantPatternId?: PatternTypeId | null
   matchLabel?: MatchLabel
 }
 
@@ -15,9 +14,8 @@ type Props = Omit<FlatListProps<ListedActivity>, "data" | "renderItem" | "keyExt
   ref?: Ref<FlatList<ListedActivity>>
 }
 
-function activityHref({ slug, dominantPatternId }: ListedActivity): Href {
-  const base = `/activities/${slug}`
-  return (dominantPatternId ? `${base}?pattern=${encodeURIComponent(dominantPatternId)}` : base) as Href
+function activityHref({ slug }: ListedActivity): Href {
+  return `/activities/${slug}` as Href
 }
 
 const ItemSeparator = () => <View style={{ height: 16 }} />

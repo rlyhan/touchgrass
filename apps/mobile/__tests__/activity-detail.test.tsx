@@ -21,11 +21,6 @@ jest.mock("@/lib/recommendations/api", () => ({
   fetchActivityBySlug: jest.fn(),
 }))
 
-// ── pattern weights ───────────────────────────────────────────────────────────
-jest.mock("@/lib/patterns/use-pattern-weights", () => ({
-  usePatternWeights: jest.fn(() => ({ weights: undefined, status: "loading" })),
-}))
-
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("react-native-safe-area-context", () => require("@/test-utils/mocks").safeAreaMock)
 
@@ -42,7 +37,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
-import { clearRecommendedSlugs, setMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { clearRecommendedSlugs, setDashboardPatternIds, setMatchLabels } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -297,32 +292,25 @@ describe("ActivityDetailPage", () => {
   })
 
   describe("why this matches you", () => {
-    const mockUsePatternWeights = jest.mocked(
-      require("@/lib/patterns/use-pattern-weights").usePatternWeights,
-    )
-
     beforeEach(() => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       mockGetCachedActivity.mockReturnValue(ACTIVITY)
       mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
-      mockUsePatternWeights.mockReturnValue({ weights: { "4-HH": 0.9 }, status: "ready" })
     })
 
     afterEach(() => {
       clearRecommendedSlugs()
     })
 
-    it("shows the pattern from a personality label without a pattern param or loading weights", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
+    it("shows the pattern from a personality label", () => {
       setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Why this matches you")).toBeTruthy()
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
-      expect(mockUsePatternWeights).not.toHaveBeenCalled()
     })
 
     it("shows the pattern and a row per shared motivation for a strong label", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       setMatchLabels({
         [ACTIVITY.slug]: {
           kind: "strong",
@@ -339,46 +327,14 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByText("Social")).toBeTruthy()
     })
 
-    it("hides the accordion and skips loading weights when no pattern param is passed", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
-      render(<ActivityDetailPage />)
-
-      expect(screen.queryByText("Why this matches you")).toBeNull()
-      expect(mockUsePatternWeights).not.toHaveBeenCalled()
-    })
-
-    it("hides the accordion when the pattern param is not a known pattern", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "nope" })
-      render(<ActivityDetailPage />)
-
-      expect(screen.queryByText("Why this matches you")).toBeNull()
-    })
-
-    it("uses the first value when the pattern param is repeated", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: ["4-HH", "9-HH"] })
+    it("shows the recommendations screen's pattern for an activity without a label", () => {
+      setDashboardPatternIds({ [ACTIVITY.slug]: "4-HH" })
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
     })
 
-    it("hides the accordion when the first repeated value doesn't match the viewer", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: ["9-HH", "4-HH"] })
-      render(<ActivityDetailPage />)
-
-      expect(screen.queryByText("Why this matches you")).toBeNull()
-    })
-
-    it("hides the accordion while the viewer's weights are loading", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "4-HH" })
-      mockUsePatternWeights.mockReturnValue({ weights: undefined, status: "loading" })
-      render(<ActivityDetailPage />)
-
-      expect(screen.queryByText("Why this matches you")).toBeNull()
-    })
-
-    it("hides the accordion when the pattern param doesn't match the viewer's weights", () => {
-      // 9-HH is a candidate for this activity, but the viewer's dominant is 4-HH.
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "9-HH" })
+    it("hides the section for an activity with no label or recommendations screen pattern", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.queryByText("Why this matches you")).toBeNull()
@@ -386,7 +342,7 @@ describe("ActivityDetailPage", () => {
 
     it("renders the match copy and reveals the short description on expand", () => {
       // 4-HH → Enchanting Visionary
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "4-HH" })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
       render(<ActivityDetailPage />)
 
       const trigger = screen.getByRole("button", {

@@ -1,5 +1,6 @@
 import type {
   Activity,
+  PatternTypeId,
   RecommendationsResponse,
   RecommendedActivity,
 } from "@touchgrass/types"
@@ -8,7 +9,7 @@ import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
 import { setCachedPatternWeights } from "@/lib/patterns/cache"
-import { setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { setDashboardPatternIds, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 
 export { UnauthenticatedError } from "@/lib/auth/errors"
 
@@ -47,9 +48,12 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   setRecommendedSlugs(body.recommendedSlugs ?? [])
   setMatchLabels(body.matchLabels ?? {})
   const recommendations = body.recommendations ?? []
-  for (const { dominantPatternId: _dominantPatternId, ...activity } of recommendations) {
+  const dashboardPatternIds: Record<string, PatternTypeId> = {}
+  for (const { dominantPatternId, ...activity } of recommendations) {
     activityCache.set(activity.slug, activity)
+    if (dominantPatternId) dashboardPatternIds[activity.slug] = dominantPatternId
   }
+  setDashboardPatternIds(dashboardPatternIds)
   return recommendations
 }
 
