@@ -5,7 +5,7 @@ import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity, ActivityField, BFASScores, Motivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
-import { getRecommendations } from "./get-recommendations.js"
+import { getRecommendations, getSharedActivityTypesBetweenActivityAndUserMotivations } from "./get-recommendations.js"
 import { calculateRecommendationBaseScore } from "./personality/base-score.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
@@ -155,6 +155,22 @@ test("getRecommendations gives no personality label to a user who scores 50 on e
   const { matchLabels } = getRecommendations(neutralUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
   const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality" || label.kind === "strong")
   assert.equal(personalityKinds.length, 0)
+})
+
+const sharedTypesActivity: Activity = { ...RECOMMENDATIONS[0]!, type: "Outdoorsy", related_types: ["Social", "Reflective"] }
+const sharedTypesMotivations: Motivation[] = [
+  { value: "connect_with_people", label: "People", associated_activity_types: ["Social", "Collaborative"] },
+  { value: "seek_adventure", label: "Adventure", associated_activity_types: ["Adventurous", "Outdoorsy", "Exploratory"] },
+  { value: "challenge_push_myself", label: "Challenge", associated_activity_types: ["Competitive", "Physical"] },
+  { value: "improve_wellbeing", label: "Wellbeing", associated_activity_types: ["Reflective", "Outdoorsy"] },
+]
+
+test("getSharedActivityTypesBetweenActivityAndUserMotivations lists only the types each motivation shares with the activity, leaving out motivations that share none", () => {
+  assert.deepEqual(getSharedActivityTypesBetweenActivityAndUserMotivations(sharedTypesActivity, sharedTypesMotivations), {
+    connect_with_people: ["Social"],
+    seek_adventure: ["Outdoorsy"],
+    improve_wellbeing: ["Reflective", "Outdoorsy"],
+  })
 })
 
 test("getRecommendations only returns items from the available recommendation pool", () => {

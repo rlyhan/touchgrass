@@ -1,4 +1,4 @@
-import { Activity, ActivityField, BFASScores, MatchLabel, Motivation, PatternTypeId, ScoredRecommendation } from "@touchgrass/types";
+import { Activity, ActivityField, BFASScores, MatchLabel, Motivation, PatternTypeId, SharedActivityTypesByMotivation, ScoredRecommendation } from "@touchgrass/types";
 import { diversifyAndOrder } from "./diversify.js";
 import { calculateRecommendationBaseScore } from "./personality/base-score.js";
 import { getOCEANScores } from "./personality/ocean.js";
@@ -59,24 +59,46 @@ export function getRecommendations(
  */
 function getMatchLabels(
     activities: Activity[],
-    motivations: Motivation[],
+    userMotivations: Motivation[],
     highScoringSlugSet: Set<string>,
     strongPersonalitySlugSet: Set<string>,
 ): Record<string, MatchLabel> {
     const matchLabels: Record<string, MatchLabel> = {}
     activities.forEach((rec) => {
-        const activityTypes = [rec.type, ...(rec.related_types ?? [])]
-        const overlappingMotivations = motivations.filter((m) => m.associated_activity_types.some((t) => activityTypes.includes(t)))
+        // Find which of the user's motivations share activity types with this activity, how many, and their labels.
+        const sharedActivityTypesByMotivation = getSharedActivityTypesBetweenActivityAndUserMotivations(rec, userMotivations)
+        const overlappingMotivationCount = Object.keys(sharedActivityTypesByMotivation).length
+        const overlappingMotivationLabels = userMotivations
+            .filter((m) => m.value in sharedActivityTypesByMotivation)
+            .map((m) => m.label)
+
+        // Check which labels the activity qualifies for: strong personality, recommended, strong motivation.
         const isStrongPersonality = strongPersonalitySlugSet.has(rec.slug)
         const isRecommended = highScoringSlugSet.has(rec.slug)
-        const isStrongMotivation = isRecommended && overlappingMotivations.length >= STRONG_MOTIVATION_MIN_OVERLAPS
+        const isStrongMotivation = isRecommended && overlappingMotivationCount >= STRONG_MOTIVATION_MIN_OVERLAPS
 
+        // Pick the first label that applies; unlabelled activities are left out.
         if (isStrongPersonality && isStrongMotivation) matchLabels[rec.slug] = { kind: "strong" }
         else if (isStrongPersonality) matchLabels[rec.slug] = { kind: "personality" }
-        else if (isStrongMotivation) matchLabels[rec.slug] = { kind: "motivation", motivations: overlappingMotivations.map((m) => m.label) }
+        else if (isStrongMotivation) matchLabels[rec.slug] = { kind: "motivation", motivations: overlappingMotivationLabels }
         else if (isRecommended) matchLabels[rec.slug] = { kind: "good" }
     })
     return matchLabels
+}
+
+/*
+ * Shared activity types by motivation: for each of the user's motivations, the activity types it has in common with this
+ * activity (its primary type plus related types). Motivations sharing none are left out, so the number of keys is how many
+ * motivations overlap the activity.
+ */
+export function getSharedActivityTypesBetweenActivityAndUserMotivations(activity: Activity, userMotivations: Motivation[]): SharedActivityTypesByMotivation {
+    const activityTypes = [activity.type, ...(activity.related_types ?? [])]
+    const sharedActivityTypesByMotivation: SharedActivityTypesByMotivation = {}
+    userMotivations.forEach((m) => {
+        const sharedActivityTypes = m.associated_activity_types.filter((t) => activityTypes.includes(t))
+        if (sharedActivityTypes.length > 0) sharedActivityTypesByMotivation[m.value] = sharedActivityTypes
+    })
+    return sharedActivityTypesByMotivation
 }
 
 /*
