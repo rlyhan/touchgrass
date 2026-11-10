@@ -26,7 +26,7 @@ jest.mock("@/components/icons/grass-logo", () => require("@/test-utils/mocks").g
 jest.mock("@/components/activities/activity-card", () => require("@/test-utils/mocks").activityCardMock)
 
 import * as BrowseApi from "@/lib/browse/api"
-import { clearRecommendedSlugs, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { clearRecommendedSlugs, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import { Image } from "expo-image"
@@ -97,19 +97,27 @@ describe("BrowsePage", () => {
     expect(screen.queryByRole("button", { name: "Page 1" })).toBeNull()
   })
 
-  it("flags only the activities in the user's recommended slugs", async () => {
+  it("gives each activity its match label and leaves the rest unlabelled", async () => {
     const randomActivities = RECOMMENDATIONS.slice(20, 30)
-    const recommendedSlugs = [randomActivities[0].slug, randomActivities[3].slug]
+    const goodMatchSlug = randomActivities[0].slug
+    const personalityMatchSlug = randomActivities[3].slug
     render(<BrowsePage />)
     await act(async () => {})
 
-    await act(async () => setRecommendedSlugs(recommendedSlugs))
+    await act(async () =>
+      setMatchLabels({ [goodMatchSlug]: { kind: "good" }, [personalityMatchSlug]: { kind: "personality" } }),
+    )
 
-    const flaggedSlugs = screen
-      .UNSAFE_getByType(FlatList)
-      .props.data.filter((a: { recommended: boolean }) => a.recommended)
-      .map((a: { slug: string }) => a.slug)
-    expect(flaggedSlugs).toEqual(recommendedSlugs)
+    const labelsBySlug = Object.fromEntries(
+      screen
+        .UNSAFE_getByType(FlatList)
+        .props.data.filter((a: { matchLabel?: object }) => a.matchLabel)
+        .map((a: { slug: string; matchLabel: object }) => [a.slug, a.matchLabel]),
+    )
+    expect(labelsBySlug).toEqual({
+      [goodMatchSlug]: { kind: "good" },
+      [personalityMatchSlug]: { kind: "personality" },
+    })
   })
 
   it("lists recommended activities first within a page, otherwise keeping the page's order", async () => {

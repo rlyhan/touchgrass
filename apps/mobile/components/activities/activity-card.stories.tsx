@@ -19,7 +19,7 @@ const meta = {
     type: { control: "text" },
     field: { control: "text" },
     estimatedTime: { control: "text" },
-    recommended: { control: "boolean" },
+    matchLabel: { control: "object" },
   },
 } satisfies Meta<typeof ActivityCard>
 
@@ -51,9 +51,34 @@ export const Creative: Story = {
   },
 }
 
-export const Recommended: Story = {
+export const GoodMatch: Story = {
   args: {
-    recommended: true,
+    matchLabel: { kind: "good" },
+  },
+}
+
+export const StrongMatch: Story = {
+  args: {
+    matchLabel: { kind: "strong" },
+  },
+}
+
+export const StrongPersonalityMatch: Story = {
+  args: {
+    matchLabel: { kind: "personality" },
+  },
+}
+
+export const StrongMotivationMatch: Story = {
+  args: {
+    matchLabel: {
+      kind: "motivation",
+      motivations: [
+        "Explore my creative side",
+        "Connect with people and share experiences",
+        "Work toward goals and personal growth",
+      ],
+    },
   },
 }
 

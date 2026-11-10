@@ -3,11 +3,11 @@ import { useCallback, type Ref } from "react"
 import { FlatList, Pressable, View, type FlatListProps } from "react-native"
 
 import { ActivityCard } from "@/components/activities/activity-card"
-import type { Activity, PatternTypeId } from "@touchgrass/types"
+import type { Activity, MatchLabel, PatternTypeId } from "@touchgrass/types"
 
 export type ListedActivity = Activity & {
   dominantPatternId?: PatternTypeId | null
-  recommended?: boolean
+  matchLabel?: MatchLabel
 }
 
 type Props = Omit<FlatListProps<ListedActivity>, "data" | "renderItem" | "keyExtractor"> & {
@@ -36,7 +36,7 @@ export function ActivityList({ activities, ref, ...listProps }: Props) {
           type={activity.type}
           field={activity.field}
           estimatedTime={activity.estimated_time}
-          recommended={activity.recommended}
+          matchLabel={activity.matchLabel}
         />
       </Pressable>
     ),

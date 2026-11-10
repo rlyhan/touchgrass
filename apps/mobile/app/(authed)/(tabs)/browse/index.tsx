@@ -10,7 +10,7 @@ import { SearchField } from "@/components/ui/search-field"
 import { useActivitySearch } from "@/lib/browse/use-activity-search"
 import { useRandomActivities } from "@/lib/browse/use-random-activities"
 import { getActivityTypeIcon, getFieldIcon } from "@/lib/icons"
-import { useRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { useMatchLabels, useRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { colors } from "@/lib/theme/colors"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
@@ -33,6 +33,7 @@ export default function BrowsePage() {
   const randomActivities = useRandomActivities()
   const search = useActivitySearch()
   const recommendedSlugs = useRecommendedSlugs()
+  const matchLabels = useMatchLabels()
   const listRef = useRef<FlatList<ListedActivity>>(null)
   const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
 
@@ -44,10 +45,10 @@ export default function BrowsePage() {
       (shownActivities ?? [])
         .map((activity) => ({
           ...activity,
-          recommended: recommendedSlugs.has(activity.slug),
+          matchLabel: matchLabels[activity.slug],
         }))
-        .sort((a, b) => Number(b.recommended) - Number(a.recommended)),
-    [shownActivities, recommendedSlugs],
+        .sort((a, b) => Number(recommendedSlugs.has(b.slug)) - Number(recommendedSlugs.has(a.slug))),
+    [shownActivities, recommendedSlugs, matchLabels],
   )
 
   function handlePageChange(nextPage: number) {

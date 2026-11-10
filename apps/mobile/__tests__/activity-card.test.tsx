@@ -34,6 +34,7 @@ jest.mock("@/lib/icons", () => {
 import * as Icons from "@/lib/icons"
 import { ActivityCard } from "@/components/activities/activity-card"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
+import type { MatchLabel } from "@touchgrass/types"
 
 const mockGetActivityTypeIcon = jest.mocked(Icons.getActivityTypeIcon)
 const mockGetFieldIcon = jest.mocked(Icons.getFieldIcon)
@@ -79,12 +80,24 @@ describe("ActivityCard", () => {
     expect(screen.getByTestId("field-icon")).toBeTruthy()
   })
 
-  it("shows the recommended label only when recommended", () => {
-    const { rerender } = render(<ActivityCard {...BASE_PROPS} />)
-    expect(screen.queryByText("Recommended for you")).toBeNull()
+  it("shows no match label without one", () => {
+    render(<ActivityCard {...BASE_PROPS} />)
+    expect(screen.queryByText(/match/)).toBeNull()
+  })
 
-    rerender(<ActivityCard {...BASE_PROPS} recommended />)
-    expect(screen.getByText("Recommended for you")).toBeTruthy()
+  const labelsWithText: [MatchLabel, string][] = [
+    [{ kind: "strong" }, "Strong match"],
+    [{ kind: "personality" }, "Strong personality match"],
+    [{ kind: "good" }, "Good match"],
+    [
+      { kind: "motivation", motivations: ["Challenge and push myself", "Connect with people and share experiences"] },
+      "Strong motivation match: Challenge and push myself, Connect with people and share experiences",
+    ],
+  ]
+
+  it.each(labelsWithText)("shows the %o label as %s", (matchLabel, labelText) => {
+    render(<ActivityCard {...BASE_PROPS} matchLabel={matchLabel} />)
+    expect(screen.getByText(labelText)).toBeTruthy()
   })
 
   it("swaps the image for a fallback view when the image errors", () => {
