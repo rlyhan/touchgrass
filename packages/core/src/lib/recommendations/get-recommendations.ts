@@ -98,23 +98,39 @@ function getHighScoringSlugs(scoredRecommendations: ScoredRecommendation[]): Set
 }
 
 /*
- * Strong personality: every activity whose base score (personality only, no motivation boost) is well above this user's average,
- * and where the user scored highly (MIN_DOMINANT_WEIGHT) on at least one of the activity's patterns.
- * 1. Average every base score (the mean), then measure how spread out they are (the standard deviation, SD).
- * 2. Cutoff = mean + 1 × SD; an activity must score strictly above it, so a user with no spread (e.g. 50 on every aspect) gets none.
- * The pattern check keeps "You scored highly as …" true: a user with middling scores can clear the relative cutoff without any high pattern.
+ * Strong personality: activities that pass both personality checks.
+ * 1. Better fit than most — does this activity suit the user better than most activities? Compares the activity's base score
+ *    (how well the activity's patterns as a whole fit the user) with their other activities. See getBetterFitThanMostSlugs.
+ * 2. High-scoring pattern — does the user have a strong trait connected to this activity? The single best weight among the
+ *    activity's patterns must be at least MIN_DOMINANT_WEIGHT (0.6). Most activities pass this for a user with a few strong
+ *    traits, so on its own it doesn't single any out.
+ * Each catches what the other misses: middling users pass check 1 with nothing high, and users with a few strong traits pass
+ * check 2 on nearly every activity. Together they keep "You scored highly as …" true.
  */
 function getStrongPersonalitySlugs(userPatternWeights: Record<PatternTypeId, number>, activities: Activity[]): Set<string> {
+    const betterFitThanMostSlugs = getBetterFitThanMostSlugs(userPatternWeights, activities)
+    return new Set(
+        activities
+            .filter((rec) => betterFitThanMostSlugs.has(rec.slug) && getDominantPatternId(userPatternWeights, rec) !== null)
+            .map((rec) => rec.slug),
+    )
+}
+
+/*
+ * Better fit than most: activities whose base score is well above this user's average base score.
+ * The base score is personality only: the user's average weight on the primary type's patterns, plus 0.2 × their average
+ * weight on the related types' patterns (see personality/base-score.ts).
+ * 1. Average every base score (the mean), then measure how spread out they are (the standard deviation, SD).
+ * 2. Cutoff = mean + 1 × SD; an activity must score strictly above it, so a user with no spread (e.g. 50 on every aspect) gets none.
+ * The cutoff is relative, so this ranks activities against each other rather than measuring how well any one fits.
+ */
+function getBetterFitThanMostSlugs(userPatternWeights: Record<PatternTypeId, number>, activities: Activity[]): Set<string> {
     const baseScoredActivities = activities.map((rec) => ({ rec, baseScore: calculateRecommendationBaseScore(userPatternWeights, rec) }))
     const baseMean = baseScoredActivities.reduce((sum, { baseScore }) => sum + baseScore, 0) / baseScoredActivities.length
     const baseSd = Math.sqrt(baseScoredActivities.reduce((sum, { baseScore }) => sum + (baseScore - baseMean) ** 2, 0) / baseScoredActivities.length)
     return new Set(
         baseScoredActivities
-            .filter(
-                ({ rec, baseScore }) =>
-                    baseScore > baseMean + baseSd * STRONG_PERSONALITY_SD_MULTIPLIER &&
-                    getDominantPatternId(userPatternWeights, rec) !== null,
-            )
+            .filter(({ baseScore }) => baseScore > baseMean + baseSd * STRONG_PERSONALITY_SD_MULTIPLIER)
             .map(({ rec }) => rec.slug),
     )
 }

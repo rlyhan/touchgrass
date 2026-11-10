@@ -62,6 +62,17 @@ For each of the 40 patterns, each of its two traits is converted to a 0–1 fit 
 
 Primary affinity is the anchor; secondary affinity can only add a bonus (up to +0.2). Done by `calculateRecommendationBaseScore` (via `calculateActivityPatternAffinity`).
 
+### 4. Strong personality match label — `get-recommendations.ts`
+
+`getStrongPersonalitySlugs` gives an activity the `personality` (or `strong`) match label only when it passes two checks that answer different questions:
+
+| Check | Question it answers | How it's measured |
+|---|---|---|
+| Better fit than most (`getBetterFitThanMostSlugs`) | Does this activity suit the user better than most activities? | The activity's **base score** (step 3), which blends all its patterns, must be strictly above the user's mean base score plus one standard deviation |
+| High-scoring pattern (`getDominantPatternId`) | Does the user have a strong trait connected to this activity? | The **single best pattern weight** among the activity's patterns must be at least `MIN_DOMINANT_WEIGHT` (0.6) |
+
+Neither is enough alone. The base score check is relative, so a user with middling scores still has activities above their own average, with nothing they scored highly on. The pattern check takes the best of roughly 6–15 patterns, so a user with a few strong traits passes it on nearly every activity. Together, the label marks an activity that stands out for this user *and* is backed by a high trait, which keeps "You scored highly as …" true.
+
 ### Also built on personality
 
 - **Dominant pattern** — `getDominantPatternId` (in `@touchgrass/types/dominant-pattern`, shared with mobile) picks the user's highest-weighted pattern among an activity's primary + related patterns for the "You were matched because you scored highly as a …" copy. It returns `null` below `MIN_DOMINANT_WEIGHT = 0.6` so the copy never overclaims.
@@ -90,4 +101,4 @@ Primary affinity is the anchor; secondary affinity can only add a bonus (up to +
 - **A pattern shared by several related types counts once per type.** Creative and Artistic both include `4-HH`, so with both as related types `4-HH` is weighted twice in the secondary pool. `getDominantPatternId` deduplicates; the base score doesn't. (`base-score.test.ts`, `dominant-pattern.test.ts`)
 - **The same pattern can belong to unrelated types** (e.g. `9-HH` is in both Creative and Analytical). This matters for motivations, which match by type, not pattern. (`motivation/boost.test.ts`)
 - **Personality alone doesn't earn `recommendedSlugs`.** An activity with a strong base score but no motivation boost usually falls below the user's `recommendedSlugs` cutoff (covered in `factor-contracts.test.ts`). It can still get the `personality` match label, which uses the base score alone.
-- **The `personality` match label needs both a relative and an absolute fit.** The base score must be strictly above the user's mean plus one standard deviation, and the user must score at least `MIN_DOMINANT_WEIGHT` (0.6) on one of the activity's patterns. The relative cutoff alone let users with middling scores get the label with no pattern they scored highly on, so "You scored highly as …" wasn't true. Users with middling scores may get no personality labels at all, and a user who scores 50 on every aspect never does. (`get-recommendations.test.ts`)
+- **Users with middling scores may get no personality labels.** Without a pattern at 0.6 or more, the high-scoring pattern check fails on every activity, even though some still pass the better-fit-than-most check (see step 4). A user who scores 50 on every aspect never gets one. (`get-recommendations.test.ts`)
