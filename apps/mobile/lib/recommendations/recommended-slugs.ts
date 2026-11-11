@@ -6,7 +6,7 @@ import type { MatchLabel, PatternTypeId } from "@touchgrass/types"
 // fetchRecommendations call, read by browse to sort and label cards and by the activity page to explain them.
 let slugs: ReadonlySet<string> = new Set()
 let matchLabels: Readonly<Record<string, MatchLabel>> = {}
-let dashboardPatternIds: Readonly<Record<string, PatternTypeId>> = {}
+let dominantPatternIds: Readonly<Record<string, PatternTypeId>> = {}
 let generation = 0
 const listeners = new Set<() => void>()
 
@@ -29,8 +29,8 @@ function getMatchLabelsSnapshot() {
   return matchLabels
 }
 
-function getDashboardPatternIdsSnapshot() {
-  return dashboardPatternIds
+function getDominantPatternIdsSnapshot() {
+  return dominantPatternIds
 }
 
 export function setRecommendedSlugs(next: string[]): void {
@@ -43,8 +43,8 @@ export function setMatchLabels(next: Record<string, MatchLabel>): void {
   notify()
 }
 
-export function setDashboardPatternIds(next: Record<string, PatternTypeId>): void {
-  dashboardPatternIds = next
+export function setDominantPatternIds(next: Record<string, PatternTypeId>): void {
+  dominantPatternIds = next
   notify()
 }
 
@@ -57,7 +57,7 @@ export function clearRecommendedSlugs(): void {
   generation += 1
   slugs = new Set()
   matchLabels = {}
-  dashboardPatternIds = {}
+  dominantPatternIds = {}
   notify()
 }
 
@@ -69,6 +69,6 @@ export function useMatchLabels(): Readonly<Record<string, MatchLabel>> {
   return useSyncExternalStore(subscribe, getMatchLabelsSnapshot, getMatchLabelsSnapshot)
 }
 
-export function useDashboardPatternIds(): Readonly<Record<string, PatternTypeId>> {
-  return useSyncExternalStore(subscribe, getDashboardPatternIdsSnapshot, getDashboardPatternIdsSnapshot)
+export function useDominantPatternIds(): Readonly<Record<string, PatternTypeId>> {
+  return useSyncExternalStore(subscribe, getDominantPatternIdsSnapshot, getDominantPatternIdsSnapshot)
 }

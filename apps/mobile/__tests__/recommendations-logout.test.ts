@@ -17,7 +17,7 @@ import { clearPatternWeightsCache, getCachedPatternWeights } from "@/lib/pattern
 import { fetchRecommendations } from "@/lib/recommendations/api"
 import {
   clearRecommendedSlugs,
-  useDashboardPatternIds,
+  useDominantPatternIds,
   useMatchLabels,
   useRecommendedSlugs,
 } from "@/lib/recommendations/recommended-slugs"
@@ -62,7 +62,7 @@ function readRecommendationState() {
   const { result } = renderHook(() => ({
     slugs: [...useRecommendedSlugs()],
     matchLabels: useMatchLabels(),
-    dashboardPatternIds: useDashboardPatternIds(),
+    dominantPatternIds: useDominantPatternIds(),
   }))
   return { ...result.current, patternWeights: getCachedPatternWeights() }
 }
@@ -82,7 +82,7 @@ describe("recommendations across logout", () => {
     expect(readRecommendationState()).toEqual({
       slugs: ["pottery"],
       matchLabels: { pottery: { kind: "personality", patternId: "1-HH" } },
-      dashboardPatternIds: { pottery: "1-HH" },
+      dominantPatternIds: { pottery: "1-HH" },
       patternWeights: { "1-HH": 1 },
     })
   })
@@ -95,7 +95,7 @@ describe("recommendations across logout", () => {
     expect(readRecommendationState()).toEqual({
       slugs: [],
       matchLabels: {},
-      dashboardPatternIds: {},
+      dominantPatternIds: {},
       patternWeights: undefined,
     })
   })
@@ -109,7 +109,7 @@ describe("recommendations across logout", () => {
     expect(readRecommendationState()).toEqual({
       slugs: [],
       matchLabels: {},
-      dashboardPatternIds: {},
+      dominantPatternIds: {},
       patternWeights: undefined,
     })
   })
@@ -124,7 +124,7 @@ describe("recommendations across logout", () => {
     expect(readRecommendationState()).toEqual({
       slugs: ["climbing"],
       matchLabels: { climbing: { kind: "personality", patternId: "2-LL" } },
-      dashboardPatternIds: { climbing: "2-LL" },
+      dominantPatternIds: { climbing: "2-LL" },
       patternWeights: { "2-LL": 1 },
     })
   })

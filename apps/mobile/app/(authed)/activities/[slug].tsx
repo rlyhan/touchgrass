@@ -19,7 +19,7 @@ import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
-import { useDashboardPatternIds, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { useDominantPatternIds, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
 import { useLoadRecommendationsIfMissing } from "@/lib/recommendations/use-load-recommendations-if-missing"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
@@ -40,13 +40,13 @@ export default function ActivityDetailPage() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
   const matchLabel = useMatchLabels()[slug ?? ""]
   // Of this activity's patterns, the one the user scores highest on (0.6+), from the last recommendations fetch.
-  const dashboardPatternId = useDashboardPatternIds()[slug ?? ""]
-  // Personality reason shown on the page: the label's pattern if it has one, else the dashboard pattern when unlabelled.
+  const dominantPatternId = useDominantPatternIds()[slug ?? ""]
+  // Personality reason shown on the page: the label's pattern if it has one, else the dominant pattern when unlabelled.
   const reasonPatternId = matchLabel
     ? "patternId" in matchLabel
       ? matchLabel.patternId
       : undefined
-    : dashboardPatternId
+    : dominantPatternId
   // For each user motivation, the activity types it shares with this activity; each becomes a motivation reason row.
   const sharedActivityTypesByMotivation =
     matchLabel && "sharedActivityTypesByMotivation" in matchLabel ? matchLabel.sharedActivityTypesByMotivation : undefined

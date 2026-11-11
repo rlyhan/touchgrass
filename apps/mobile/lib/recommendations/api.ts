@@ -11,7 +11,7 @@ import { apiUrl } from "@/lib/config"
 import { setCachedPatternWeights } from "@/lib/patterns/cache"
 import {
   getRecommendationsGeneration,
-  setDashboardPatternIds,
+  setDominantPatternIds,
   setMatchLabels,
   setRecommendedSlugs,
 } from "@/lib/recommendations/recommended-slugs"
@@ -56,12 +56,12 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   }
   setRecommendedSlugs(body.recommendedSlugs ?? [])
   setMatchLabels(body.matchLabels ?? {})
-  const dashboardPatternIds: Record<string, PatternTypeId> = {}
+  const dominantPatternIds: Record<string, PatternTypeId> = {}
   for (const { dominantPatternId, ...activity } of recommendations) {
     activityCache.set(activity.slug, activity)
-    if (dominantPatternId) dashboardPatternIds[activity.slug] = dominantPatternId
+    if (dominantPatternId) dominantPatternIds[activity.slug] = dominantPatternId
   }
-  setDashboardPatternIds(dashboardPatternIds)
+  setDominantPatternIds(dominantPatternIds)
   return recommendations
 }
 

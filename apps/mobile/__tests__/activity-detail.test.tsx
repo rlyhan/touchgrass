@@ -38,7 +38,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
-import { clearRecommendedSlugs, setDashboardPatternIds, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { clearRecommendedSlugs, setDominantPatternIds, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -330,7 +330,7 @@ describe("ActivityDetailPage", () => {
     })
 
     it("shows the recommendations screen's pattern for an activity without a label", () => {
-      setDashboardPatternIds({ [ACTIVITY.slug]: "4-HH" })
+      setDominantPatternIds({ [ACTIVITY.slug]: "4-HH" })
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
