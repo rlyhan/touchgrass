@@ -9,7 +9,12 @@ import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
 import { setCachedPatternWeights } from "@/lib/patterns/cache"
-import { setDashboardPatternIds, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import {
+  getRecommendationsGeneration,
+  setDashboardPatternIds,
+  setMatchLabels,
+  setRecommendedSlugs,
+} from "@/lib/recommendations/recommended-slugs"
 
 export { UnauthenticatedError } from "@/lib/auth/errors"
 
@@ -27,6 +32,7 @@ export class ProfileNotFoundError extends Error {
 }
 
 export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
+  const generation = getRecommendationsGeneration()
   const response = await authedFetch(apiUrl("/recommendations"))
 
   if (response.status === 401) {
@@ -42,12 +48,14 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   }
 
   const body = (await response.json()) as RecommendationsResponse
+  const recommendations = body.recommendations ?? []
+  // A logout during the request means this response belongs to the previous user.
+  if (generation !== getRecommendationsGeneration()) return recommendations
   if (body.patternWeights) {
     setCachedPatternWeights(body.patternWeights)
   }
   setRecommendedSlugs(body.recommendedSlugs ?? [])
   setMatchLabels(body.matchLabels ?? {})
-  const recommendations = body.recommendations ?? []
   const dashboardPatternIds: Record<string, PatternTypeId> = {}
   for (const { dominantPatternId, ...activity } of recommendations) {
     activityCache.set(activity.slug, activity)

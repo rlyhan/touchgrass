@@ -7,6 +7,7 @@ import type { MatchLabel, PatternTypeId } from "@touchgrass/types"
 let slugs: ReadonlySet<string> = new Set()
 let matchLabels: Readonly<Record<string, MatchLabel>> = {}
 let dashboardPatternIds: Readonly<Record<string, PatternTypeId>> = {}
+let generation = 0
 const listeners = new Set<() => void>()
 
 function notify() {
@@ -47,7 +48,13 @@ export function setDashboardPatternIds(next: Record<string, PatternTypeId>): voi
   notify()
 }
 
+// Bumped on clear (logout) so a fetch started before it can tell its response is stale.
+export function getRecommendationsGeneration(): number {
+  return generation
+}
+
 export function clearRecommendedSlugs(): void {
+  generation += 1
   slugs = new Set()
   matchLabels = {}
   dashboardPatternIds = {}
