@@ -159,6 +159,7 @@ Deployed services:
 The `qa` branch is the integration branch for testing before merging to `main`.
 
 - Feature branches squash and merge into `qa` first
+- Exception: a stacked branch (one with an unmerged parent branch) squash and merges into its parent branch instead; the parent then goes into `qa`
 - Vercel QA (`touchgrass-mobile-qa.vercel.app`) auto-deploys from `qa`
 - Fly QA (`touchgrass-api-qa.fly.dev`) is deployed manually with `fly deploy`
 - Both use `EXPO_PUBLIC_API_BASE_URL` to point directly at their respective Fly app — no proxy
