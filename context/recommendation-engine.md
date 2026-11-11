@@ -37,6 +37,7 @@ Each factor has its own doc covering what it affects, what it never affects, and
 - Each label carries its reasons, worked out in `getMatchLabels` so the label and its explanation always agree:
   - `personality` and `strong` carry `patternId`: the user's highest-weighted pattern among the activity's patterns (always 0.6 or more).
   - `motivation`, `strong` and `good` carry `sharedActivityTypesByMotivation`: each selected motivation that overlaps the activity, keyed by its value, with only the activity types they share (e.g. `{ seek_adventure: ["Outdoorsy"] }`). A `good` label has exactly one, because two or more would make it `motivation`.
+- The activity page shows these reasons under "Why this matches you": a row for the pattern, then one per shared motivation. Recommendations-screen activities without a label show their `dominantPatternId` instead. Browse and the activity page fetch recommendations themselves when none are loaded, so labels and reasons also appear after a direct link or a restart.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity — see [Personality](recommendation-engine/personality.md).
 
 ---
