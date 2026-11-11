@@ -2,10 +2,10 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import type { Activity, ActivityField, BFASScores, Motivation } from "@touchgrass/types"
+import type { Activity, ActivityField, ActivityType, BFASScores, Motivation, SharedActivityTypesByMotivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
-import { getRecommendations } from "./get-recommendations.js"
+import { getRecommendations, getSharedActivityTypesBetweenActivityAndUserMotivations } from "./get-recommendations.js"
 import { calculateRecommendationBaseScore } from "./personality/base-score.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
@@ -61,6 +61,10 @@ function overlappingMotivationLabels(activity: Activity, motivations: Motivation
     .map((m) => m.label)
 }
 
+function motivationLabelsOf(sharedActivityTypesByMotivation: SharedActivityTypesByMotivation): string[] {
+  return MOTIVATION_OPTIONS.filter((m) => sharedActivityTypesByMotivation[m.value]).map((m) => m.label)
+}
+
 function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
   const weights = getUserPatternWeights(getOCEANScores(bfas))
   const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
@@ -92,7 +96,7 @@ test("getRecommendations gives a motivation label only to recommended activities
     const qualifies = recommendedSlugs.includes(rec.slug) && overlaps.length >= 2
     assert.equal(motivationLabelled.includes(rec), qualifies, rec.slug)
     const label = matchLabels[rec.slug]
-    if (label?.kind === "motivation") assert.deepEqual(label.motivations, overlaps)
+    if (label?.kind === "motivation") assert.deepEqual(motivationLabelsOf(label.sharedActivityTypesByMotivation), overlaps)
   }
 })
 
@@ -113,14 +117,54 @@ test("getRecommendations labels activities that qualify for both the personality
   assert.deepEqual(strongMatchSlugs, bothSlugs)
 })
 
-test("getRecommendations labels the rest of recommendedSlugs a good match and leaves other activities unlabelled", () => {
+test("getRecommendations names the user's best pattern as the reason for every personality and strong label", () => {
+  const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
+  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+  const withPattern = RECOMMENDATIONS.flatMap((rec) => {
+    const label = matchLabels[rec.slug]
+    return label?.kind === "personality" || label?.kind === "strong" ? [{ rec, patternId: label.patternId }] : []
+  })
+
+  assert.ok(withPattern.some(({ rec }) => matchLabels[rec.slug]?.kind === "strong"))
+  for (const { rec, patternId } of withPattern) {
+    assert.equal(patternId, getDominantPatternId(weights, rec), rec.slug)
+  }
+})
+
+test("getRecommendations lists each overlapping motivation by value with only the activity types it shares", () => {
+  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+
+  for (const rec of RECOMMENDATIONS) {
+    const label = matchLabels[rec.slug]
+    if (!label || label.kind === "personality") continue
+    const activityTypes = [rec.type, ...(rec.related_types ?? [])]
+    assert.deepEqual(motivationLabelsOf(label.sharedActivityTypesByMotivation), overlappingMotivationLabels(rec, MOTIVATION_OPTIONS), rec.slug)
+    for (const motivation of MOTIVATION_OPTIONS) {
+      const sharedActivityTypes: ActivityType[] | undefined = label.sharedActivityTypesByMotivation[motivation.value]
+      if (sharedActivityTypes) {
+        assert.deepEqual(sharedActivityTypes, motivation.associated_activity_types.filter((t) => activityTypes.includes(t)), rec.slug)
+      }
+    }
+  }
+})
+
+test("getRecommendations labels the rest of recommendedSlugs that share a motivation a good match and leaves other activities unlabelled", () => {
   const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
 
   for (const rec of RECOMMENDATIONS) {
     const kind = matchLabels[rec.slug]?.kind
-    if (recommendedSlugs.includes(rec.slug)) assert.ok(kind !== undefined, rec.slug)
+    const sharesMotivation = overlappingMotivationLabels(rec, creativeAdventureAndPeople).length > 0
+    if (recommendedSlugs.includes(rec.slug) && sharesMotivation) assert.ok(kind !== undefined, rec.slug)
     else assert.ok(kind === undefined || kind === "personality", rec.slug)
   }
+})
+
+test("getRecommendations explains each good match with exactly one shared motivation", () => {
+  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const goodMatches = Object.values(matchLabels).filter((label) => label.kind === "good")
+
+  assert.ok(goodMatches.length > 0)
+  assert.ok(goodMatches.every((label) => Object.keys(label.sharedActivityTypesByMotivation).length === 1))
 })
 
 test("getRecommendations gives no personality label to a user with middling scores and no high-scoring pattern", () => {
@@ -155,6 +199,22 @@ test("getRecommendations gives no personality label to a user who scores 50 on e
   const { matchLabels } = getRecommendations(neutralUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
   const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality" || label.kind === "strong")
   assert.equal(personalityKinds.length, 0)
+})
+
+const sharedTypesActivity: Activity = { ...RECOMMENDATIONS[0]!, type: "Outdoorsy", related_types: ["Social", "Reflective"] }
+const sharedTypesMotivations: Motivation[] = [
+  { value: "connect_with_people", label: "People", associated_activity_types: ["Social", "Collaborative"] },
+  { value: "seek_adventure", label: "Adventure", associated_activity_types: ["Adventurous", "Outdoorsy", "Exploratory"] },
+  { value: "challenge_push_myself", label: "Challenge", associated_activity_types: ["Competitive", "Physical"] },
+  { value: "improve_wellbeing", label: "Wellbeing", associated_activity_types: ["Reflective", "Outdoorsy"] },
+]
+
+test("getSharedActivityTypesBetweenActivityAndUserMotivations lists only the types each motivation shares with the activity, leaving out motivations that share none", () => {
+  assert.deepEqual(getSharedActivityTypesBetweenActivityAndUserMotivations(sharedTypesActivity, sharedTypesMotivations), {
+    connect_with_people: ["Social"],
+    seek_adventure: ["Outdoorsy"],
+    improve_wellbeing: ["Reflective", "Outdoorsy"],
+  })
 })
 
 test("getRecommendations only returns items from the available recommendation pool", () => {

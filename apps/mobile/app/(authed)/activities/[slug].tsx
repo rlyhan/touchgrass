@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { ActivityCard } from "@/components/activities/activity-card"
-import { PatternMatch } from "@/components/patterns/pattern-match"
+import { MatchReasons } from "@/components/activities/match-reasons"
 import { PortableText } from "@/components/ui/portable-text"
 // import { PrimaryButton } from "@/components/ui/primary-button"
 import { UnauthenticatedError } from "@/lib/auth/errors"
@@ -19,6 +19,8 @@ import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
+import { useDominantPatternIds, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { useLoadRecommendationsIfMissing } from "@/lib/recommendations/use-load-recommendations-if-missing"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
 
@@ -35,10 +37,20 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 }
 
 export default function ActivityDetailPage() {
-  const params = useLocalSearchParams<{ slug: string; pattern?: string | string[] }>()
-  const { slug } = params
-  // A repeated ?pattern= arrives as an array; use the first value, like URLSearchParams.get.
-  const pattern = Array.isArray(params.pattern) ? params.pattern[0] : params.pattern
+  const { slug } = useLocalSearchParams<{ slug: string }>()
+  const matchLabel = useMatchLabels()[slug ?? ""]
+  // Of this activity's patterns, the one the user scores highest on (0.6+), from the last recommendations fetch.
+  const dominantPatternId = useDominantPatternIds()[slug ?? ""]
+  // Personality reason shown on the page: the label's pattern if it has one, else the dominant pattern when unlabelled.
+  const reasonPatternId = matchLabel
+    ? "patternId" in matchLabel
+      ? matchLabel.patternId
+      : undefined
+    : dominantPatternId
+  // For each user motivation, the activity types it shares with this activity; each becomes a motivation reason row.
+  const sharedActivityTypesByMotivation =
+    matchLabel && "sharedActivityTypesByMotivation" in matchLabel ? matchLabel.sharedActivityTypesByMotivation : undefined
+  useLoadRecommendationsIfMissing()
 
   const cached = slug ? getCachedActivity(slug) : undefined
   const [activity, setActivity] = useState<Activity | null>(cached ?? null)
@@ -131,7 +143,10 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        {pattern ? <PatternMatch activity={activity} patternId={pattern} /> : null}
+        <MatchReasons
+          patternId={reasonPatternId}
+          sharedActivityTypesByMotivation={sharedActivityTypesByMotivation}
+        />
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">

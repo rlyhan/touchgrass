@@ -1,11 +1,13 @@
 import { useSyncExternalStore } from "react"
 
-import type { MatchLabel } from "@touchgrass/types"
+import type { MatchLabel, PatternTypeId } from "@touchgrass/types"
 
-// Recommended slugs and match labels from the last fetchRecommendations call,
-// read by browse to sort activities and label their cards.
+// Recommended slugs, match labels and the recommendations screen's patterns from the last
+// fetchRecommendations call, read by browse to sort and label cards and by the activity page to explain them.
 let slugs: ReadonlySet<string> = new Set()
 let matchLabels: Readonly<Record<string, MatchLabel>> = {}
+let dominantPatternIds: Readonly<Record<string, PatternTypeId>> = {}
+let generation = 0
 const listeners = new Set<() => void>()
 
 function notify() {
@@ -27,6 +29,10 @@ function getMatchLabelsSnapshot() {
   return matchLabels
 }
 
+function getDominantPatternIdsSnapshot() {
+  return dominantPatternIds
+}
+
 export function setRecommendedSlugs(next: string[]): void {
   slugs = new Set(next)
   notify()
@@ -37,9 +43,21 @@ export function setMatchLabels(next: Record<string, MatchLabel>): void {
   notify()
 }
 
+export function setDominantPatternIds(next: Record<string, PatternTypeId>): void {
+  dominantPatternIds = next
+  notify()
+}
+
+// Bumped on clear (logout) so a fetch started before it can tell its response is stale.
+export function getRecommendationsGeneration(): number {
+  return generation
+}
+
 export function clearRecommendedSlugs(): void {
+  generation += 1
   slugs = new Set()
   matchLabels = {}
+  dominantPatternIds = {}
   notify()
 }
 
@@ -49,4 +67,8 @@ export function useRecommendedSlugs(): ReadonlySet<string> {
 
 export function useMatchLabels(): Readonly<Record<string, MatchLabel>> {
   return useSyncExternalStore(subscribe, getMatchLabelsSnapshot, getMatchLabelsSnapshot)
+}
+
+export function useDominantPatternIds(): Readonly<Record<string, PatternTypeId>> {
+  return useSyncExternalStore(subscribe, getDominantPatternIdsSnapshot, getDominantPatternIdsSnapshot)
 }

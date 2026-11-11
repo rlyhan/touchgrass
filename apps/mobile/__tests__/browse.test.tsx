@@ -12,6 +12,10 @@ jest.mock("@/lib/browse/api", () => ({
   searchActivities: jest.fn(),
 }))
 
+jest.mock("@/lib/recommendations/api", () => ({
+  fetchRecommendations: jest.fn(() => Promise.resolve([])),
+}))
+
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("expo-image", () => ({
   Image: { prefetch: jest.fn(() => Promise.resolve(true)) },
@@ -26,6 +30,7 @@ jest.mock("@/components/icons/grass-logo", () => require("@/test-utils/mocks").g
 jest.mock("@/components/activities/activity-card", () => require("@/test-utils/mocks").activityCardMock)
 
 import * as BrowseApi from "@/lib/browse/api"
+import * as RecommendationsApi from "@/lib/recommendations/api"
 import { clearRecommendedSlugs, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
@@ -36,6 +41,7 @@ import BrowsePage from "@/app/(authed)/(tabs)/browse"
 const mockSearchActivities = jest.mocked(BrowseApi.searchActivities)
 const mockFetchRandomActivities = jest.mocked(BrowseApi.fetchRandomActivities)
 const mockPrefetch = jest.mocked(Image.prefetch)
+const mockFetchRecommendations = jest.mocked(RecommendationsApi.fetchRecommendations)
 
 const FIRST_PAGE = RECOMMENDATIONS.slice(0, 10)
 const SECOND_PAGE = RECOMMENDATIONS.slice(10, 13)
@@ -97,6 +103,30 @@ describe("BrowsePage", () => {
     expect(screen.queryByRole("button", { name: "Page 1" })).toBeNull()
   })
 
+  it("fetches recommendations when none are loaded, then labels the activities", async () => {
+    const randomActivities = RECOMMENDATIONS.slice(20, 30)
+    const personalityMatchSlug = randomActivities[3].slug
+    mockFetchRecommendations.mockImplementationOnce(async () => {
+      setRecommendedSlugs([personalityMatchSlug])
+      setMatchLabels({ [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" } })
+      return []
+    })
+    render(<BrowsePage />)
+    await act(async () => {})
+
+    expect(mockFetchRecommendations).toHaveBeenCalledTimes(1)
+    const listed = screen.UNSAFE_getByType(FlatList).props.data
+    expect(listed[0]).toMatchObject({ slug: personalityMatchSlug, matchLabel: { kind: "personality", patternId: "4-LH" } })
+  })
+
+  it("doesn't fetch recommendations when they're already loaded", async () => {
+    setRecommendedSlugs([RECOMMENDATIONS[0].slug])
+    render(<BrowsePage />)
+    await act(async () => {})
+
+    expect(mockFetchRecommendations).not.toHaveBeenCalled()
+  })
+
   it("gives each activity its match label and leaves the rest unlabelled", async () => {
     const randomActivities = RECOMMENDATIONS.slice(20, 30)
     const goodMatchSlug = randomActivities[0].slug
@@ -105,7 +135,7 @@ describe("BrowsePage", () => {
     await act(async () => {})
 
     await act(async () =>
-      setMatchLabels({ [goodMatchSlug]: { kind: "good" }, [personalityMatchSlug]: { kind: "personality" } }),
+      setMatchLabels({ [goodMatchSlug]: { kind: "good", sharedActivityTypesByMotivation: {} }, [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" } }),
     )
 
     const labelsBySlug = Object.fromEntries(
@@ -115,8 +145,8 @@ describe("BrowsePage", () => {
         .map((a: { slug: string; matchLabel: object }) => [a.slug, a.matchLabel]),
     )
     expect(labelsBySlug).toEqual({
-      [goodMatchSlug]: { kind: "good" },
-      [personalityMatchSlug]: { kind: "personality" },
+      [goodMatchSlug]: { kind: "good", sharedActivityTypesByMotivation: {} },
+      [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" },
     })
   })
 

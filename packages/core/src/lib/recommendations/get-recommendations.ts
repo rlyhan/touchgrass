@@ -1,4 +1,4 @@
-import { Activity, ActivityField, BFASScores, MatchLabel, Motivation, PatternTypeId, ScoredRecommendation } from "@touchgrass/types";
+import { Activity, ActivityField, BFASScores, MatchLabel, Motivation, PatternTypeId, SharedActivityTypesByMotivation, ScoredRecommendation } from "@touchgrass/types";
 import { diversifyAndOrder } from "./diversify.js";
 import { calculateRecommendationBaseScore } from "./personality/base-score.js";
 import { getOCEANScores } from "./personality/ocean.js";
@@ -37,8 +37,8 @@ export function getRecommendations(
     const highScoringSlugSet = getHighScoringSlugs(scoredRecommendations)
     const strongPersonalitySlugSet = getStrongPersonalitySlugs(userPatternWeights, activities)
 
-    // Give each activity the match label browse shows.
-    const matchLabels = getMatchLabels(activities, motivations, highScoringSlugSet, strongPersonalitySlugSet)
+    // Give each activity the match label browse shows, with the reasons behind it.
+    const matchLabels = getMatchLabels(activities, motivations, userPatternWeights, highScoringSlugSet, strongPersonalitySlugSet)
 
     // Return the top MAX_RECOMMENDATIONS for the recommendations screen, the slugs browse marks as recommended, and each activity's match label.
     return {
@@ -52,31 +52,55 @@ export function getRecommendations(
  * Match labels: the reason browse gives for each activity, keyed by slug. The first that applies wins:
  * 1. "strong" — qualifies for both "personality" and "motivation".
  * 2. "personality" — passes the strong personality cutoff, whether or not it's high scoring.
- * 3. "motivation" — high scoring, and two or more selected motivations share a type with it (named on the label).
+ * 3. "motivation" — high scoring, and two or more selected motivations share a type with it.
  *    Limited to high scoring activities because every activity overlaps at least two of the seven motivations.
- * 4. "good" — any other high scoring activity.
- * Activities with none of these are left out.
+ * 4. "good" — any other high scoring activity that shares at least one motivation, so every label has a reason to show.
+ * Each label carries its reasons: the user's best pattern for personality, and each overlapping motivation (by value) with
+ * the activity types it shares. Activities with none of these labels are left out.
  */
 function getMatchLabels(
     activities: Activity[],
-    motivations: Motivation[],
+    userMotivations: Motivation[],
+    userPatternWeights: Record<PatternTypeId, number>,
     highScoringSlugSet: Set<string>,
     strongPersonalitySlugSet: Set<string>,
 ): Record<string, MatchLabel> {
     const matchLabels: Record<string, MatchLabel> = {}
     activities.forEach((rec) => {
-        const activityTypes = [rec.type, ...(rec.related_types ?? [])]
-        const overlappingMotivations = motivations.filter((m) => m.associated_activity_types.some((t) => activityTypes.includes(t)))
+        // Find which of the user's motivations share activity types with this activity, and how many do.
+        const sharedActivityTypesByMotivation = getSharedActivityTypesBetweenActivityAndUserMotivations(rec, userMotivations)
+        const overlappingMotivationCount = Object.keys(sharedActivityTypesByMotivation).length
+
+        // Check which labels the activity qualifies for: strong personality, recommended, strong motivation.
         const isStrongPersonality = strongPersonalitySlugSet.has(rec.slug)
         const isRecommended = highScoringSlugSet.has(rec.slug)
-        const isStrongMotivation = isRecommended && overlappingMotivations.length >= STRONG_MOTIVATION_MIN_OVERLAPS
+        const isStrongMotivation = isRecommended && overlappingMotivationCount >= STRONG_MOTIVATION_MIN_OVERLAPS
 
-        if (isStrongPersonality && isStrongMotivation) matchLabels[rec.slug] = { kind: "strong" }
-        else if (isStrongPersonality) matchLabels[rec.slug] = { kind: "personality" }
-        else if (isStrongMotivation) matchLabels[rec.slug] = { kind: "motivation", motivations: overlappingMotivations.map((m) => m.label) }
-        else if (isRecommended) matchLabels[rec.slug] = { kind: "good" }
+        // Strong personality matches always have a pattern of 0.6+, which becomes the personality reason.
+        const patternId = isStrongPersonality ? getDominantPatternId(userPatternWeights, rec) : null
+
+        // Pick the first label that applies, with its reasons; unlabelled activities are left out.
+        if (patternId && isStrongMotivation) matchLabels[rec.slug] = { kind: "strong", patternId, sharedActivityTypesByMotivation }
+        else if (patternId) matchLabels[rec.slug] = { kind: "personality", patternId }
+        else if (isStrongMotivation) matchLabels[rec.slug] = { kind: "motivation", sharedActivityTypesByMotivation }
+        else if (isRecommended && overlappingMotivationCount >= 1) matchLabels[rec.slug] = { kind: "good", sharedActivityTypesByMotivation }
     })
     return matchLabels
+}
+
+/*
+ * Shared activity types by motivation: for each of the user's motivations, the activity types it has in common with this
+ * activity (its primary type plus related types). Motivations sharing none are left out, so the number of keys is how many
+ * motivations overlap the activity.
+ */
+export function getSharedActivityTypesBetweenActivityAndUserMotivations(activity: Activity, userMotivations: Motivation[]): SharedActivityTypesByMotivation {
+    const activityTypes = [activity.type, ...(activity.related_types ?? [])]
+    const sharedActivityTypesByMotivation: SharedActivityTypesByMotivation = {}
+    userMotivations.forEach((m) => {
+        const sharedActivityTypes = m.associated_activity_types.filter((t) => activityTypes.includes(t))
+        if (sharedActivityTypes.length > 0) sharedActivityTypesByMotivation[m.value] = sharedActivityTypes
+    })
+    return sharedActivityTypesByMotivation
 }
 
 /*

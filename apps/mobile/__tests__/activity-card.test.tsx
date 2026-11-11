@@ -86,11 +86,14 @@ describe("ActivityCard", () => {
   })
 
   const labelsWithText: [MatchLabel, string][] = [
-    [{ kind: "strong" }, "Strong match"],
-    [{ kind: "personality" }, "Strong personality match"],
-    [{ kind: "good" }, "Good match"],
+    [{ kind: "strong", patternId: "4-LH", sharedActivityTypesByMotivation: {} }, "Strong match"],
+    [{ kind: "personality", patternId: "4-LH" }, "Strong personality match"],
+    [{ kind: "good", sharedActivityTypesByMotivation: {} }, "Good match"],
     [
-      { kind: "motivation", motivations: ["Challenge and push myself", "Connect with people and share experiences"] },
+      {
+        kind: "motivation",
+        sharedActivityTypesByMotivation: { challenge_push_myself: ["Competitive"], connect_with_people: ["Social"] },
+      },
       "Strong motivation match: Challenge and push myself, Connect with people and share experiences",
     ],
   ]
