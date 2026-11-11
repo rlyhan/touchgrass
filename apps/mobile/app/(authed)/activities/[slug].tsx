@@ -20,6 +20,7 @@ import {
   getCachedActivity,
 } from "@/lib/recommendations/api"
 import { useDashboardPatternIds, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { useLoadRecommendationsIfMissing } from "@/lib/recommendations/use-load-recommendations-if-missing"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
 
@@ -39,6 +40,7 @@ export default function ActivityDetailPage() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
   const matchLabel = useMatchLabels()[slug ?? ""]
   const dashboardPatternId = useDashboardPatternIds()[slug ?? ""]
+  useLoadRecommendationsIfMissing()
 
   const cached = slug ? getCachedActivity(slug) : undefined
   const [activity, setActivity] = useState<Activity | null>(cached ?? null)

@@ -19,6 +19,7 @@ jest.mock("expo-router", () => ({
 jest.mock("@/lib/recommendations/api", () => ({
   getCachedActivity: jest.fn(),
   fetchActivityBySlug: jest.fn(),
+  fetchRecommendations: jest.fn(() => Promise.resolve([])),
 }))
 
 // ── heavy native deps ─────────────────────────────────────────────────────────
@@ -37,7 +38,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
-import { clearRecommendedSlugs, setDashboardPatternIds, setMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { clearRecommendedSlugs, setDashboardPatternIds, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -94,6 +95,7 @@ const mockCanGoBack = jest.mocked(ExpoRouter.router.canGoBack)
 const mockUseLocalSearchParams = jest.mocked(ExpoRouter.useLocalSearchParams)
 const mockGetCachedActivity = jest.mocked(Api.getCachedActivity)
 const mockFetchActivityBySlug = jest.mocked(Api.fetchActivityBySlug)
+const mockFetchRecommendations = jest.mocked(Api.fetchRecommendations)
 
 import ActivityDetailPage from "@/app/(authed)/activities/[slug]"
 
@@ -338,6 +340,36 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.queryByText("Why this matches you")).toBeNull()
+    })
+
+    it("fetches recommendations when none are loaded, then shows the reasons", async () => {
+      mockFetchRecommendations.mockImplementationOnce(async () => {
+        setRecommendedSlugs([ACTIVITY.slug])
+        setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+        return []
+      })
+      render(<ActivityDetailPage />)
+
+      expect(mockFetchRecommendations).toHaveBeenCalledTimes(1)
+      expect(await screen.findByText("Enchanting Visionary")).toBeTruthy()
+    })
+
+    it("doesn't fetch recommendations when they're already loaded", () => {
+      setRecommendedSlugs([ACTIVITY.slug])
+      render(<ActivityDetailPage />)
+
+      expect(mockFetchRecommendations).not.toHaveBeenCalled()
+    })
+
+    it("still shows the activity, and warns in dev, when fetching recommendations fails", async () => {
+      const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+      mockFetchRecommendations.mockRejectedValueOnce(new Error("network error"))
+      render(<ActivityDetailPage />)
+
+      await waitFor(() => expect(warn).toHaveBeenCalledWith("Couldn't load recommendations", expect.any(Error)))
+      expect(screen.getByTestId("activity-card")).toBeTruthy()
+      expect(screen.queryByText("Why this matches you")).toBeNull()
+      warn.mockRestore()
     })
 
     it("renders the match copy and reveals the short description on expand", () => {
