@@ -152,6 +152,18 @@ test("GET /recommendations only labels activities from the pool, and only person
   assert.ok(Object.entries(body.matchLabels).every(([slug, label]) => recommended.has(slug) || label.kind === "personality"))
 })
 
+test("GET /recommendations includes the user's onboarding interests, dropping any that aren't activity fields", async () => {
+  getProfileByAuthUserId.mock.mockImplementation(async () => ({
+    ...fakeProfile,
+    interests: ["Music", "Not A Field", "Coding"],
+  }))
+
+  const res = await fetch(`${baseUrl}/recommendations`)
+  const body = (await res.json()) as RecommendationsResponse
+
+  assert.deepEqual(body.interests, ["Music", "Coding"])
+})
+
 test("GET /recommendations returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 

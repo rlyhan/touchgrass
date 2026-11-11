@@ -19,7 +19,7 @@ import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
-import { useDominantPatternIds, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { useDominantPatternIds, useInterests, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
 import { useLoadRecommendationsIfMissing } from "@/lib/recommendations/use-load-recommendations-if-missing"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
@@ -50,6 +50,7 @@ export default function ActivityDetailPage() {
   // For each user motivation, the activity types it shares with this activity; each becomes a motivation reason row.
   const sharedActivityTypesByMotivation =
     matchLabel && "sharedActivityTypesByMotivation" in matchLabel ? matchLabel.sharedActivityTypesByMotivation : undefined
+  const interests = useInterests()
   useLoadRecommendationsIfMissing()
 
   const cached = slug ? getCachedActivity(slug) : undefined
@@ -146,6 +147,7 @@ export default function ActivityDetailPage() {
         <MatchReasons
           patternId={reasonPatternId}
           sharedActivityTypesByMotivation={sharedActivityTypesByMotivation}
+          interestField={interests.includes(activity.field) ? activity.field : undefined}
         />
 
         {activity.description && activity.description.length > 0 ? (

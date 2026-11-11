@@ -38,7 +38,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
-import { clearRecommendedSlugs, setDominantPatternIds, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { clearRecommendedSlugs, setDominantPatternIds, setInterests, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -334,6 +334,34 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+    })
+
+    it("shows the interest row alongside the label's reasons when the activity's field is an interest", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+      expect(screen.getByText(ACTIVITY.field)).toBeTruthy()
+      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+    })
+
+    it("shows the section with only the interest row for an unlabelled activity in one of the user's interests", () => {
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Why this matches you")).toBeTruthy()
+      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+    })
+
+    it("leaves out the interest row when the activity's field isn't one of the user's interests", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+      setInterests(["Martial Arts"])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Why this matches you")).toBeTruthy()
+      expect(screen.queryByText(/as one of your interests/)).toBeNull()
     })
 
     it("hides the section for an activity with no label or recommendations screen pattern", () => {

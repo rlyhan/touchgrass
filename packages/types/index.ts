@@ -258,6 +258,7 @@ export type RecommendationsResponse = {
   patternWeights: UserPatternWeights
   recommendedSlugs: string[]
   matchLabels: Record<string, MatchLabel>
+  interests: ActivityField[]
 }
 
 export type PatternWeightsResponse = {

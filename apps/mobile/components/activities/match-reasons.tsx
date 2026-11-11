@@ -1,22 +1,24 @@
 import { Text, View } from "react-native"
 
 import { PatternMatchAccordion } from "@/components/patterns/pattern-match-accordion"
-import type { PatternTypeId, SharedActivityTypesByMotivation } from "@touchgrass/types"
+import type { ActivityField, PatternTypeId, SharedActivityTypesByMotivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS, PATTERN_TYPES } from "@touchgrass/types/constants"
 
-// "Why this matches you" on the activity page: a row for the matched pattern, then one per shared motivation.
+// "Why this matches you" on the activity page: a row for the matched pattern, one per shared motivation, then the
+// activity's field when the user picked it as an interest.
 
 const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
 
 type Props = {
   patternId?: PatternTypeId
   sharedActivityTypesByMotivation?: SharedActivityTypesByMotivation
+  interestField?: ActivityField
 }
 
-export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {} }: Props) {
+export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {}, interestField }: Props) {
   const pattern = patternId ? PATTERN_BY_ID[patternId] : undefined
   const motivations = MOTIVATION_OPTIONS.filter((m) => sharedActivityTypesByMotivation[m.value])
-  if (!pattern && motivations.length === 0) return null
+  if (!pattern && motivations.length === 0 && !interestField) return null
 
   return (
     <View className="mt-10">
@@ -33,6 +35,13 @@ export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {} }
             </Text>
           </View>
         ))}
+        {interestField ? (
+          <View className="rounded-2xl bg-gray-100 p-4">
+            <Text className="text-base leading-relaxed text-gray-800">
+              You picked <Text className="font-semibold text-gray-900">{interestField}</Text> as one of your interests.
+            </Text>
+          </View>
+        ) : null}
       </View>
     </View>
   )

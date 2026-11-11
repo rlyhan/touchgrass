@@ -54,7 +54,7 @@ export function getRecommendationsHandler({
       ...s.rec,
       dominantPatternId: getDominantPatternId(patternWeights, s.rec),
     }))
-    const body: RecommendationsResponse = { recommendations, patternWeights, recommendedSlugs, matchLabels }
+    const body: RecommendationsResponse = { recommendations, patternWeights, recommendedSlugs, matchLabels, interests }
     res.status(200).json(body)
   }
 }

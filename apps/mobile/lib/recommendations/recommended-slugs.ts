@@ -1,12 +1,13 @@
 import { useSyncExternalStore } from "react"
 
-import type { MatchLabel, PatternTypeId } from "@touchgrass/types"
+import type { ActivityField, MatchLabel, PatternTypeId } from "@touchgrass/types"
 
-// Recommended slugs, match labels and the recommendations screen's patterns from the last
+// Recommended slugs, match labels, the recommendations screen's patterns and the user's interests from the last
 // fetchRecommendations call, read by browse to sort and label cards and by the activity page to explain them.
 let slugs: ReadonlySet<string> = new Set()
 let matchLabels: Readonly<Record<string, MatchLabel>> = {}
 let dominantPatternIds: Readonly<Record<string, PatternTypeId>> = {}
+let interests: readonly ActivityField[] = []
 let generation = 0
 const listeners = new Set<() => void>()
 
@@ -33,6 +34,10 @@ function getDominantPatternIdsSnapshot() {
   return dominantPatternIds
 }
 
+function getInterestsSnapshot() {
+  return interests
+}
+
 export function setRecommendedSlugs(next: string[]): void {
   slugs = new Set(next)
   notify()
@@ -48,6 +53,11 @@ export function setDominantPatternIds(next: Record<string, PatternTypeId>): void
   notify()
 }
 
+export function setInterests(next: ActivityField[]): void {
+  interests = next
+  notify()
+}
+
 // Bumped on clear (logout) so a fetch started before it can tell its response is stale.
 export function getRecommendationsGeneration(): number {
   return generation
@@ -58,6 +68,7 @@ export function clearRecommendedSlugs(): void {
   slugs = new Set()
   matchLabels = {}
   dominantPatternIds = {}
+  interests = []
   notify()
 }
 
@@ -71,4 +82,8 @@ export function useMatchLabels(): Readonly<Record<string, MatchLabel>> {
 
 export function useDominantPatternIds(): Readonly<Record<string, PatternTypeId>> {
   return useSyncExternalStore(subscribe, getDominantPatternIdsSnapshot, getDominantPatternIdsSnapshot)
+}
+
+export function useInterests(): readonly ActivityField[] {
+  return useSyncExternalStore(subscribe, getInterestsSnapshot, getInterestsSnapshot)
 }

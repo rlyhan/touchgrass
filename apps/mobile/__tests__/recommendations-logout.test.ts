@@ -10,7 +10,7 @@ jest.mock("@/lib/config", () => ({
 }))
 
 import { renderHook } from "@testing-library/react-native"
-import type { PatternTypeId, RecommendationsResponse } from "@touchgrass/types"
+import type { ActivityField, PatternTypeId, RecommendationsResponse } from "@touchgrass/types"
 
 import { authedFetch } from "@/lib/auth/fetch"
 import { clearPatternWeightsCache, getCachedPatternWeights } from "@/lib/patterns/cache"
@@ -18,18 +18,20 @@ import { fetchRecommendations } from "@/lib/recommendations/api"
 import {
   clearRecommendedSlugs,
   useDominantPatternIds,
+  useInterests,
   useMatchLabels,
   useRecommendedSlugs,
 } from "@/lib/recommendations/recommended-slugs"
 
 const mockAuthedFetch = jest.mocked(authedFetch)
 
-function responseFor(slug: string, patternId: PatternTypeId): RecommendationsResponse {
+function responseFor(slug: string, patternId: PatternTypeId, interest: ActivityField): RecommendationsResponse {
   return {
     recommendations: [{ slug, dominantPatternId: patternId }],
     recommendedSlugs: [slug],
     matchLabels: { [slug]: { kind: "personality", patternId } },
     patternWeights: { [patternId]: 1 },
+    interests: [interest],
   } as unknown as RecommendationsResponse
 }
 
@@ -63,12 +65,13 @@ function readRecommendationState() {
     slugs: [...useRecommendedSlugs()],
     matchLabels: useMatchLabels(),
     dominantPatternIds: useDominantPatternIds(),
+    interests: [...useInterests()],
   }))
   return { ...result.current, patternWeights: getCachedPatternWeights() }
 }
 
-const userA = responseFor("pottery", "1-HH")
-const userB = responseFor("climbing", "2-LL")
+const userA = responseFor("pottery", "1-HH", "Art")
+const userB = responseFor("climbing", "2-LL", "Sports")
 
 beforeEach(() => {
   mockAuthedFetch.mockReset()
@@ -83,6 +86,7 @@ describe("recommendations across logout", () => {
       slugs: ["pottery"],
       matchLabels: { pottery: { kind: "personality", patternId: "1-HH" } },
       dominantPatternIds: { pottery: "1-HH" },
+      interests: ["Art"],
       patternWeights: { "1-HH": 1 },
     })
   })
@@ -96,6 +100,7 @@ describe("recommendations across logout", () => {
       slugs: [],
       matchLabels: {},
       dominantPatternIds: {},
+      interests: [],
       patternWeights: undefined,
     })
   })
@@ -110,6 +115,7 @@ describe("recommendations across logout", () => {
       slugs: [],
       matchLabels: {},
       dominantPatternIds: {},
+      interests: [],
       patternWeights: undefined,
     })
   })
@@ -125,6 +131,7 @@ describe("recommendations across logout", () => {
       slugs: ["climbing"],
       matchLabels: { climbing: { kind: "personality", patternId: "2-LL" } },
       dominantPatternIds: { climbing: "2-LL" },
+      interests: ["Sports"],
       patternWeights: { "2-LL": 1 },
     })
   })
