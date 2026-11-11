@@ -15,7 +15,12 @@ type Props = {
 }
 
 export function MatchReasons({ matchLabel, dashboardPatternId }: Props) {
-  const patternId = matchLabel && "patternId" in matchLabel ? matchLabel.patternId : dashboardPatternId
+  // Personality reason: the label's pattern if it has one, else the dashboard pattern when unlabelled.
+  const patternId = matchLabel
+    ? "patternId" in matchLabel
+      ? matchLabel.patternId
+      : undefined
+    : dashboardPatternId
   const sharedActivityTypesByMotivation =
     matchLabel && "sharedActivityTypesByMotivation" in matchLabel ? matchLabel.sharedActivityTypesByMotivation : {}
 
