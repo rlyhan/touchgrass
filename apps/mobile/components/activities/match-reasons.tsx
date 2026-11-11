@@ -1,29 +1,19 @@
 import { Text, View } from "react-native"
 
 import { PatternMatchAccordion } from "@/components/patterns/pattern-match-accordion"
-import type { MatchLabel, PatternTypeId } from "@touchgrass/types"
+import type { PatternTypeId, SharedActivityTypesByMotivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS, PATTERN_TYPES } from "@touchgrass/types/constants"
 
-// "Why this matches you" on the activity page: one row per reason behind the activity's match label.
-// Recommendations-screen activities without a label fall back to the pattern the API returned for them.
+// "Why this matches you" on the activity page: a row for the matched pattern, then one per shared motivation.
 
 const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
 
 type Props = {
-  matchLabel?: MatchLabel
-  dashboardPatternId?: PatternTypeId
+  patternId?: PatternTypeId
+  sharedActivityTypesByMotivation?: SharedActivityTypesByMotivation
 }
 
-export function MatchReasons({ matchLabel, dashboardPatternId }: Props) {
-  // Personality reason: the label's pattern if it has one, else the dashboard pattern when unlabelled.
-  const patternId = matchLabel
-    ? "patternId" in matchLabel
-      ? matchLabel.patternId
-      : undefined
-    : dashboardPatternId
-  const sharedActivityTypesByMotivation =
-    matchLabel && "sharedActivityTypesByMotivation" in matchLabel ? matchLabel.sharedActivityTypesByMotivation : {}
-
+export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {} }: Props) {
   const pattern = patternId ? PATTERN_BY_ID[patternId] : undefined
   const motivations = MOTIVATION_OPTIONS.filter((m) => sharedActivityTypesByMotivation[m.value])
   if (!pattern && motivations.length === 0) return null

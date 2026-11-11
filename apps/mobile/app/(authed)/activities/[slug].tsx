@@ -39,7 +39,17 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 export default function ActivityDetailPage() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
   const matchLabel = useMatchLabels()[slug ?? ""]
+  // Of this activity's patterns, the one the user scores highest on (0.6+), from the last recommendations fetch.
   const dashboardPatternId = useDashboardPatternIds()[slug ?? ""]
+  // Personality reason shown on the page: the label's pattern if it has one, else the dashboard pattern when unlabelled.
+  const reasonPatternId = matchLabel
+    ? "patternId" in matchLabel
+      ? matchLabel.patternId
+      : undefined
+    : dashboardPatternId
+  // For each user motivation, the activity types it shares with this activity; each becomes a motivation reason row.
+  const sharedActivityTypesByMotivation =
+    matchLabel && "sharedActivityTypesByMotivation" in matchLabel ? matchLabel.sharedActivityTypesByMotivation : undefined
   useLoadRecommendationsIfMissing()
 
   const cached = slug ? getCachedActivity(slug) : undefined
@@ -133,7 +143,10 @@ export default function ActivityDetailPage() {
           size="large"
         />
 
-        <MatchReasons matchLabel={matchLabel} dashboardPatternId={dashboardPatternId} />
+        <MatchReasons
+          patternId={reasonPatternId}
+          sharedActivityTypesByMotivation={sharedActivityTypesByMotivation}
+        />
 
         {activity.description && activity.description.length > 0 ? (
           <View className="mt-10">
