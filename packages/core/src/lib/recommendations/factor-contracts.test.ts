@@ -10,7 +10,7 @@ import { calculateMotivationBoost } from "./motivation/boost.js"
 import { calculateRecommendationBaseScore } from "./personality/base-score.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
-import { scoreRecommendation } from "./score.js"
+import { getMeanAndSd, scoreRecommendation } from "./score.js"
 
 const mockUserBfas: BFASScores = {
   Openness: 97,
@@ -28,8 +28,7 @@ const mockUserBfas: BFASScores = {
 const creativeMotivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
 
 function recommendedCutoff(scores: number[]): number {
-  const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length
-  const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
+  const { mean, sd } = getMeanAndSd(scores)
   return mean + sd * 0.5
 }
 
@@ -55,11 +54,14 @@ test("getRecommendations returns the same recommendedSlugs whatever the user's i
   assert.deepEqual(withEveryInterest.recommendedSlugs, withoutInterests.recommendedSlugs)
 })
 
-test("getRecommendations returns the same matchLabels whatever the user's interests", () => {
+test("getRecommendations gives the same personality reasons whatever the user's interests", () => {
   const withoutInterests = getRecommendations(mockUserBfas, [creativeMotivation], [], RECOMMENDATIONS)
   const withEveryInterest = getRecommendations(mockUserBfas, [creativeMotivation], [...ACTIVITY_FIELDS], RECOMMENDATIONS)
+  const patternsBySlug = (matchLabels: typeof withoutInterests.matchLabels) =>
+    Object.fromEntries(Object.entries(matchLabels).flatMap(([slug, label]) => (label.patternId ? [[slug, label.patternId]] : [])))
 
-  assert.deepEqual(withEveryInterest.matchLabels, withoutInterests.matchLabels)
+  assert.ok(Object.keys(patternsBySlug(withoutInterests.matchLabels)).length > 0)
+  assert.deepEqual(patternsBySlug(withEveryInterest.matchLabels), patternsBySlug(withoutInterests.matchLabels))
 })
 
 test("getRecommendations leaves the best personality fit out of recommendedSlugs when it gets no motivation boost", () => {

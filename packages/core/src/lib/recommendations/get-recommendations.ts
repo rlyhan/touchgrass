@@ -11,9 +11,9 @@ const MAX_RECOMMENDATIONS = 10
  * Returns scored, diversified recommendations for a user.
  * Converts BFAS traits → OCEAN → NEO pattern weights, scores each recommendation
  * (including motivation boost), then applies interest-aware diversification and bucket
- * ordering before capping the result. Also returns the slugs browse labels as recommended
- * (every activity scoring at least half a standard deviation above the user's mean score)
- * and the match label browse shows for each activity.
+ * ordering before capping the result. Also returns the slugs browse lists first (every activity
+ * scoring at least half a standard deviation above the user's mean score) and the match label
+ * browse shows for each activity.
  */
 export function getRecommendations(
     userTraits: BFASScores,
@@ -25,17 +25,18 @@ export function getRecommendations(
     const bfasToOCEAN = getOCEANScores(userTraits)
     const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
 
-    // Score every activity (personality + motivation), then order them for the recommendations screen.
+    // Score every activity (personality + motivation), then take the top MAX_RECOMMENDATIONS for the recommendations screen.
     const scoredRecommendations = activities.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
-    const orderedRecommendations = diversifyAndOrder(scoredRecommendations, interests)
+    const recommendations = diversifyAndOrder(scoredRecommendations, interests).slice(0, MAX_RECOMMENDATIONS)
 
     // Find the high scoring activities, then give each activity the match label browse shows, with the reasons behind it.
     const highScoringSlugSet = getSlugSet(getHighFinalScoreActivities(scoredRecommendations))
-    const matchLabels = getMatchLabels(activities, motivations, userPatternWeights, highScoringSlugSet)
+    const recommendedSlugSet = getSlugSet(recommendations.map((s) => s.rec))
+    const matchLabels = getMatchLabels(activities, motivations, userPatternWeights, recommendedSlugSet)
 
-    // Return the top MAX_RECOMMENDATIONS for the recommendations screen, the slugs browse marks as recommended, and each activity's match label.
+    // Return the recommendations screen's activities, the slugs browse marks as recommended, and each activity's match label.
     return {
-        recommendations: orderedRecommendations.slice(0, MAX_RECOMMENDATIONS),
+        recommendations,
         recommendedSlugs: [...highScoringSlugSet],
         matchLabels,
     }

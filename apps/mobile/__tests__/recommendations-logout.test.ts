@@ -29,7 +29,7 @@ function responseFor(slug: string, patternId: PatternTypeId, interest: ActivityF
   return {
     recommendations: [{ slug, dominantPatternId: patternId }],
     recommendedSlugs: [slug],
-    matchLabels: { [slug]: { kind: "personality", patternId } },
+    matchLabels: { [slug]: { kind: "personality", patternId, sharedActivityTypesByMotivation: {} } },
     patternWeights: { [patternId]: 1 },
     interests: [interest],
   } as unknown as RecommendationsResponse
@@ -84,7 +84,7 @@ describe("recommendations across logout", () => {
 
     expect(readRecommendationState()).toEqual({
       slugs: ["pottery"],
-      matchLabels: { pottery: { kind: "personality", patternId: "1-HH" } },
+      matchLabels: { pottery: { kind: "personality", patternId: "1-HH", sharedActivityTypesByMotivation: {} } },
       dominantPatternIds: { pottery: "1-HH" },
       interests: ["Art"],
       patternWeights: { "1-HH": 1 },
@@ -129,7 +129,7 @@ describe("recommendations across logout", () => {
 
     expect(readRecommendationState()).toEqual({
       slugs: ["climbing"],
-      matchLabels: { climbing: { kind: "personality", patternId: "2-LL" } },
+      matchLabels: { climbing: { kind: "personality", patternId: "2-LL", sharedActivityTypesByMotivation: {} } },
       dominantPatternIds: { climbing: "2-LL" },
       interests: ["Sports"],
       patternWeights: { "2-LL": 1 },

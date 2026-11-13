@@ -141,15 +141,14 @@ test("GET /recommendations includes recommendedSlugs from the activity pool", as
   assert.ok(body.recommendedSlugs.every((slug) => poolSlugs.has(slug)))
 })
 
-test("GET /recommendations only labels activities from the pool, and only personality matches outside recommendedSlugs", async () => {
+test("GET /recommendations only labels activities from the pool, labelling the recommendations screen's activities recommended", async () => {
   const res = await fetch(`${baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse
 
   const poolSlugs = new Set(RECOMMENDATIONS.map((a) => a.slug))
   assert.ok(Object.keys(body.matchLabels).every((slug) => poolSlugs.has(slug)))
-  const recommended = new Set(body.recommendedSlugs)
-  assert.ok(Object.values(body.matchLabels).length > 0)
-  assert.ok(Object.entries(body.matchLabels).every(([slug, label]) => recommended.has(slug) || label.kind === "personality"))
+  assert.ok(body.recommendations.length > 0)
+  assert.ok(body.recommendations.every((a) => body.matchLabels[a.slug]?.kind === "recommended"))
 })
 
 test("GET /recommendations includes the user's onboarding interests, dropping any that aren't activity fields", async () => {

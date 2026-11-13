@@ -108,7 +108,7 @@ describe("BrowsePage", () => {
     const personalityMatchSlug = randomActivities[3].slug
     mockFetchRecommendations.mockImplementationOnce(async () => {
       setRecommendedSlugs([personalityMatchSlug])
-      setMatchLabels({ [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" } })
+      setMatchLabels({ [personalityMatchSlug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} } })
       return []
     })
     render(<BrowsePage />)
@@ -116,7 +116,7 @@ describe("BrowsePage", () => {
 
     expect(mockFetchRecommendations).toHaveBeenCalledTimes(1)
     const listed = screen.UNSAFE_getByType(FlatList).props.data
-    expect(listed[0]).toMatchObject({ slug: personalityMatchSlug, matchLabel: { kind: "personality", patternId: "4-LH" } })
+    expect(listed[0]).toMatchObject({ slug: personalityMatchSlug, matchLabel: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} } })
   })
 
   it("doesn't fetch recommendations when they're already loaded", async () => {
@@ -129,13 +129,13 @@ describe("BrowsePage", () => {
 
   it("gives each activity its match label and leaves the rest unlabelled", async () => {
     const randomActivities = RECOMMENDATIONS.slice(20, 30)
-    const goodMatchSlug = randomActivities[0].slug
+    const recommendedSlug = randomActivities[0].slug
     const personalityMatchSlug = randomActivities[3].slug
     render(<BrowsePage />)
     await act(async () => {})
 
     await act(async () =>
-      setMatchLabels({ [goodMatchSlug]: { kind: "good", sharedActivityTypesByMotivation: {} }, [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" } }),
+      setMatchLabels({ [recommendedSlug]: { kind: "recommended", sharedActivityTypesByMotivation: {} }, [personalityMatchSlug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} } }),
     )
 
     const labelsBySlug = Object.fromEntries(
@@ -145,8 +145,8 @@ describe("BrowsePage", () => {
         .map((a: { slug: string; matchLabel: object }) => [a.slug, a.matchLabel]),
     )
     expect(labelsBySlug).toEqual({
-      [goodMatchSlug]: { kind: "good", sharedActivityTypesByMotivation: {} },
-      [personalityMatchSlug]: { kind: "personality", patternId: "4-LH" },
+      [recommendedSlug]: { kind: "recommended", sharedActivityTypesByMotivation: {} },
+      [personalityMatchSlug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
     })
   })
 

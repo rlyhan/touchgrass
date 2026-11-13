@@ -51,34 +51,15 @@ export const Creative: Story = {
   },
 }
 
-export const GoodMatch: Story = {
+export const InYourRecommendations: Story = {
   args: {
-    matchLabel: { kind: "good", sharedActivityTypesByMotivation: {} },
+    matchLabel: { kind: "recommended", sharedActivityTypesByMotivation: {} },
   },
 }
 
-export const StrongMatch: Story = {
+export const PersonalityMatch: Story = {
   args: {
-    matchLabel: { kind: "strong", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
-  },
-}
-
-export const StrongPersonalityMatch: Story = {
-  args: {
-    matchLabel: { kind: "personality", patternId: "4-LH" },
-  },
-}
-
-export const StrongMotivationMatch: Story = {
-  args: {
-    matchLabel: {
-      kind: "motivation",
-      sharedActivityTypesByMotivation: {
-        explore_creative: ["Creative"],
-        connect_with_people: ["Collaborative"],
-        grow_and_achieve: ["Disciplined"],
-      },
-    },
+    matchLabel: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
   },
 }
 

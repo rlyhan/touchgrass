@@ -20,11 +20,9 @@ export function scoreRecommendation(userPatternWeights: Record<PatternTypeId, nu
  * The cutoff is relative to each user because more motivations raise every score. It typically keeps about a third of the catalogue.
  */
 export function getHighFinalScoreActivities(scoredRecommendations: ScoredRecommendation[]): Activity[] {
-    const finalScores = scoredRecommendations.map((s) => s.score)
-    const finalMean = finalScores.reduce((sum, score) => sum + score, 0) / finalScores.length
-    const finalSd = Math.sqrt(finalScores.reduce((sum, score) => sum + (score - finalMean) ** 2, 0) / finalScores.length)
+    const { mean, sd } = getMeanAndSd(scoredRecommendations.map((s) => s.score))
     return scoredRecommendations
-        .filter((s) => s.score >= finalMean + finalSd * HIGH_FINAL_SCORE_SD_MULTIPLIER)
+        .filter((s) => s.score >= mean + sd * HIGH_FINAL_SCORE_SD_MULTIPLIER)
         .map((s) => s.rec)
 }
 
@@ -38,11 +36,17 @@ export function getHighFinalScoreActivities(scoredRecommendations: ScoredRecomme
  */
 export function getHighBaseScoreActivities(userPatternWeights: Record<PatternTypeId, number>, activities: Activity[]): Activity[] {
     const baseScoredActivities = activities.map((rec) => ({ rec, baseScore: calculateRecommendationBaseScore(userPatternWeights, rec) }))
-    const baseMean = baseScoredActivities.reduce((sum, { baseScore }) => sum + baseScore, 0) / baseScoredActivities.length
-    const baseSd = Math.sqrt(baseScoredActivities.reduce((sum, { baseScore }) => sum + (baseScore - baseMean) ** 2, 0) / baseScoredActivities.length)
+    const { mean, sd } = getMeanAndSd(baseScoredActivities.map(({ baseScore }) => baseScore))
     return baseScoredActivities
-        .filter(({ baseScore }) => baseScore > baseMean + baseSd * HIGH_BASE_SCORE_SD_MULTIPLIER)
+        .filter(({ baseScore }) => baseScore > mean + sd * HIGH_BASE_SCORE_SD_MULTIPLIER)
         .map(({ rec }) => rec)
+}
+
+/* The mean of the given scores, and their (population) standard deviation: how spread out they are around it. */
+export function getMeanAndSd(scores: number[]): { mean: number; sd: number } {
+    const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length
+    const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
+    return { mean, sd }
 }
 
 /* The slugs of the given activities, as a set for quick lookups. */

@@ -39,11 +39,9 @@ export async function generateStaticParams(): Promise<{ slug: string }[]> {
 export default function ActivityDetailPage() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
   const matchLabel = useMatchLabels()[slug ?? ""]
-  // Personality reason shown on the page: only a "personality" or "strong" label's pattern, so it matches browse.
-  const reasonPatternId = matchLabel && "patternId" in matchLabel ? matchLabel.patternId : undefined
-  // For each user motivation, the activity types it shares with this activity; each becomes a motivation reason row.
-  const sharedActivityTypesByMotivation =
-    matchLabel && "sharedActivityTypesByMotivation" in matchLabel ? matchLabel.sharedActivityTypesByMotivation : undefined
+  // The label's reasons: its pattern (strong personality matches only) and, per shared motivation, the types it shares.
+  const reasonPatternId = matchLabel?.patternId
+  const sharedActivityTypesByMotivation = matchLabel?.sharedActivityTypesByMotivation
   const interests = useInterests()
   useLoadRecommendationsIfMissing()
 

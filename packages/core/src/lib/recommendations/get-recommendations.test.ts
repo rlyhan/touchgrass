@@ -7,10 +7,9 @@ import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import { getRecommendations } from "./get-recommendations.js"
 import { getSharedActivityTypesBetweenActivityAndUserMotivations } from "./motivation/shared-activity-types.js"
-import { calculateRecommendationBaseScore } from "./personality/base-score.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
-import { scoreRecommendation } from "./score.js"
+import { getHighBaseScoreActivities, getHighFinalScoreActivities, scoreRecommendation } from "./score.js"
 import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
 
 const mockUserBfas: BFASScores = {
@@ -37,19 +36,12 @@ test("getRecommendations returns up to 10 recommendations", () => {
 test("getRecommendations puts activities scoring at least half a standard deviation above the mean in recommendedSlugs", () => {
   const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
   const scored = RECOMMENDATIONS.map((rec) => scoreRecommendation(weights, rec, [creativeMotivation]))
-  const cutoff = recommendedCutoff(scored.map((s) => s.score))
-  const aboveCutoffSlugs = scored.filter((s) => s.score >= cutoff).map((s) => s.rec.slug)
+  const aboveCutoffSlugs = getHighFinalScoreActivities(scored).map((rec) => rec.slug)
 
   const { recommendedSlugs } = getRecommendations(mockUserBfas, [creativeMotivation], ["Art"], RECOMMENDATIONS)
   assert.deepEqual(recommendedSlugs, aboveCutoffSlugs)
   assert.ok(recommendedSlugs.length > 0 && recommendedSlugs.length < RECOMMENDATIONS.length)
 })
-
-function recommendedCutoff(scores: number[]): number {
-  const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length
-  const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
-  return mean + sd * 0.5
-}
 
 const creativeAdventureAndPeople = MOTIVATION_OPTIONS.filter((m) =>
   ["explore_creative", "seek_adventure", "connect_with_people"].includes(m.value),
@@ -68,67 +60,49 @@ function motivationLabelsOf(sharedActivityTypesByMotivation: SharedActivityTypes
 
 function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
   const weights = getUserPatternWeights(getOCEANScores(bfas))
-  const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
-  const mean = baseScores.reduce((sum, score) => sum + score, 0) / baseScores.length
-  const sd = Math.sqrt(baseScores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / baseScores.length)
-  return RECOMMENDATIONS.filter((rec, i) => baseScores[i]! > mean + sd && getDominantPatternId(weights, rec) !== null).map(
-    (rec) => rec.slug,
-  )
+  return getHighBaseScoreActivities(weights, RECOMMENDATIONS)
+    .filter((rec) => getDominantPatternId(weights, rec) !== null)
+    .map((rec) => rec.slug)
 }
 
-test("getRecommendations gives a personality label to exactly the activities over one SD above the mean base score with a high-scoring pattern", () => {
-  const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
+test("getRecommendations labels the recommendations screen's activities recommended", () => {
+  const { recommendations, matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
 
-  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-  const personalityLabelledSlugs = RECOMMENDATIONS.map((rec) => rec.slug).filter((slug) =>
-    ["personality", "strong"].includes(matchLabels[slug]?.kind ?? ""),
-  )
-  assert.ok(strongPersonalitySlugs.length > 0)
-  assert.deepEqual(personalityLabelledSlugs, strongPersonalitySlugs)
+  assert.ok(recommendations.length > 0)
+  for (const { rec } of recommendations) assert.equal(matchLabels[rec.slug]?.kind, "recommended", rec.slug)
 })
 
-test("getRecommendations gives a motivation label only to recommended activities overlapping two or more motivations, naming them", () => {
-  const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-  const motivationLabelled = RECOMMENDATIONS.filter((rec) => ["motivation", "strong"].includes(matchLabels[rec.slug]?.kind ?? ""))
+test("getRecommendations labels every other strong personality match personality and leaves the rest unlabelled", () => {
+  const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
+  const { recommendations, matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const recommendedSlugSet = new Set(recommendations.map(({ rec }) => rec.slug))
 
-  assert.ok(motivationLabelled.length > 0)
+  assert.ok(Object.values(matchLabels).some((label) => label.kind === "personality"))
   for (const rec of RECOMMENDATIONS) {
-    const overlaps = overlappingMotivationLabels(rec, creativeAdventureAndPeople)
-    const qualifies = recommendedSlugs.includes(rec.slug) && overlaps.length >= 2
-    assert.equal(motivationLabelled.includes(rec), qualifies, rec.slug)
-    const label = matchLabels[rec.slug]
-    if (label?.kind === "motivation") assert.deepEqual(motivationLabelsOf(label.sharedActivityTypesByMotivation), overlaps)
+    if (recommendedSlugSet.has(rec.slug)) continue
+    const expected = strongPersonalitySlugs.includes(rec.slug) ? "personality" : undefined
+    assert.equal(matchLabels[rec.slug]?.kind, expected, rec.slug)
   }
 })
 
-test("getRecommendations labels activities that qualify for both the personality and motivation labels as strong", () => {
-  const everyMotivation = [...MOTIVATION_OPTIONS]
+test("getRecommendations gives a labelled activity a pattern only when it's over one SD above the mean base score with a high-scoring pattern", () => {
   const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
 
-  const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, everyMotivation, [], RECOMMENDATIONS)
-  const strongMatchSlugs = RECOMMENDATIONS.map((rec) => rec.slug).filter((slug) => matchLabels[slug]?.kind === "strong")
-  const bothSlugs = RECOMMENDATIONS.filter(
-    (rec) =>
-      strongPersonalitySlugs.includes(rec.slug) &&
-      recommendedSlugs.includes(rec.slug) &&
-      overlappingMotivationLabels(rec, everyMotivation).length >= 2,
-  ).map((rec) => rec.slug)
+  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+  const withPatternSlugs = Object.entries(matchLabels).filter(([, label]) => label.patternId).map(([slug]) => slug)
+  const expected = Object.keys(matchLabels).filter((slug) => strongPersonalitySlugs.includes(slug))
 
-  assert.ok(bothSlugs.length > 0)
-  assert.deepEqual(strongMatchSlugs, bothSlugs)
+  assert.ok(withPatternSlugs.length > 0)
+  assert.deepEqual(withPatternSlugs.sort(), expected.sort())
 })
 
-test("getRecommendations names the user's best pattern as the reason for every personality and strong label", () => {
+test("getRecommendations names the user's best pattern as each label's personality reason", () => {
   const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
   const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
-  const withPattern = RECOMMENDATIONS.flatMap((rec) => {
-    const label = matchLabels[rec.slug]
-    return label?.kind === "personality" || label?.kind === "strong" ? [{ rec, patternId: label.patternId }] : []
-  })
 
-  assert.ok(withPattern.some(({ rec }) => matchLabels[rec.slug]?.kind === "strong"))
-  for (const { rec, patternId } of withPattern) {
-    assert.equal(patternId, getDominantPatternId(weights, rec), rec.slug)
+  for (const rec of RECOMMENDATIONS) {
+    const patternId = matchLabels[rec.slug]?.patternId
+    if (patternId) assert.equal(patternId, getDominantPatternId(weights, rec), rec.slug)
   }
 })
 
@@ -137,7 +111,7 @@ test("getRecommendations lists each overlapping motivation by value with only th
 
   for (const rec of RECOMMENDATIONS) {
     const label = matchLabels[rec.slug]
-    if (!label || label.kind === "personality") continue
+    if (!label) continue
     const activityTypes = [rec.type, ...(rec.related_types ?? [])]
     assert.deepEqual(motivationLabelsOf(label.sharedActivityTypesByMotivation), overlappingMotivationLabels(rec, MOTIVATION_OPTIONS), rec.slug)
     for (const motivation of MOTIVATION_OPTIONS) {
@@ -149,26 +123,7 @@ test("getRecommendations lists each overlapping motivation by value with only th
   }
 })
 
-test("getRecommendations labels the rest of recommendedSlugs that share a motivation a good match and leaves other activities unlabelled", () => {
-  const { matchLabels, recommendedSlugs } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-
-  for (const rec of RECOMMENDATIONS) {
-    const kind = matchLabels[rec.slug]?.kind
-    const sharesMotivation = overlappingMotivationLabels(rec, creativeAdventureAndPeople).length > 0
-    if (recommendedSlugs.includes(rec.slug) && sharesMotivation) assert.ok(kind !== undefined, rec.slug)
-    else assert.ok(kind === undefined || kind === "personality", rec.slug)
-  }
-})
-
-test("getRecommendations explains each good match with exactly one shared motivation", () => {
-  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-  const goodMatches = Object.values(matchLabels).filter((label) => label.kind === "good")
-
-  assert.ok(goodMatches.length > 0)
-  assert.ok(goodMatches.every((label) => Object.keys(label.sharedActivityTypesByMotivation).length === 1))
-})
-
-test("getRecommendations gives no personality label to a user with middling scores and no high-scoring pattern", () => {
+test("getRecommendations gives no personality reason to a user with middling scores and no high-scoring pattern", () => {
   const middlingUser: BFASScores = {
     Openness: 62,
     Intellect: 58,
@@ -182,24 +137,20 @@ test("getRecommendations gives no personality label to a user with middling scor
     Withdrawal: 48,
   }
   const weights = getUserPatternWeights(getOCEANScores(middlingUser))
-  const baseScores = RECOMMENDATIONS.map((rec) => calculateRecommendationBaseScore(weights, rec))
-  const mean = baseScores.reduce((sum, score) => sum + score, 0) / baseScores.length
-  const sd = Math.sqrt(baseScores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / baseScores.length)
 
   assert.ok(Object.values(weights).every((weight) => weight < 0.6))
-  assert.ok(baseScores.some((score) => score > mean + sd))
+  assert.ok(getHighBaseScoreActivities(weights, RECOMMENDATIONS).length > 0)
 
   const { matchLabels } = getRecommendations(middlingUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-  const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality" || label.kind === "strong")
-  assert.equal(personalityKinds.length, 0)
+  assert.ok(Object.values(matchLabels).length > 0)
+  assert.ok(Object.values(matchLabels).every((label) => label.patternId === undefined))
 })
 
-test("getRecommendations gives no personality label to a user who scores 50 on every aspect", () => {
+test("getRecommendations gives no personality reason to a user who scores 50 on every aspect", () => {
   const neutralUser = Object.fromEntries(Object.keys(mockUserBfas).map((aspect) => [aspect, 50])) as BFASScores
 
   const { matchLabels } = getRecommendations(neutralUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
-  const personalityKinds = Object.values(matchLabels).filter((label) => label.kind === "personality" || label.kind === "strong")
-  assert.equal(personalityKinds.length, 0)
+  assert.ok(Object.values(matchLabels).every((label) => label.patternId === undefined))
 })
 
 const sharedTypesActivity: Activity = { ...RECOMMENDATIONS[0]!, type: "Outdoorsy", related_types: ["Social", "Reflective"] }

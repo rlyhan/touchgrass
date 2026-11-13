@@ -10,7 +10,6 @@ import {
 } from "@/lib/icons"
 import { colors } from "@/lib/theme/colors"
 import type { MatchLabel } from "@touchgrass/types"
-import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 // iOS clips shadows on a View with `overflow: hidden`, so the shadow needs to
 // live on an outer wrapper while the clipped/rounded content sits inside.
@@ -26,16 +25,7 @@ const cardShadow = Platform.select({
 })
 
 function matchLabelText(matchLabel: MatchLabel): string {
-  switch (matchLabel.kind) {
-    case "strong":
-      return "Strong match"
-    case "personality":
-      return "Strong personality match"
-    case "motivation":
-      return `Strong motivation match: ${MOTIVATION_OPTIONS.filter((m) => matchLabel.sharedActivityTypesByMotivation[m.value]).map((m) => m.label).join(", ")}`
-    case "good":
-      return "Good match"
-  }
+  return matchLabel.kind === "recommended" ? "In your recommendations" : "Personality match"
 }
 
 interface ActivityCardProps {

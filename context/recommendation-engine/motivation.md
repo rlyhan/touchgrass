@@ -4,7 +4,7 @@ Motivation produces each activity's **motivation boost**, which is added to the 
 
 Code: [`packages/core/src/lib/recommendations/motivation/`](../../packages/core/src/lib/recommendations/motivation/), with a `.test.ts` next to each file.
 
-- **Affects:** the final score, so both the order of the recommendations screen and which activities land in `recommendedSlugs`. Also the `motivation` and `strong` match labels, which use direct type overlap rather than the boost (see [`recommendation-engine.md`](../recommendation-engine.md)).
+- **Affects:** the final score, so both the order of the recommendations screen and which activities land in `recommendedSlugs`. Through the final score, also which activities reach the top 10 and get the `recommended` match label. The motivation reasons on a label use direct type overlap rather than the boost (see [`recommendation-engine.md`](../recommendation-engine.md)).
 - **Depends on:** personality — the boost is built from the user's pattern weights (see [Personality](personality.md)).
 - **Never affected by:** interests.
 

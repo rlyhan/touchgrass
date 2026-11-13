@@ -304,18 +304,18 @@ describe("ActivityDetailPage", () => {
       clearRecommendedSlugs()
     })
 
-    it("shows the pattern from a personality label", () => {
-      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+    it("shows the pattern from a recommended label that carries one", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Why this matches you")).toBeTruthy()
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
     })
 
-    it("shows the pattern and a row per shared motivation for a strong label", () => {
+    it("shows the pattern and a row per shared motivation", () => {
       setMatchLabels({
         [ACTIVITY.slug]: {
-          kind: "strong",
+          kind: "personality",
           patternId: "4-HH",
           sharedActivityTypesByMotivation: { explore_creative: ["Artistic", "Creative"], connect_with_people: ["Social"] },
         },
@@ -338,9 +338,9 @@ describe("ActivityDetailPage", () => {
       expect(screen.queryByText(/You scored highly as/)).toBeNull()
     })
 
-    it("doesn't show a pattern for a good label", () => {
+    it("doesn't show a pattern for a label without one", () => {
       setDominantPatternIds({ [ACTIVITY.slug]: "4-HH" })
-      setMatchLabels({ [ACTIVITY.slug]: { kind: "good", sharedActivityTypesByMotivation: { explore_creative: ["Artistic"] } } })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: { explore_creative: ["Artistic"] } } })
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Explore my creative side")).toBeTruthy()
@@ -348,7 +348,7 @@ describe("ActivityDetailPage", () => {
     })
 
     it("shows the interest row alongside the label's reasons when the activity's field is an interest", () => {
-      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
@@ -367,7 +367,7 @@ describe("ActivityDetailPage", () => {
     })
 
     it("leaves out the interest row when the activity's field isn't one of the user's interests", () => {
-      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       setInterests(["Martial Arts"])
       render(<ActivityDetailPage />)
 
@@ -384,7 +384,7 @@ describe("ActivityDetailPage", () => {
     it("fetches recommendations when none are loaded, then shows the reasons", async () => {
       mockFetchRecommendations.mockImplementationOnce(async () => {
         setRecommendedSlugs([ACTIVITY.slug])
-        setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+        setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
         return []
       })
       render(<ActivityDetailPage />)
@@ -413,7 +413,7 @@ describe("ActivityDetailPage", () => {
 
     it("renders the match copy and reveals the short description on expand", () => {
       // 4-HH → Enchanting Visionary
-      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH" } })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       render(<ActivityDetailPage />)
 
       const trigger = screen.getByRole("button", {

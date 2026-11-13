@@ -28,16 +28,14 @@ Each factor has its own doc covering what it affects, what it never affects, and
 ## Outputs
 
 - `getRecommendations` returns the top 10 best-match recommendations (`ScoredRecommendation[]`) after scoring and diversification — the recommendations screen.
-- It also returns `recommendedSlugs`, which browse lists first on each page and which decides the `motivation` and `good` match labels: every activity whose final score (step 4, base + motivation boost) is at least half a standard deviation above the user's mean score across the catalogue, without diversification. The cutoff is relative to each user because the motivation boost grows with the number of motivations selected, so absolute final scores aren't comparable across users.
-- It also returns `matchLabels`, keyed by slug, giving the reason an activity matches. Browse shows it on each card as "Strong match", "Strong personality match", "Strong motivation match: …" (naming the motivations) or "Good match". Activities with none of these are left out. The first that applies wins:
-  1. `strong` — qualifies for both `personality` and `motivation`.
-  2. `personality` — base score (steps 1–3) strictly above the user's mean base score plus one standard deviation, and the user scores at least `MIN_DOMINANT_WEIGHT` (0.6) on one of the activity's patterns. Any activity can get it, recommended or not.
-  3. `motivation` — in `recommendedSlugs`, and two or more selected motivations list the activity's `type` or one of its `related_types` in their `associated_activity_types`. It's limited to `recommendedSlugs` because every activity overlaps at least two of the seven motivations.
-  4. `good` — any other activity in `recommendedSlugs` that shares at least one motivation, so every label has a reason to show. A high scorer that shares none gets no label, though browse still lists it first.
-- Each label carries its reasons, worked out in `getMatchLabels` so the label and its explanation always agree:
-  - `personality` and `strong` carry `patternId`: the user's highest-weighted pattern among the activity's patterns (always 0.6 or more).
-  - `motivation`, `strong` and `good` carry `sharedActivityTypesByMotivation`: each selected motivation that overlaps the activity, keyed by its value, with only the activity types they share (e.g. `{ seek_adventure: ["Outdoorsy"] }`). A `good` label has exactly one, because two or more would make it `motivation`.
-- The activity page shows these reasons under "Why this matches you": a row for the pattern, then one per shared motivation. Recommendations-screen activities without a label show their `dominantPatternId` instead; a `good` or `motivation` label never does, as its reasons are only its motivations. Browse and the activity page fetch recommendations themselves when none are loaded, so labels and reasons also appear after a direct link or a restart.
+- It also returns `recommendedSlugs`, which browse lists first on each page: every activity whose final score (step 4, base + motivation boost) is at least half a standard deviation above the user's mean score across the catalogue, without diversification. The cutoff is relative to each user because the motivation boost grows with the number of motivations selected, so absolute final scores aren't comparable across users.
+- It also returns `matchLabels`, keyed by slug. Browse shows it on each card. Activities with neither label are left out. The first that applies wins:
+  1. `recommended` ("In your recommendations") — one of the top 10 on the recommendations screen.
+  2. `personality` ("Personality match") — any other strong personality match: base score (steps 1–3) strictly above the user's mean base score plus one standard deviation, and a pattern the user scores at least `MIN_DOMINANT_WEIGHT` (0.6) on.
+- Each label carries its reasons, worked out in `getMatchLabels` (`match-labels.ts`):
+  - `patternId`, only for a strong personality match (on either label): the user's highest-weighted pattern among the activity's patterns. Browse cards never show it; the activity page does.
+  - `sharedActivityTypesByMotivation`: each selected motivation that lists the activity's `type` or one of its `related_types` in its `associated_activity_types`, keyed by its value, with only the activity types they share (e.g. `{ seek_adventure: ["Outdoorsy"] }`). Empty when none overlap.
+- The activity page shows these reasons under "Why this matches you": a row for the pattern if there is one, then one per shared motivation, then the activity's field if it's one of the user's interests. Unlabelled activities show only the interest row, if any. Browse and the activity page fetch recommendations themselves when none are loaded, so labels and reasons also appear after a direct link or a restart.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity — see [Personality](recommendation-engine/personality.md).
 
 ---
@@ -52,7 +50,7 @@ Everything lives in [`packages/core/src/lib/recommendations/`](../packages/core/
 | `score.ts` | `scoreRecommendation` — the only place factors combine (`base + boost`) |
 | `diversify.ts` | `diversifyAndOrder` — final order for the recommendations screen |
 | `get-recommendations.ts` | `getRecommendations` — runs the steps below, takes the top 10 and computes `recommendedSlugs` and `matchLabels` |
-| `factor-contracts.test.ts` | Rules that span factors: interests never change `recommendedSlugs` or `matchLabels`, many motivations don't inflate `recommendedSlugs`, personality alone doesn't earn it |
+| `factor-contracts.test.ts` | Rules that span factors: interests never change `recommendedSlugs` or personality reasons, many motivations don't inflate `recommendedSlugs`, personality alone doesn't earn it |
 
 ### 1–3. Personality → base score
 

@@ -4,7 +4,7 @@ Personality produces each activity's **base score**: how well the activity's typ
 
 Code: [`packages/core/src/lib/recommendations/personality/`](../../packages/core/src/lib/recommendations/personality/), with a `.test.ts` next to each file.
 
-- **Affects:** every activity's base score, the "You were matched because…" pattern, `getTopActivityTypes`, the `personality` and `strong` match labels.
+- **Affects:** every activity's base score, the "You were matched because…" pattern, `getTopActivityTypes`, the `personality` match label and the personality reason (`patternId`) on any label.
 - **Never affected by:** motivations or interests.
 
 ---
@@ -62,16 +62,16 @@ For each of the 40 patterns, each of its two traits is converted to a 0–1 fit 
 
 Primary affinity is the anchor; secondary affinity can only add a bonus (up to +0.2). Done by `calculateRecommendationBaseScore` (via `calculateActivityPatternAffinity`).
 
-### 4. Strong personality match label — `match-labels.ts`
+### 4. Strong personality reason — `match-labels.ts`
 
-`isStrongPersonality` gives an activity the `personality` (or `strong`) match label only when it passes two checks that answer different questions:
+`isStrongPersonality` gives an activity the `personality` match label (unless it's already `recommended`) and a personality reason (`patternId`, shown on its page as "You scored highly as …") only when it passes two checks that answer different questions:
 
 | Check | Question it answers | How it's measured |
 |---|---|---|
 | Top personality fit (`getHighBaseScoreActivities`) | Is this among the activities that suit the user's personality best? | The activity's **base score** (step 3), which blends all its patterns, must be strictly above the user's mean base score plus one standard deviation — roughly the top sixth of the catalogue |
 | High-scoring pattern (`getDominantPatternId`) | Does the user have a strong trait connected to this activity? | The **single best pattern weight** among the activity's patterns must be at least `MIN_DOMINANT_WEIGHT` (0.6) |
 
-Neither is enough alone. The base score check is relative, so a user with middling scores still has activities above their own average, with nothing they scored highly on. The pattern check takes the best of roughly 6–15 patterns, so a user with a few strong traits passes it on nearly every activity. Together, the label marks an activity that stands out for this user *and* is backed by a high trait, which keeps "You scored highly as …" true.
+Neither is enough alone. The base score check is relative, so a user with middling scores still has activities above their own average, with nothing they scored highly on. The pattern check takes the best of roughly 6–15 patterns, so a user with a few strong traits passes it on nearly every activity. Together, the reason marks an activity that stands out for this user *and* is backed by a high trait, which keeps "You scored highly as …" true.
 
 ### Also built on personality
 
@@ -101,4 +101,4 @@ Neither is enough alone. The base score check is relative, so a user with middli
 - **A pattern shared by several related types counts once per type.** Creative and Artistic both include `4-HH`, so with both as related types `4-HH` is weighted twice in the secondary pool. `getDominantPatternId` deduplicates; the base score doesn't. (`base-score.test.ts`, `dominant-pattern.test.ts`)
 - **The same pattern can belong to unrelated types** (e.g. `9-HH` is in both Creative and Analytical). This matters for motivations, which match by type, not pattern. (`motivation/boost.test.ts`)
 - **Personality alone doesn't earn `recommendedSlugs`.** An activity with a strong base score but no motivation boost usually falls below the user's `recommendedSlugs` cutoff (covered in `factor-contracts.test.ts`). It can still get the `personality` match label, which uses the base score alone.
-- **Users with middling scores may get no personality labels.** Without a pattern at 0.6 or more, the high-scoring pattern check fails on every activity, even though some still pass the top personality fit check (see step 4). A user who scores 50 on every aspect never gets one. (`get-recommendations.test.ts`)
+- **Users with middling scores may get no personality matches.** Without a pattern at 0.6 or more, the high-scoring pattern check fails on every activity, even though some still pass the top personality fit check (see step 4). A user who scores 50 on every aspect never gets one. (`get-recommendations.test.ts`)
