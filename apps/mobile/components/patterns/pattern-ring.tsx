@@ -19,10 +19,12 @@ const RADIUS = (SIZE - STROKE_WIDTH) / 2
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 const FADE_DURATION = 250
 const DIMMED_OPACITY = 0.35
+const PALE_STROKE_OPACITY = 0.45
 
 type Props = {
   percent: number
   label: string
+  color: string
   duration?: number
   isSelected?: boolean
   anySelected?: boolean
@@ -31,6 +33,7 @@ type Props = {
 export function PatternRing({
   percent,
   label,
+  color,
   duration = 800,
   isSelected = false,
   anySelected = false,
@@ -92,7 +95,7 @@ export function PatternRing({
             cx={SIZE / 2}
             cy={SIZE / 2}
             r={RADIUS}
-            stroke={colors.emerald[500]}
+            stroke={color}
             strokeWidth={STROKE_WIDTH}
             strokeLinecap="round"
             fill="none"
@@ -106,7 +109,8 @@ export function PatternRing({
             cx={SIZE / 2}
             cy={SIZE / 2}
             r={RADIUS}
-            stroke={colors.emerald[300]}
+            stroke={color}
+            strokeOpacity={PALE_STROKE_OPACITY}
             strokeWidth={STROKE_WIDTH}
             strokeLinecap="round"
             fill="none"

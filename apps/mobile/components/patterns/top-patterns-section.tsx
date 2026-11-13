@@ -15,6 +15,7 @@ import type {
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
 
 import { colors } from "@/lib/theme/colors"
+import { PATTERN_COLORS } from "@/lib/theme/pattern-colors"
 
 import { PatternRing } from "./pattern-ring"
 
@@ -155,6 +156,7 @@ export function TopPatternsSection({ patternWeights }: Props) {
               <PatternRing
                 percent={patternWeights[id] * 100}
                 label={pattern.name}
+                color={PATTERN_COLORS[id]}
                 isSelected={isSelected}
                 anySelected={selectedId !== null}
               />
