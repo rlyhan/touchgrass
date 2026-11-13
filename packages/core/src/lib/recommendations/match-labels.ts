@@ -10,14 +10,16 @@ const PERSONALITY_MATCH = "personality"
 
 /*
  * Match labels: the label browse gives for each activity, keyed by slug, chosen by getMatchLabelKind.
- * Each label carries its reasons: the user's best pattern when the activity is a strong personality match, and each
- * overlapping motivation (by value) with the activity types it shares. Activities with no label are left out.
+ * Each label carries its reasons: the user's best pattern when the activity is a strong personality match, each
+ * overlapping motivation (by value) with the activity types it shares, and whether the recommendations screen picked it
+ * for variety (its type's best pick). Activities with no label are left out.
  */
 export function getMatchLabels(
     activities: Activity[],
     userMotivations: Motivation[],
     userPatternWeights: Record<PatternTypeId, number>,
     recommendedSlugSet: Set<string>,
+    varietyPickSlugSet: Set<string>,
 ): Record<string, MatchLabel> {
     const topPersonalityFitSlugSet = getSlugSet(getHighBaseScoreActivities(userPatternWeights, activities))
     const matchLabels: Record<string, MatchLabel> = {}
@@ -28,11 +30,15 @@ export function getMatchLabels(
         const kind = getMatchLabelKind(recommendedSlugSet.has(rec.slug), strongPersonality)
         if (!kind) return
 
-        // Attach the reasons: the personality pattern only for strong personality matches, plus any shared motivations.
+        // Attach the reasons: the personality pattern only for strong personality matches, any shared motivations, and
+        // whether it was picked for variety.
         const sharedActivityTypesByMotivation = getSharedActivityTypesBetweenActivityAndUserMotivations(rec, userMotivations)
-        matchLabels[rec.slug] = strongPersonality
-            ? { kind, patternId: patternId!, sharedActivityTypesByMotivation }
-            : { kind, sharedActivityTypesByMotivation }
+        matchLabels[rec.slug] = {
+            kind,
+            ...(strongPersonality ? { patternId: patternId! } : {}),
+            sharedActivityTypesByMotivation,
+            ...(varietyPickSlugSet.has(rec.slug) ? { pickedForVariety: true } : {}),
+        }
     })
     return matchLabels
 }

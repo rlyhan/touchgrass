@@ -247,6 +247,7 @@ export type SharedActivityTypesByMotivation = Partial<Record<MotivationValue, Ac
 export type MatchLabel = {
   kind: "recommended" | "personality"
   patternId?: PatternTypeId
+  pickedForVariety?: boolean
   sharedActivityTypesByMotivation: SharedActivityTypesByMotivation
 }
 

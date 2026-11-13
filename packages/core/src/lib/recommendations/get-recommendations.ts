@@ -32,9 +32,10 @@ export function getRecommendations(
     // Find the high scoring activities, then give each activity the match label browse shows, with the reasons behind it.
     const highScoringSlugSet = getSlugSet(getHighFinalScoreActivities(scoredRecommendations))
     const recommendedSlugSet = getSlugSet(recommendations.map((s) => s.rec))
-    const matchLabels = getMatchLabels(activities, motivations, userPatternWeights, recommendedSlugSet)
+    const varietyPickSlugSet = getSlugSet(recommendations.filter((s) => s.pickedForVariety).map((s) => s.rec))
+    const matchLabels = getMatchLabels(activities, motivations, userPatternWeights, recommendedSlugSet, varietyPickSlugSet)
 
-    // Return the recommendations screen's activities, the slugs browse marks as recommended, and each activity's match label.
+    // Return the recommendations screen's activities, the slugs browse lists first, and each activity's match label.
     return {
         recommendations,
         recommendedSlugs: [...highScoringSlugSet],

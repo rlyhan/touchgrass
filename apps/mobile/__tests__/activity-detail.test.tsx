@@ -366,6 +366,30 @@ describe("ActivityDetailPage", () => {
       expect(screen.queryByText(/You scored highly as/)).toBeNull()
     })
 
+    it("says the activity is the best pick of its type in the user's interests when picked for variety", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {}, pickedForVariety: true } })
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText(ACTIVITY.type)).toBeTruthy()
+      expect(screen.getByText(/pick in your interests\./)).toBeTruthy()
+    })
+
+    it("leaves out 'in your interests' for a variety pick outside the user's interests", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {}, pickedForVariety: true } })
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText(/Your best-matching/)).toBeTruthy()
+      expect(screen.queryByText(/in your interests/)).toBeNull()
+    })
+
+    it("shows no variety row for a recommended activity that wasn't picked for variety", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: { explore_creative: ["Artistic"] } } })
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByText(/Your best-matching/)).toBeNull()
+    })
+
     it("leaves out the interest row when the activity's field isn't one of the user's interests", () => {
       setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       setInterests(["Martial Arts"])

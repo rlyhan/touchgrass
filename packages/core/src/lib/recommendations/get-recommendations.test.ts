@@ -72,6 +72,15 @@ test("getRecommendations labels the recommendations screen's activities recommen
   for (const { rec } of recommendations) assert.equal(matchLabels[rec.slug]?.kind, "recommended", rec.slug)
 })
 
+test("getRecommendations marks the recommendations screen's activity-type picks as picked for variety, one per type", () => {
+  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, ["Art", "Music"], RECOMMENDATIONS)
+  const varietyPicks = RECOMMENDATIONS.filter((rec) => matchLabels[rec.slug]?.pickedForVariety)
+
+  assert.ok(varietyPicks.length > 0)
+  assert.ok(varietyPicks.every((rec) => matchLabels[rec.slug]?.kind === "recommended"))
+  assert.equal(new Set(varietyPicks.map((rec) => rec.type)).size, varietyPicks.length)
+})
+
 test("getRecommendations labels every other strong personality match personality and leaves the rest unlabelled", () => {
   const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
   const { recommendations, matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)

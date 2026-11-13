@@ -35,7 +35,8 @@ Each factor has its own doc covering what it affects, what it never affects, and
 - Each label carries its reasons, worked out in `getMatchLabels` (`match-labels.ts`):
   - `patternId`, only for a strong personality match (on either label): the user's highest-weighted pattern among the activity's patterns. Browse cards never show it; the activity page does.
   - `sharedActivityTypesByMotivation`: each selected motivation that lists the activity's `type` or one of its `related_types` in its `associated_activity_types`, keyed by its value, with only the activity types they share (e.g. `{ seek_adventure: ["Outdoorsy"] }`). Empty when none overlap.
-- The activity page shows these reasons under "Why this matches you": a row for the pattern if there is one, then one per shared motivation, then the activity's field if it's one of the user's interests. Unlabelled activities show only the interest row, if any. Browse and the activity page fetch recommendations themselves when none are loaded, so labels and reasons also appear after a direct link or a restart.
+  - `pickedForVariety`, only on `recommended` labels: the activity-type pass of diversification picked it, as the best-scoring activity of a type not yet in the top 10.
+- The activity page shows these reasons under "Why this matches you": a row for the pattern if there is one, one per shared motivation, "Your best-matching **Social** pick in your interests" for a variety pick ("in your interests" only when its field is one), then the activity's field if it's one of the user's interests. Unlabelled activities show only the interest row, if any. Browse and the activity page fetch recommendations themselves when none are loaded, so labels and reasons also appear after a direct link or a restart.
 - `getTopActivityTypes` returns the top N (default 6) activity types for the user by pattern affinity — see [Personality](recommendation-engine/personality.md).
 
 ---

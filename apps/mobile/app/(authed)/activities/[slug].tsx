@@ -139,6 +139,7 @@ export default function ActivityDetailPage() {
         <MatchReasons
           patternId={reasonPatternId}
           sharedActivityTypesByMotivation={sharedActivityTypesByMotivation}
+          varietyType={matchLabel?.pickedForVariety ? activity.type : undefined}
           interestField={interests.includes(activity.field) ? activity.field : undefined}
         />
 
