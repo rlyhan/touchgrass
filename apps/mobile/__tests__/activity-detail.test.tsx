@@ -329,11 +329,22 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByText("Social")).toBeTruthy()
     })
 
-    it("shows the recommendations screen's pattern for an activity without a label", () => {
+    it("doesn't show a pattern for an activity without a label, even if the recommendations screen has one", () => {
       setDominantPatternIds({ [ACTIVITY.slug]: "4-HH" })
+      setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
-      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+    })
+
+    it("doesn't show a pattern for a good label", () => {
+      setDominantPatternIds({ [ACTIVITY.slug]: "4-HH" })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "good", sharedActivityTypesByMotivation: { explore_creative: ["Artistic"] } } })
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Explore my creative side")).toBeTruthy()
+      expect(screen.queryByText(/You scored highly as/)).toBeNull()
     })
 
     it("shows the interest row alongside the label's reasons when the activity's field is an interest", () => {
