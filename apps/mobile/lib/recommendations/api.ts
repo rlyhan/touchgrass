@@ -14,8 +14,7 @@ import {
   setDominantPatternIds,
   setInterests,
   setMatchLabels,
-  setRecommendedSlugs,
-} from "@/lib/recommendations/recommended-slugs"
+} from "@/lib/recommendations/recommendation-store"
 
 export { UnauthenticatedError } from "@/lib/auth/errors"
 
@@ -55,7 +54,6 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   if (body.patternWeights) {
     setCachedPatternWeights(body.patternWeights)
   }
-  setRecommendedSlugs(body.recommendedSlugs ?? [])
   setMatchLabels(body.matchLabels ?? {})
   setInterests(body.interests ?? [])
   const dominantPatternIds: Record<string, PatternTypeId> = {}

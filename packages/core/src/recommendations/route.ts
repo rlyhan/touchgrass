@@ -44,7 +44,7 @@ export function getRecommendationsHandler({
       (ACTIVITY_FIELDS as readonly string[]).includes(i),
     )
     const patternWeights = getUserPatternWeights(getOCEANScores(personality))
-    const { recommendations: scored, recommendedSlugs, matchLabels } = getRecommendations(
+    const { recommendations: scored, matchLabels } = getRecommendations(
       personality,
       motivations,
       interests,
@@ -54,7 +54,7 @@ export function getRecommendationsHandler({
       ...s.rec,
       dominantPatternId: getDominantPatternId(patternWeights, s.rec),
     }))
-    const body: RecommendationsResponse = { recommendations, patternWeights, recommendedSlugs, matchLabels, interests }
+    const body: RecommendationsResponse = { recommendations, patternWeights, matchLabels, interests }
     res.status(200).json(body)
   }
 }

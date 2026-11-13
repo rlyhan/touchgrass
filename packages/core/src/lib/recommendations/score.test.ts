@@ -1,10 +1,10 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
-import type { Activity, PatternTypeId, ScoredRecommendation } from "@touchgrass/types"
+import type { Activity, PatternTypeId } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
-import { getHighBaseScoreActivities, getHighFinalScoreActivities, getMeanAndSd, scoreRecommendation } from "./score.js"
+import { getHighBaseScoreActivities, getMeanAndSd, scoreRecommendation } from "./score.js"
 
 const creativeMotivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
 
@@ -59,19 +59,6 @@ test("scoreRecommendation score is higher with a matching motivation than withou
 
 test("getMeanAndSd returns the mean and population standard deviation", () => {
   assert.deepEqual(getMeanAndSd([2, 4, 4, 4, 5, 5, 7, 9]), { mean: 5, sd: 2 })
-})
-
-const scoredWith = (scores: number[]): ScoredRecommendation[] =>
-  scores.map((score, i) => ({ rec: makeRec("Creative", undefined, `rec-${i}`), score }))
-
-test("getHighFinalScoreActivities keeps activities at or above the mean plus half a standard deviation", () => {
-  // mean 5, SD 2 → cutoff 6
-  const kept = getHighFinalScoreActivities(scoredWith([2, 4, 4, 4, 5, 5, 7, 9]))
-  assert.deepEqual(kept.map((rec) => rec.slug), ["rec-6", "rec-7"])
-})
-
-test("getHighFinalScoreActivities keeps every activity when all scores are equal, since the cutoff is inclusive", () => {
-  assert.equal(getHighFinalScoreActivities(scoredWith([1.5, 1.5, 1.5])).length, 3)
 })
 
 test("getHighBaseScoreActivities keeps only activities strictly above the mean base score plus one standard deviation", () => {

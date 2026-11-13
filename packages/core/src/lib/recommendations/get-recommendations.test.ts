@@ -9,7 +9,7 @@ import { getRecommendations } from "./get-recommendations.js"
 import { getSharedActivityTypesBetweenActivityAndUserMotivations } from "./motivation/shared-activity-types.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
-import { getHighBaseScoreActivities, getHighFinalScoreActivities, scoreRecommendation } from "./score.js"
+import { getHighBaseScoreActivities } from "./score.js"
 import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
 
 const mockUserBfas: BFASScores = {
@@ -31,16 +31,6 @@ test("getRecommendations returns up to 10 recommendations", () => {
   const scored = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS).recommendations
   assert.ok(scored.length <= 10)
   assert.ok(scored.length > 0)
-})
-
-test("getRecommendations puts activities scoring at least half a standard deviation above the mean in recommendedSlugs", () => {
-  const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
-  const scored = RECOMMENDATIONS.map((rec) => scoreRecommendation(weights, rec, [creativeMotivation]))
-  const aboveCutoffSlugs = getHighFinalScoreActivities(scored).map((rec) => rec.slug)
-
-  const { recommendedSlugs } = getRecommendations(mockUserBfas, [creativeMotivation], ["Art"], RECOMMENDATIONS)
-  assert.deepEqual(recommendedSlugs, aboveCutoffSlugs)
-  assert.ok(recommendedSlugs.length > 0 && recommendedSlugs.length < RECOMMENDATIONS.length)
 })
 
 const creativeAdventureAndPeople = MOTIVATION_OPTIONS.filter((m) =>

@@ -19,7 +19,7 @@ import {
   fetchActivityBySlug,
   getCachedActivity,
 } from "@/lib/recommendations/api"
-import { useInterests, useMatchLabels } from "@/lib/recommendations/recommended-slugs"
+import { useInterests, useMatchLabels } from "@/lib/recommendations/recommendation-store"
 import { useLoadRecommendationsIfMissing } from "@/lib/recommendations/use-load-recommendations-if-missing"
 import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"

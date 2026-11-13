@@ -38,7 +38,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
-import { clearRecommendedSlugs, setDominantPatternIds, setInterests, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { clearRecommendationStore, setDominantPatternIds, setInterests, setMatchLabels } from "@/lib/recommendations/recommendation-store"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -301,7 +301,7 @@ describe("ActivityDetailPage", () => {
     })
 
     afterEach(() => {
-      clearRecommendedSlugs()
+      clearRecommendationStore()
     })
 
     it("shows the pattern from a recommended label that carries one", () => {
@@ -407,7 +407,6 @@ describe("ActivityDetailPage", () => {
 
     it("fetches recommendations when none are loaded, then shows the reasons", async () => {
       mockFetchRecommendations.mockImplementationOnce(async () => {
-        setRecommendedSlugs([ACTIVITY.slug])
         setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
         return []
       })
@@ -418,7 +417,7 @@ describe("ActivityDetailPage", () => {
     })
 
     it("doesn't fetch recommendations when they're already loaded", () => {
-      setRecommendedSlugs([ACTIVITY.slug])
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} } })
       render(<ActivityDetailPage />)
 
       expect(mockFetchRecommendations).not.toHaveBeenCalled()

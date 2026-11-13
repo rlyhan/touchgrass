@@ -16,19 +16,17 @@ import { authedFetch } from "@/lib/auth/fetch"
 import { clearPatternWeightsCache, getCachedPatternWeights } from "@/lib/patterns/cache"
 import { fetchRecommendations } from "@/lib/recommendations/api"
 import {
-  clearRecommendedSlugs,
+  clearRecommendationStore,
   useDominantPatternIds,
   useInterests,
   useMatchLabels,
-  useRecommendedSlugs,
-} from "@/lib/recommendations/recommended-slugs"
+} from "@/lib/recommendations/recommendation-store"
 
 const mockAuthedFetch = jest.mocked(authedFetch)
 
 function responseFor(slug: string, patternId: PatternTypeId, interest: ActivityField): RecommendationsResponse {
   return {
     recommendations: [{ slug, dominantPatternId: patternId }],
-    recommendedSlugs: [slug],
     matchLabels: { [slug]: { kind: "personality", patternId, sharedActivityTypesByMotivation: {} } },
     patternWeights: { [patternId]: 1 },
     interests: [interest],
@@ -57,12 +55,11 @@ async function loadRecommendations(body: RecommendationsResponse) {
 
 function logOut() {
   clearPatternWeightsCache()
-  clearRecommendedSlugs()
+  clearRecommendationStore()
 }
 
 function readRecommendationState() {
   const { result } = renderHook(() => ({
-    slugs: [...useRecommendedSlugs()],
     matchLabels: useMatchLabels(),
     dominantPatternIds: useDominantPatternIds(),
     interests: [...useInterests()],
@@ -83,7 +80,6 @@ describe("recommendations across logout", () => {
     await loadRecommendations(userA)
 
     expect(readRecommendationState()).toEqual({
-      slugs: ["pottery"],
       matchLabels: { pottery: { kind: "personality", patternId: "1-HH", sharedActivityTypesByMotivation: {} } },
       dominantPatternIds: { pottery: "1-HH" },
       interests: ["Art"],
@@ -97,7 +93,6 @@ describe("recommendations across logout", () => {
     logOut()
 
     expect(readRecommendationState()).toEqual({
-      slugs: [],
       matchLabels: {},
       dominantPatternIds: {},
       interests: [],
@@ -112,7 +107,6 @@ describe("recommendations across logout", () => {
     await respond(userA)
 
     expect(readRecommendationState()).toEqual({
-      slugs: [],
       matchLabels: {},
       dominantPatternIds: {},
       interests: [],
@@ -128,7 +122,6 @@ describe("recommendations across logout", () => {
     await respondToA(userA)
 
     expect(readRecommendationState()).toEqual({
-      slugs: ["climbing"],
       matchLabels: { climbing: { kind: "personality", patternId: "2-LL", sharedActivityTypesByMotivation: {} } },
       dominantPatternIds: { climbing: "2-LL" },
       interests: ["Sports"],

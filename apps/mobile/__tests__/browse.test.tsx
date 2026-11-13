@@ -31,7 +31,7 @@ jest.mock("@/components/activities/activity-card", () => require("@/test-utils/m
 
 import * as BrowseApi from "@/lib/browse/api"
 import * as RecommendationsApi from "@/lib/recommendations/api"
-import { clearRecommendedSlugs, setMatchLabels, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { clearRecommendationStore, setMatchLabels } from "@/lib/recommendations/recommendation-store"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import { Image } from "expo-image"
@@ -68,7 +68,7 @@ describe("BrowsePage", () => {
     jest.clearAllMocks()
     mockPrefetch.mockResolvedValue(true)
     mockFetchRandomActivities.mockResolvedValue(RECOMMENDATIONS.slice(20, 30))
-    clearRecommendedSlugs()
+    clearRecommendationStore()
   })
 
   afterEach(() => {
@@ -107,7 +107,6 @@ describe("BrowsePage", () => {
     const randomActivities = RECOMMENDATIONS.slice(20, 30)
     const personalityMatchSlug = randomActivities[3].slug
     mockFetchRecommendations.mockImplementationOnce(async () => {
-      setRecommendedSlugs([personalityMatchSlug])
       setMatchLabels({ [personalityMatchSlug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} } })
       return []
     })
@@ -120,7 +119,7 @@ describe("BrowsePage", () => {
   })
 
   it("doesn't fetch recommendations when they're already loaded", async () => {
-    setRecommendedSlugs([RECOMMENDATIONS[0].slug])
+    setMatchLabels({ [RECOMMENDATIONS[0].slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} } })
     render(<BrowsePage />)
     await act(async () => {})
 

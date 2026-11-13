@@ -254,7 +254,6 @@ export type MatchLabel = {
 export type RecommendationsResponse = {
   recommendations: RecommendedActivity[]
   patternWeights: UserPatternWeights
-  recommendedSlugs: string[]
   matchLabels: Record<string, MatchLabel>
   interests: ActivityField[]
 }

@@ -2,7 +2,6 @@ import { Activity, Motivation, PatternTypeId, ScoredRecommendation } from "@touc
 import { calculateMotivationBoost } from "./motivation/boost.js";
 import { calculateRecommendationBaseScore } from "./personality/base-score.js";
 
-const HIGH_FINAL_SCORE_SD_MULTIPLIER = 0.5
 const HIGH_BASE_SCORE_SD_MULTIPLIER = 1
 
 /* Combines base pattern affinity with motivation boost to produce a final score. */
@@ -10,20 +9,6 @@ export function scoreRecommendation(userPatternWeights: Record<PatternTypeId, nu
     const baseScore = calculateRecommendationBaseScore(userPatternWeights, recommendation)
     const motivationBoost = calculateMotivationBoost(userPatternWeights, recommendation, motivations)
     return { rec: recommendation, score: baseScore + motivationBoost }
-}
-
-/*
- * High final score: every activity in the catalogue whose final score (base + motivation boost) is well above this
- * user's average. Separate from the top recommendations on the recommendations screen, which are diversified.
- * 1. Average every final score (the mean), then measure how spread out they are (the standard deviation, SD).
- * 2. Cutoff = mean + 0.5 × SD; every activity scoring at or above it is kept.
- * The cutoff is relative to each user because more motivations raise every score. It typically keeps about a third of the catalogue.
- */
-export function getHighFinalScoreActivities(scoredRecommendations: ScoredRecommendation[]): Activity[] {
-    const { mean, sd } = getMeanAndSd(scoredRecommendations.map((s) => s.score))
-    return scoredRecommendations
-        .filter((s) => s.score >= mean + sd * HIGH_FINAL_SCORE_SD_MULTIPLIER)
-        .map((s) => s.rec)
 }
 
 /*
