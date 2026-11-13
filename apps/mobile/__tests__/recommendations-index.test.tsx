@@ -39,7 +39,7 @@ jest.mock("@/components/activities/activity-card", () => require("@/test-utils/m
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import type { RecommendedActivity } from "@touchgrass/types"
+import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
 
 const mockPush = jest.mocked(ExpoRouter.router.push)
@@ -47,10 +47,7 @@ const mockReplace = jest.mocked(ExpoRouter.router.replace)
 const mockFetchRecommendations = jest.mocked(Api.fetchRecommendations)
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
-const RECS: RecommendedActivity[] = [
-  { ...RECOMMENDATIONS[0], dominantPatternId: "4-HH" },
-  { ...RECOMMENDATIONS[1], dominantPatternId: null },
-]
+const RECS: Activity[] = [RECOMMENDATIONS[0], RECOMMENDATIONS[1]]
 
 import RecommendationsPage from "@/app/(authed)/(tabs)/recommendations"
 

@@ -1,8 +1,6 @@
 import type {
   Activity,
-  PatternTypeId,
   RecommendationsResponse,
-  RecommendedActivity,
 } from "@touchgrass/types"
 
 import { UnauthenticatedError } from "@/lib/auth/errors"
@@ -11,7 +9,6 @@ import { apiUrl } from "@/lib/config"
 import { setCachedPatternWeights } from "@/lib/patterns/cache"
 import {
   getRecommendationsGeneration,
-  setDominantPatternIds,
   setInterests,
   setMatchLabels,
 } from "@/lib/recommendations/recommendation-store"
@@ -31,7 +28,7 @@ export class ProfileNotFoundError extends Error {
   }
 }
 
-export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
+export async function fetchRecommendations(): Promise<Activity[]> {
   const generation = getRecommendationsGeneration()
   const response = await authedFetch(apiUrl("/recommendations"))
 
@@ -56,12 +53,7 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   }
   setMatchLabels(body.matchLabels ?? {})
   setInterests(body.interests ?? [])
-  const dominantPatternIds: Record<string, PatternTypeId> = {}
-  for (const { dominantPatternId, ...activity } of recommendations) {
-    activityCache.set(activity.slug, activity)
-    if (dominantPatternId) dominantPatternIds[activity.slug] = dominantPatternId
-  }
-  setDominantPatternIds(dominantPatternIds)
+  for (const activity of recommendations) activityCache.set(activity.slug, activity)
   return recommendations
 }
 

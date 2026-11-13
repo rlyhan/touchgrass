@@ -17,7 +17,6 @@ import { clearPatternWeightsCache, getCachedPatternWeights } from "@/lib/pattern
 import { fetchRecommendations } from "@/lib/recommendations/api"
 import {
   clearRecommendationStore,
-  useDominantPatternIds,
   useInterests,
   useMatchLabels,
 } from "@/lib/recommendations/recommendation-store"
@@ -26,7 +25,7 @@ const mockAuthedFetch = jest.mocked(authedFetch)
 
 function responseFor(slug: string, patternId: PatternTypeId, interest: ActivityField): RecommendationsResponse {
   return {
-    recommendations: [{ slug, dominantPatternId: patternId }],
+    recommendations: [{ slug }],
     matchLabels: { [slug]: { kind: "personality", patternId, sharedActivityTypesByMotivation: {} } },
     patternWeights: { [patternId]: 1 },
     interests: [interest],
@@ -61,7 +60,6 @@ function logOut() {
 function readRecommendationState() {
   const { result } = renderHook(() => ({
     matchLabels: useMatchLabels(),
-    dominantPatternIds: useDominantPatternIds(),
     interests: [...useInterests()],
   }))
   return { ...result.current, patternWeights: getCachedPatternWeights() }
@@ -81,7 +79,6 @@ describe("recommendations across logout", () => {
 
     expect(readRecommendationState()).toEqual({
       matchLabels: { pottery: { kind: "personality", patternId: "1-HH", sharedActivityTypesByMotivation: {} } },
-      dominantPatternIds: { pottery: "1-HH" },
       interests: ["Art"],
       patternWeights: { "1-HH": 1 },
     })
@@ -94,7 +91,6 @@ describe("recommendations across logout", () => {
 
     expect(readRecommendationState()).toEqual({
       matchLabels: {},
-      dominantPatternIds: {},
       interests: [],
       patternWeights: undefined,
     })
@@ -108,7 +104,6 @@ describe("recommendations across logout", () => {
 
     expect(readRecommendationState()).toEqual({
       matchLabels: {},
-      dominantPatternIds: {},
       interests: [],
       patternWeights: undefined,
     })
@@ -123,7 +118,6 @@ describe("recommendations across logout", () => {
 
     expect(readRecommendationState()).toEqual({
       matchLabels: { climbing: { kind: "personality", patternId: "2-LL", sharedActivityTypesByMotivation: {} } },
-      dominantPatternIds: { climbing: "2-LL" },
       interests: ["Sports"],
       patternWeights: { "2-LL": 1 },
     })

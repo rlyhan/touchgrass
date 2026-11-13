@@ -38,7 +38,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
-import { clearRecommendationStore, setDominantPatternIds, setInterests, setMatchLabels } from "@/lib/recommendations/recommendation-store"
+import { clearRecommendationStore, setInterests, setMatchLabels } from "@/lib/recommendations/recommendation-store"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -329,8 +329,7 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByText("Social")).toBeTruthy()
     })
 
-    it("doesn't show a pattern for an activity without a label, even if the recommendations screen has one", () => {
-      setDominantPatternIds({ [ACTIVITY.slug]: "4-HH" })
+    it("doesn't show a pattern for an activity without a label", () => {
       setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
@@ -339,7 +338,6 @@ describe("ActivityDetailPage", () => {
     })
 
     it("doesn't show a pattern for a label without one", () => {
-      setDominantPatternIds({ [ACTIVITY.slug]: "4-HH" })
       setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: { explore_creative: ["Artistic"] } } })
       render(<ActivityDetailPage />)
 

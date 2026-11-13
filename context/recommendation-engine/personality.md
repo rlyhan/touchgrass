@@ -4,7 +4,7 @@ Personality produces each activity's **base score**: how well the activity's typ
 
 Code: [`packages/core/src/lib/recommendations/personality/`](../../packages/core/src/lib/recommendations/personality/), with a `.test.ts` next to each file.
 
-- **Affects:** every activity's base score, the "You were matched because…" pattern, `getTopActivityTypes`, the `personality` match label and the personality reason (`patternId`) on any label.
+- **Affects:** every activity's base score, `getTopActivityTypes`, the `personality` match label and the personality reason (`patternId`) on any label.
 - **Never affected by:** motivations or interests.
 
 ---
@@ -75,7 +75,7 @@ Neither is enough alone. The base score check is relative, so a user with middli
 
 ### Also built on personality
 
-- **Dominant pattern** — `getDominantPatternId` (in `@touchgrass/types/dominant-pattern`, shared with mobile) picks the user's highest-weighted pattern among an activity's primary + related patterns for the "You were matched because you scored highly as a …" copy. It returns `null` below `MIN_DOMINANT_WEIGHT = 0.6` so the copy never overclaims.
+- **Dominant pattern** — `getDominantPatternId` (in `@touchgrass/types/dominant-pattern`) picks the user's highest-weighted pattern among an activity's primary + related patterns. It's the high-scoring pattern check in step 4, and becomes a label's `patternId` ("You scored highly as …" on the activity page). It returns `null` below `MIN_DOMINANT_WEIGHT = 0.6` so the copy never overclaims.
 - **Top activity types** — `getTopActivityTypes` (`top-activity-types.ts`) ranks all activity types by primary affinity alone and returns the top N (default 6). Not currently used by the app.
 
 ---

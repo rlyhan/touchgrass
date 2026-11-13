@@ -238,10 +238,6 @@ export type ScoredActivityType = {
 
 export type UserPatternWeights = Record<PatternTypeId, number>
 
-export type RecommendedActivity = Activity & {
-  dominantPatternId: PatternTypeId | null
-}
-
 export type SharedActivityTypesByMotivation = Partial<Record<MotivationValue, ActivityType[]>>
 
 export type MatchLabel = {
@@ -252,7 +248,7 @@ export type MatchLabel = {
 }
 
 export type RecommendationsResponse = {
-  recommendations: RecommendedActivity[]
+  recommendations: Activity[]
   patternWeights: UserPatternWeights
   matchLabels: Record<string, MatchLabel>
   interests: ActivityField[]

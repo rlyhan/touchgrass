@@ -104,19 +104,6 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
   assert.equal(getProfileByAuthUserId.mock.calls[0]?.arguments[0], AUTH_USER_ID)
 })
 
-test("GET /recommendations includes a dominantPatternId on every recommendation", async () => {
-  const res = await fetch(`${baseUrl}/recommendations`)
-  const body = (await res.json()) as RecommendationsResponse
-
-  const validIds = new Set<PatternTypeId>(PATTERN_TYPES.map((p) => p.id))
-  for (const rec of body.recommendations) {
-    assert.ok(
-      rec.dominantPatternId === null || validIds.has(rec.dominantPatternId),
-      `expected valid pattern id or null, got ${rec.dominantPatternId}`,
-    )
-  }
-})
-
 test("GET /recommendations includes patternWeights for all 40 patterns in [0, 1]", async () => {
   const res = await fetch(`${baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse

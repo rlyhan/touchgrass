@@ -1,11 +1,9 @@
 import { useSyncExternalStore } from "react"
 
-import type { ActivityField, MatchLabel, PatternTypeId } from "@touchgrass/types"
+import type { ActivityField, MatchLabel } from "@touchgrass/types"
 
-// Match labels, the recommendations screen's patterns and the user's interests from the last fetchRecommendations
-// call, read by browse to sort and label cards and by the activity page to explain them.
+// Match labels and the user's interests from the last fetchRecommendations call, read by browse to sort and label cards and by the activity page to explain them.
 let matchLabels: Readonly<Record<string, MatchLabel>> = {}
-let dominantPatternIds: Readonly<Record<string, PatternTypeId>> = {}
 let interests: readonly ActivityField[] = []
 let generation = 0
 const listeners = new Set<() => void>()
@@ -25,21 +23,12 @@ function getMatchLabelsSnapshot() {
   return matchLabels
 }
 
-function getDominantPatternIdsSnapshot() {
-  return dominantPatternIds
-}
-
 function getInterestsSnapshot() {
   return interests
 }
 
 export function setMatchLabels(next: Record<string, MatchLabel>): void {
   matchLabels = next
-  notify()
-}
-
-export function setDominantPatternIds(next: Record<string, PatternTypeId>): void {
-  dominantPatternIds = next
   notify()
 }
 
@@ -56,17 +45,12 @@ export function getRecommendationsGeneration(): number {
 export function clearRecommendationStore(): void {
   generation += 1
   matchLabels = {}
-  dominantPatternIds = {}
   interests = []
   notify()
 }
 
 export function useMatchLabels(): Readonly<Record<string, MatchLabel>> {
   return useSyncExternalStore(subscribe, getMatchLabelsSnapshot, getMatchLabelsSnapshot)
-}
-
-export function useDominantPatternIds(): Readonly<Record<string, PatternTypeId>> {
-  return useSyncExternalStore(subscribe, getDominantPatternIdsSnapshot, getDominantPatternIdsSnapshot)
 }
 
 export function useInterests(): readonly ActivityField[] {
