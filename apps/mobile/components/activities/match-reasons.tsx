@@ -2,14 +2,14 @@ import type { ReactNode } from "react"
 import { Text, View } from "react-native"
 
 import { PatternIcon } from "@/components/icons/pattern-icon"
-import { getFieldIcon } from "@/lib/icons"
+import { getActivityTypeIcon, getFieldIcon } from "@/lib/icons"
 import { colors } from "@/lib/theme/colors"
 import { PATTERN_COLORS } from "@/lib/theme/pattern-colors"
 import type { ActivityField, ActivityType, PatternTypeId, SharedActivityTypesByMotivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS, PATTERN_TYPES } from "@touchgrass/types/constants"
 
 // "Why this matches you" on the activity page: square boxes for the matched pattern and the user's interest field,
-// then a pill per shared motivation and a row for the activity's type when the recommendations screen picked it for variety.
+// then a row for the activity's type when the recommendations screen picked it for variety and a pill per shared motivation.
 
 const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
 
@@ -57,7 +57,7 @@ export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {}, 
   return (
     <View className="mt-10">
       <Text className="mb-4 text-2xl font-semibold text-gray-900">Why this matches you</Text>
-      <View className="gap-3">
+      <View className="gap-5">
         {pattern || interestField ? (
           <View className="flex-row gap-3">
             {pattern ? (
@@ -80,6 +80,15 @@ export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {}, 
             ) : null}
           </View>
         ) : null}
+        {varietyType ? (
+          <View testID="variety-reason" className="flex-row items-center rounded-xl bg-gray-100 px-3 py-2.5">
+            <VarietyTypeIcon type={varietyType} />
+            <Text className="ml-2 flex-1 text-sm leading-relaxed text-gray-700">
+              Your best-matching <Text className="font-semibold text-gray-900">{varietyType}</Text> pick
+              {interestField ? " in your interests" : ""}.
+            </Text>
+          </View>
+        ) : null}
         {motivations.length > 0 ? (
           <View testID="motivation-reasons">
             <Text className="mb-2 text-base font-semibold text-gray-900">Motivations</Text>
@@ -92,14 +101,6 @@ export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {}, 
             </View>
           </View>
         ) : null}
-        {varietyType ? (
-          <View className="rounded-2xl bg-gray-100 p-4">
-            <Text className="text-base leading-relaxed text-gray-800">
-              Your best-matching <Text className="font-semibold text-gray-900">{varietyType}</Text> pick
-              {interestField ? " in your interests" : ""}.
-            </Text>
-          </View>
-        ) : null}
       </View>
     </View>
   )
@@ -108,4 +109,9 @@ export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {}, 
 function FieldIcon({ field }: { field: ActivityField }) {
   const Icon = getFieldIcon(field)
   return <Icon size={32} color={colors.warm.accent} strokeWidth={1.7} />
+}
+
+function VarietyTypeIcon({ type }: { type: ActivityType }) {
+  const Icon = getActivityTypeIcon(type)
+  return <Icon size={18} color={colors.gray[600]} />
 }

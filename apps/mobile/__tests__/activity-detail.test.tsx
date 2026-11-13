@@ -371,6 +371,7 @@ describe("ActivityDetailPage", () => {
 
       expect(screen.getByText(ACTIVITY.type)).toBeTruthy()
       expect(screen.getByText(/pick in your interests\./)).toBeTruthy()
+      expect(within(screen.getByTestId("variety-reason")).getByTestId("wrench-icon")).toBeTruthy()
     })
 
     it("leaves out 'in your interests' for a variety pick outside the user's interests", () => {
