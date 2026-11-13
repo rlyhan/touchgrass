@@ -5,7 +5,7 @@ Interests change the **order** of the recommendations screen: they push activiti
 Code: [`packages/core/src/lib/recommendations/interests/`](../../packages/core/src/lib/recommendations/interests/), with a `.test.ts` next to each file. Both pieces are used by `diversifyAndOrder` in [`diversify.ts`](../../packages/core/src/lib/recommendations/diversify.ts).
 
 - **Affects:** the order of the 10 activities on the recommendations screen.
-- **Never affects:** any activity's score, so neither the final score nor `recommendedSlugs` (sorted first in browse) nor a label's personality reason. It does decide which activities reach the top 10, and so which get the `recommended` match label.
+- **Never affects:** any activity's score, so neither the final score nor `recommendedSlugs` nor a label's personality reason. It does decide which activities reach the top 10, and so which get the `recommended` match label.
 - **Depends on:** the final score from [Personality](personality.md) + [Motivation](motivation.md).
 
 ---

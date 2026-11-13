@@ -11,7 +11,7 @@ const MAX_RECOMMENDATIONS = 10
  * Returns scored, diversified recommendations for a user.
  * Converts BFAS traits → OCEAN → NEO pattern weights, scores each recommendation
  * (including motivation boost), then applies interest-aware diversification and bucket
- * ordering before capping the result. Also returns the slugs browse lists first (every activity
+ * ordering before capping the result. Also returns the high scoring slugs (every activity
  * scoring at least half a standard deviation above the user's mean score) and the match label
  * browse shows for each activity.
  */
@@ -35,7 +35,7 @@ export function getRecommendations(
     const varietyPickSlugSet = getSlugSet(recommendations.filter((s) => s.pickedForVariety).map((s) => s.rec))
     const matchLabels = getMatchLabels(activities, motivations, userPatternWeights, recommendedSlugSet, varietyPickSlugSet)
 
-    // Return the recommendations screen's activities, the slugs browse lists first, and each activity's match label.
+    // Return the recommendations screen's activities, the high scoring slugs, and each activity's match label.
     return {
         recommendations,
         recommendedSlugs: [...highScoringSlugSet],

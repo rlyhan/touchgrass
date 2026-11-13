@@ -150,15 +150,20 @@ describe("BrowsePage", () => {
     })
   })
 
-  it("lists recommended activities first within a page, otherwise keeping the page's order", async () => {
-    const [first, second, third, fourth] = FIRST_PAGE
-    mockSearchActivities.mockResolvedValue({ items: [first, second, third, fourth], total: 4 })
-    setRecommendedSlugs([second.slug, fourth.slug])
+  it("lists recommended activities first, then personality matches, otherwise keeping the page's order", async () => {
+    const [first, second, third, fourth, fifth] = FIRST_PAGE
+    mockSearchActivities.mockResolvedValue({ items: [first, second, third, fourth, fifth], total: 5 })
+    setMatchLabels({
+      [second.slug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
+      [third.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} },
+      [fourth.slug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
+      [fifth.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} },
+    })
     render(<BrowsePage />)
 
     await act(async () => typeQuery("guitar"))
 
-    expect(listedTitles()).toEqual([second.title, fourth.title, first.title, third.title])
+    expect(listedTitles()).toEqual([third.title, fifth.title, second.title, fourth.title, first.title])
   })
 
   it("lets card taps through while the keyboard is open and dismisses it on scroll", async () => {
