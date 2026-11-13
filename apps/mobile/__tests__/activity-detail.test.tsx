@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react-native"
 import { ActivityIndicator } from "react-native"
 
@@ -333,8 +334,8 @@ describe("ActivityDetailPage", () => {
       setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
-      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
-      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+      expect(within(screen.getByTestId("interest-reason-box")).getByText(ACTIVITY.field)).toBeTruthy()
+      expect(screen.queryByTestId("pattern-reason-box")).toBeNull()
     })
 
     it("doesn't show a pattern for a label without one", () => {
@@ -342,7 +343,7 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Explore my creative side")).toBeTruthy()
-      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+      expect(screen.queryByTestId("pattern-reason-box")).toBeNull()
     })
 
     it("shows the interest row alongside the label's reasons when the activity's field is an interest", () => {
@@ -350,9 +351,8 @@ describe("ActivityDetailPage", () => {
       setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
-      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
-      expect(screen.getByText(ACTIVITY.field)).toBeTruthy()
-      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+      expect(within(screen.getByTestId("pattern-reason-box")).getByText("Enchanting Visionary")).toBeTruthy()
+      expect(within(screen.getByTestId("interest-reason-box")).getByText(ACTIVITY.field)).toBeTruthy()
     })
 
     it("shows the section with only the interest row for an unlabelled activity in one of the user's interests", () => {
@@ -360,8 +360,8 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Why this matches you")).toBeTruthy()
-      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
-      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+      expect(within(screen.getByTestId("interest-reason-box")).getByText(ACTIVITY.field)).toBeTruthy()
+      expect(screen.queryByTestId("pattern-reason-box")).toBeNull()
     })
 
     it("says the activity is the best pick of its type in the user's interests when picked for variety", () => {
@@ -394,7 +394,7 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Why this matches you")).toBeTruthy()
-      expect(screen.queryByText(/as one of your interests/)).toBeNull()
+      expect(screen.queryByTestId("interest-reason-box")).toBeNull()
     })
 
     it("hides the section for an activity with no label or recommendations screen pattern", () => {
@@ -432,29 +432,18 @@ describe("ActivityDetailPage", () => {
       warn.mockRestore()
     })
 
-    it("renders the match copy and reveals the short description on expand", () => {
-      // 4-HH → Enchanting Visionary
+    it("shows the matched pattern's name in the pattern box", () => {
       setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       render(<ActivityDetailPage />)
 
-      const trigger = screen.getByRole("button", {
-        name: "Expand pattern details",
-      })
-      expect(
-        screen.getByText(/You scored highly as/),
-      ).toBeTruthy()
-      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
-      const expectedDescription =
-        require("@touchgrass/types/constants").PATTERN_TYPES.find(
-          (p: { id: string }) => p.id === "4-HH",
-        ).shortDescription
-      expect(screen.queryByText(expectedDescription)).toBeNull()
-      expect(screen.getByText("See more")).toBeTruthy()
+      expect(within(screen.getByTestId("pattern-reason-box")).getByText("Enchanting Visionary")).toBeTruthy()
+    })
 
-      fireEvent.press(trigger)
+    it("shows the field's icon in the interest box", () => {
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
 
-      expect(screen.getByText(expectedDescription)).toBeTruthy()
-      expect(screen.getByText("See less")).toBeTruthy()
+      expect(within(screen.getByTestId("interest-reason-box")).getByTestId("guitar-icon")).toBeTruthy()
     })
   })
 })
