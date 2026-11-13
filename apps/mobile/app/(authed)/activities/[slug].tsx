@@ -193,28 +193,37 @@ export default function ActivityDetailPage() {
             <Text className="mb-5 text-2xl font-semibold text-gray-900">
               Instructions
             </Text>
-            {activity.instructions.map((step, idx) => (
-              <View
-                key={`${idx}-${step.title}`}
-                className="mb-5 flex-row items-start"
-              >
-                <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-emerald-500">
-                  <Text className="text-base font-semibold text-white">
-                    {idx + 1}
-                  </Text>
+            {activity.instructions.map((step, idx, steps) => {
+              const isFirst = idx === 0
+              const isLast = idx === steps.length - 1
+              return (
+                <View key={`${idx}-${step.title}`} className="flex-row">
+                  <View className="mr-3 items-center">
+                    <View className={`h-2 w-0.5 ${isFirst ? "" : "bg-emerald-200"}`} />
+                    <View className="h-8 w-8 items-center justify-center rounded-full border-2 border-emerald-500 bg-white">
+                      <Text className="text-base font-semibold text-emerald-600">
+                        {idx + 1}
+                      </Text>
+                    </View>
+                    {isLast ? null : (
+                      <View testID="instruction-trail" className="w-0.5 flex-1 bg-emerald-200" />
+                    )}
+                  </View>
+                  <View className={`flex-1 ${isLast ? "" : "pb-4"}`}>
+                    <View className="rounded-2xl bg-gray-100 px-4 pb-4 pt-3">
+                      <Text className="text-base font-semibold leading-6 text-gray-900">
+                        {step.title}
+                      </Text>
+                      {step.description ? (
+                        <Text className="mt-1.5 text-sm leading-relaxed text-gray-700">
+                          {step.description}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
                 </View>
-                <View className="flex-1">
-                  <Text className="mb-1 text-xl font-semibold text-gray-900">
-                    {step.title}
-                  </Text>
-                  {step.description ? (
-                    <Text className="leading-relaxed text-gray-500">
-                      {step.description}
-                    </Text>
-                  ) : null}
-                </View>
-              </View>
-            ))}
+              )
+            })}
           </View>
         ) : null}
 

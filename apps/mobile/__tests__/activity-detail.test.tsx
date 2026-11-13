@@ -228,6 +228,14 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByText("Attach pedals with velcro.")).toBeTruthy()
     })
 
+    it("joins the instruction steps with a trail that stops at the last step", () => {
+      mockGetCachedActivity.mockReturnValue(ACTIVITY_WITH_INSTRUCTIONS)
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY_WITH_INSTRUCTIONS)
+      render(<ActivityDetailPage />)
+
+      expect(screen.getAllByTestId("instruction-trail")).toHaveLength(2)
+    })
+
     it("hides the instructions section when the activity has no instructions", () => {
       // Default ACTIVITY has no instructions
       render(<ActivityDetailPage />)
