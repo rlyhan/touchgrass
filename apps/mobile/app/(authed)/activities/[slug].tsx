@@ -26,6 +26,8 @@ import type { Activity } from "@touchgrass/types"
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
 
+const PAGE_PADDING = 16
+
 // Activity slugs are CMS-driven, so we don't enumerate them at build time.
 // Static export only emits HTML for routes it knows about, so a dynamic route
 // with no params produces no file and direct hits / hard refreshes 404 at the
@@ -134,7 +136,7 @@ export default function ActivityDetailPage() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 + bottomInset }}
+        contentContainerStyle={{ paddingHorizontal: PAGE_PADDING, paddingBottom: 32 + bottomInset }}
         showsVerticalScrollIndicator={false}
       >
         <ActivityCard
@@ -154,11 +156,17 @@ export default function ActivityDetailPage() {
         />
 
         {activity.description && activity.description.length > 0 ? (
-          <View className="mt-10">
+          <View
+            className="mt-10 bg-emerald-50 pb-4 pt-8"
+            style={{ marginHorizontal: -PAGE_PADDING, paddingHorizontal: PAGE_PADDING }}
+          >
             <Text className="mb-4 text-2xl font-semibold text-gray-900">
               About this activity
             </Text>
-            <PortableText blocks={activity.description} />
+            <PortableText
+              blocks={activity.description}
+              paragraphClassName="mb-4 leading-relaxed text-gray-700"
+            />
           </View>
         ) : null}
 
