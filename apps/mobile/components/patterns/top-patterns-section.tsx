@@ -46,12 +46,23 @@ function pickTopThree(weights: UserPatternWeights): PatternTypeId[] {
     .map(([id]) => id)
 }
 
-function PatternDetail({ pattern }: { pattern: PatternType }) {
+function PatternDetail({
+  pattern,
+  percent,
+}: {
+  pattern: PatternType
+  percent: number
+}) {
   return (
     <>
-      <Text className="text-base font-semibold text-gray-900">
-        {pattern.name}
-      </Text>
+      <View className="flex-row items-baseline justify-between">
+        <Text className="flex-1 text-base font-semibold text-gray-900">
+          {pattern.name}
+        </Text>
+        <Text className="ml-3 text-sm font-semibold text-gray-600">
+          {Math.round(percent)}% match
+        </Text>
+      </View>
       <Text className="mt-2 text-sm leading-relaxed text-gray-700">
         {pattern.shortDescription}
       </Text>
@@ -70,6 +81,8 @@ export function TopPatternsSection({ patternWeights }: Props) {
   const opacityValue = useSharedValue(0)
   const gapValue = useSharedValue(0)
   const displayed = displayedId !== null ? PATTERN_BY_ID[displayedId] : null
+  const displayedPercent =
+    displayedId !== null ? patternWeights[displayedId] * 100 : 0
   const needsMeasure =
     displayedId !== null && heightById.current[displayedId] === undefined
 
@@ -181,7 +194,7 @@ export function TopPatternsSection({ patternWeights }: Props) {
             style={{ padding: DETAIL_PADDING }}
             onLayout={(e) => handleLayout(e.nativeEvent.layout.height)}
           >
-            <PatternDetail pattern={displayed} />
+            <PatternDetail pattern={displayed} percent={displayedPercent} />
           </View>
         </View>
       ) : null}
@@ -197,7 +210,7 @@ export function TopPatternsSection({ patternWeights }: Props) {
         ]}
       >
         <View testID="pattern-detail-panel" style={{ padding: DETAIL_PADDING }}>
-          {displayed ? <PatternDetail pattern={displayed} /> : null}
+          {displayed ? <PatternDetail pattern={displayed} percent={displayedPercent} /> : null}
         </View>
       </Animated.View>
     </View>

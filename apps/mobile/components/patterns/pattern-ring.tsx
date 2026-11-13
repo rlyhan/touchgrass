@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated"
 import Svg, { Circle } from "react-native-svg"
 
+import { PatternIcon } from "@/components/icons/pattern-icon"
 import { colors } from "@/lib/theme/colors"
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle)
@@ -122,9 +123,7 @@ export function PatternRing({
           />
         </Svg>
         <View className="absolute inset-0 items-center justify-center">
-          <Text className="text-base font-semibold text-gray-900">
-            {Math.round(percent)}%
-          </Text>
+          <PatternIcon color={color} size={36} />
         </View>
       </View>
       <Text
