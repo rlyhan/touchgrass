@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0] - 2026-11-14 — Feat: Pattern colours and activity page redesign
+
+Gives each personality pattern its own colour and a shared geometric icon, and redesigns the activity page's match reasons, about section and instructions for readability.
+
+### Mobile (`apps/mobile`)
+
+- Added `PATTERN_COLORS` (`lib/theme/pattern-colors.ts`), one distinct colour per pattern, used by the dashboard rings and the activity page pattern box. Orange is reserved for interests, so no pattern uses an orange or amber hue.
+- Added a `PatternIcon` component (hexagon, diamond and dot, outlined in the pattern's colour).
+- Dashboard rings use the pattern's colour and show the icon in the centre; the match percentage moved into the detail box that opens on tap.
+- "Why this matches you" on the activity page now shows the matched pattern and the user's interest field as square boxes (pattern colour tint, and pale orange with the field's icon), a compact variety row with the activity type's icon, and the shared motivations as green outlined pills. Removed `PatternMatchAccordion`, so the pattern's short description no longer appears on this page.
+- The about section is a full-width pale green band, and instructions show each step as a box joined by a numbered trail.
+- The activity page header has an iOS shadow, and content scrolls under the home indicator instead of stopping at a white safe-area band.
+
 ## [1.7.0] - 2026-11-10 — Feat: Browse match labels and wider type filter
 
 Replaces browse's "Recommended for you" badge with labels explaining why an activity matches, lists recommended activities first on each page, and fixes the activity type filter missing most matches.

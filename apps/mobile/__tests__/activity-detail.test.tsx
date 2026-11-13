@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react-native"
 import { ActivityIndicator } from "react-native"
 
@@ -227,6 +228,14 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByText("Attach pedals with velcro.")).toBeTruthy()
     })
 
+    it("joins the instruction steps with a trail that stops at the last step", () => {
+      mockGetCachedActivity.mockReturnValue(ACTIVITY_WITH_INSTRUCTIONS)
+      mockFetchActivityBySlug.mockResolvedValue(ACTIVITY_WITH_INSTRUCTIONS)
+      render(<ActivityDetailPage />)
+
+      expect(screen.getAllByTestId("instruction-trail")).toHaveLength(2)
+    })
+
     it("hides the instructions section when the activity has no instructions", () => {
       // Default ACTIVITY has no instructions
       render(<ActivityDetailPage />)
@@ -312,7 +321,7 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
     })
 
-    it("shows the pattern and a row per shared motivation", () => {
+    it("shows the pattern and a pill per shared motivation", () => {
       setMatchLabels({
         [ACTIVITY.slug]: {
           kind: "personality",
@@ -323,18 +332,18 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
-      expect(screen.getByText("Explore my creative side")).toBeTruthy()
-      expect(screen.getByText("Artistic and Creative")).toBeTruthy()
-      expect(screen.getByText("Connect with people and share experiences")).toBeTruthy()
-      expect(screen.getByText("Social")).toBeTruthy()
+      const motivationReasons = within(screen.getByTestId("motivation-reasons"))
+      expect(motivationReasons.getByText("Motivations")).toBeTruthy()
+      expect(motivationReasons.getByText("Explore my creative side")).toBeTruthy()
+      expect(motivationReasons.getByText("Connect with people and share experiences")).toBeTruthy()
     })
 
     it("doesn't show a pattern for an activity without a label", () => {
       setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
-      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
-      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+      expect(within(screen.getByTestId("interest-reason-box")).getByText(ACTIVITY.field)).toBeTruthy()
+      expect(screen.queryByTestId("pattern-reason-box")).toBeNull()
     })
 
     it("doesn't show a pattern for a label without one", () => {
@@ -342,7 +351,7 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Explore my creative side")).toBeTruthy()
-      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+      expect(screen.queryByTestId("pattern-reason-box")).toBeNull()
     })
 
     it("shows the interest row alongside the label's reasons when the activity's field is an interest", () => {
@@ -350,9 +359,8 @@ describe("ActivityDetailPage", () => {
       setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
-      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
-      expect(screen.getByText(ACTIVITY.field)).toBeTruthy()
-      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+      expect(within(screen.getByTestId("pattern-reason-box")).getByText("Enchanting Visionary")).toBeTruthy()
+      expect(within(screen.getByTestId("interest-reason-box")).getByText(ACTIVITY.field)).toBeTruthy()
     })
 
     it("shows the section with only the interest row for an unlabelled activity in one of the user's interests", () => {
@@ -360,8 +368,8 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Why this matches you")).toBeTruthy()
-      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
-      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+      expect(within(screen.getByTestId("interest-reason-box")).getByText(ACTIVITY.field)).toBeTruthy()
+      expect(screen.queryByTestId("pattern-reason-box")).toBeNull()
     })
 
     it("says the activity is the best pick of its type in the user's interests when picked for variety", () => {
@@ -371,6 +379,7 @@ describe("ActivityDetailPage", () => {
 
       expect(screen.getByText(ACTIVITY.type)).toBeTruthy()
       expect(screen.getByText(/pick in your interests\./)).toBeTruthy()
+      expect(within(screen.getByTestId("variety-reason")).getByTestId("wrench-icon")).toBeTruthy()
     })
 
     it("leaves out 'in your interests' for a variety pick outside the user's interests", () => {
@@ -394,7 +403,7 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Why this matches you")).toBeTruthy()
-      expect(screen.queryByText(/as one of your interests/)).toBeNull()
+      expect(screen.queryByTestId("interest-reason-box")).toBeNull()
     })
 
     it("hides the section for an activity with no label or recommendations screen pattern", () => {
@@ -432,29 +441,25 @@ describe("ActivityDetailPage", () => {
       warn.mockRestore()
     })
 
-    it("renders the match copy and reveals the short description on expand", () => {
-      // 4-HH → Enchanting Visionary
+    it("leaves out the motivations heading when no motivation is shared", () => {
       setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       render(<ActivityDetailPage />)
 
-      const trigger = screen.getByRole("button", {
-        name: "Expand pattern details",
-      })
-      expect(
-        screen.getByText(/You scored highly as/),
-      ).toBeTruthy()
-      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
-      const expectedDescription =
-        require("@touchgrass/types/constants").PATTERN_TYPES.find(
-          (p: { id: string }) => p.id === "4-HH",
-        ).shortDescription
-      expect(screen.queryByText(expectedDescription)).toBeNull()
-      expect(screen.getByText("See more")).toBeTruthy()
+      expect(screen.queryByTestId("motivation-reasons")).toBeNull()
+    })
 
-      fireEvent.press(trigger)
+    it("shows the matched pattern's name in the pattern box", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
+      render(<ActivityDetailPage />)
 
-      expect(screen.getByText(expectedDescription)).toBeTruthy()
-      expect(screen.getByText("See less")).toBeTruthy()
+      expect(within(screen.getByTestId("pattern-reason-box")).getByText("Enchanting Visionary")).toBeTruthy()
+    })
+
+    it("shows the field's icon in the interest box", () => {
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
+
+      expect(within(screen.getByTestId("interest-reason-box")).getByTestId("guitar-icon")).toBeTruthy()
     })
   })
 })

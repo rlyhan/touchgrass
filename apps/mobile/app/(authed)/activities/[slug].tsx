@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { ActivityCard } from "@/components/activities/activity-card"
 import { MatchReasons } from "@/components/activities/match-reasons"
@@ -25,6 +25,8 @@ import { colors } from "@/lib/theme/colors"
 import type { Activity } from "@touchgrass/types"
 
 type ActivityStatus = "loading" | "ready" | "not-found" | "error"
+
+const PAGE_PADDING = 16
 
 // Activity slugs are CMS-driven, so we don't enumerate them at build time.
 // Static export only emits HTML for routes it knows about, so a dynamic route
@@ -43,6 +45,7 @@ export default function ActivityDetailPage() {
   const reasonPatternId = matchLabel?.patternId
   const sharedActivityTypesByMotivation = matchLabel?.sharedActivityTypesByMotivation
   const interests = useInterests()
+  const { bottom: bottomInset } = useSafeAreaInsets()
   useLoadRecommendationsIfMissing()
 
   const cached = slug ? getCachedActivity(slug) : undefined
@@ -110,9 +113,18 @@ export default function ActivityDetailPage() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       {/* Header with back button */}
-      <View className="z-10 bg-white/80 px-4 py-3" style={{ elevation: 4 }}>
+      <View
+        className="z-10 bg-white/80 px-4 py-3"
+        style={{
+          elevation: 4,
+          shadowColor: colors.black,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 4,
+        }}
+      >
         <Pressable
           onPress={handleBack}
           className="h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white"
@@ -124,7 +136,7 @@ export default function ActivityDetailPage() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ paddingHorizontal: PAGE_PADDING, paddingBottom: 32 + bottomInset }}
         showsVerticalScrollIndicator={false}
       >
         <ActivityCard
@@ -144,11 +156,17 @@ export default function ActivityDetailPage() {
         />
 
         {activity.description && activity.description.length > 0 ? (
-          <View className="mt-10">
+          <View
+            className="mt-10 bg-emerald-50 pb-4 pt-8"
+            style={{ marginHorizontal: -PAGE_PADDING, paddingHorizontal: PAGE_PADDING }}
+          >
             <Text className="mb-4 text-2xl font-semibold text-gray-900">
               About this activity
             </Text>
-            <PortableText blocks={activity.description} />
+            <PortableText
+              blocks={activity.description}
+              paragraphClassName="mb-4 leading-relaxed text-gray-700"
+            />
           </View>
         ) : null}
 
@@ -175,28 +193,37 @@ export default function ActivityDetailPage() {
             <Text className="mb-5 text-2xl font-semibold text-gray-900">
               Instructions
             </Text>
-            {activity.instructions.map((step, idx) => (
-              <View
-                key={`${idx}-${step.title}`}
-                className="mb-5 flex-row items-start"
-              >
-                <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-emerald-500">
-                  <Text className="text-base font-semibold text-white">
-                    {idx + 1}
-                  </Text>
+            {activity.instructions.map((step, idx, steps) => {
+              const isFirst = idx === 0
+              const isLast = idx === steps.length - 1
+              return (
+                <View key={`${idx}-${step.title}`} className="flex-row">
+                  <View className="mr-3 items-center">
+                    <View className={`h-2 w-0.5 ${isFirst ? "" : "bg-emerald-200"}`} />
+                    <View className="h-8 w-8 items-center justify-center rounded-full border-2 border-emerald-500 bg-white">
+                      <Text className="text-base font-semibold text-emerald-600">
+                        {idx + 1}
+                      </Text>
+                    </View>
+                    {isLast ? null : (
+                      <View testID="instruction-trail" className="w-0.5 flex-1 bg-emerald-200" />
+                    )}
+                  </View>
+                  <View className={`flex-1 ${isLast ? "" : "pb-4"}`}>
+                    <View className="rounded-2xl bg-gray-100 px-4 pb-4 pt-3">
+                      <Text className="text-base font-semibold leading-6 text-gray-900">
+                        {step.title}
+                      </Text>
+                      {step.description ? (
+                        <Text className="mt-1.5 text-sm leading-relaxed text-gray-700">
+                          {step.description}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
                 </View>
-                <View className="flex-1">
-                  <Text className="mb-1 text-xl font-semibold text-gray-900">
-                    {step.title}
-                  </Text>
-                  {step.description ? (
-                    <Text className="leading-relaxed text-gray-500">
-                      {step.description}
-                    </Text>
-                  ) : null}
-                </View>
-              </View>
-            ))}
+              )
+            })}
           </View>
         ) : null}
 
