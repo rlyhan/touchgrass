@@ -9,6 +9,7 @@ import {
   getFieldIcon,
 } from "@/lib/icons"
 import { colors } from "@/lib/theme/colors"
+import type { MatchLabel } from "@touchgrass/types"
 
 // iOS clips shadows on a View with `overflow: hidden`, so the shadow needs to
 // live on an outer wrapper while the clipped/rounded content sits inside.
@@ -23,6 +24,10 @@ const cardShadow = Platform.select({
   default: { boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.12)" } as object,
 })
 
+function matchLabelText(matchLabel: MatchLabel): string {
+  return matchLabel.kind === "recommended" ? "In your recommendations" : "Personality match"
+}
+
 interface ActivityCardProps {
   title: string
   imageUrl: string
@@ -30,7 +35,7 @@ interface ActivityCardProps {
   field: string
   estimatedTime?: string
   size?: "default" | "large"
-  recommended?: boolean
+  matchLabel?: MatchLabel
 }
 
 export function ActivityCard({
@@ -40,7 +45,7 @@ export function ActivityCard({
   field,
   estimatedTime,
   size = "default",
-  recommended = false,
+  matchLabel,
 }: ActivityCardProps) {
   const TypeIcon = getActivityTypeIcon(type)
   const FieldIcon = getFieldIcon(field)
@@ -70,9 +75,11 @@ export function ActivityCard({
             locations={[0, 0.5, 1]}
             style={{ position: "absolute", inset: 0 }}
           />
-          {recommended ? (
-            <View className="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1">
-              <Text className="text-xs font-semibold text-white">Recommended for you</Text>
+          {matchLabel ? (
+            <View className="absolute left-3 right-3 top-3 items-end">
+              <View className="rounded-2xl bg-emerald-800 px-3 py-1">
+                <Text className="text-xs font-semibold text-white">{matchLabelText(matchLabel)}</Text>
+              </View>
             </View>
           ) : null}
           {isLarge ? (

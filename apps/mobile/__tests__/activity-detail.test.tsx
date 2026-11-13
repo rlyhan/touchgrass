@@ -19,11 +19,7 @@ jest.mock("expo-router", () => ({
 jest.mock("@/lib/recommendations/api", () => ({
   getCachedActivity: jest.fn(),
   fetchActivityBySlug: jest.fn(),
-}))
-
-// ── pattern weights ───────────────────────────────────────────────────────────
-jest.mock("@/lib/patterns/use-pattern-weights", () => ({
-  usePatternWeights: jest.fn(() => ({ weights: undefined, status: "loading" })),
+  fetchRecommendations: jest.fn(() => Promise.resolve([])),
 }))
 
 // ── heavy native deps ─────────────────────────────────────────────────────────
@@ -42,6 +38,7 @@ jest.mock("lucide-react-native", () => require("@/test-utils/mocks").lucideMock)
 
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
+import { clearRecommendationStore, setInterests, setMatchLabels } from "@/lib/recommendations/recommendation-store"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
@@ -98,6 +95,7 @@ const mockCanGoBack = jest.mocked(ExpoRouter.router.canGoBack)
 const mockUseLocalSearchParams = jest.mocked(ExpoRouter.useLocalSearchParams)
 const mockGetCachedActivity = jest.mocked(Api.getCachedActivity)
 const mockFetchActivityBySlug = jest.mocked(Api.fetchActivityBySlug)
+const mockFetchRecommendations = jest.mocked(Api.fetchRecommendations)
 
 import ActivityDetailPage from "@/app/(authed)/activities/[slug]"
 
@@ -295,72 +293,155 @@ describe("ActivityDetailPage", () => {
     })
   })
 
-  describe("pattern-match accordion", () => {
-    const mockUsePatternWeights = jest.mocked(
-      require("@/lib/patterns/use-pattern-weights").usePatternWeights,
-    )
-
+  describe("why this matches you", () => {
     beforeEach(() => {
+      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
       mockGetCachedActivity.mockReturnValue(ACTIVITY)
       mockFetchActivityBySlug.mockResolvedValue(ACTIVITY)
-      mockUsePatternWeights.mockReturnValue({ weights: { "4-HH": 0.9 }, status: "ready" })
     })
 
-    it("hides the accordion and skips loading weights when no pattern param is passed", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug })
-      render(<ActivityDetailPage />)
-
-      expect(screen.queryByText(/You were matched/)).toBeNull()
-      expect(mockUsePatternWeights).not.toHaveBeenCalled()
+    afterEach(() => {
+      clearRecommendationStore()
     })
 
-    it("hides the accordion when the pattern param is not a known pattern", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "nope" })
+    it("shows the pattern from a recommended label that carries one", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
-    })
-
-    it("uses the first value when the pattern param is repeated", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: ["4-HH", "9-HH"] })
-      render(<ActivityDetailPage />)
-
+      expect(screen.getByText("Why this matches you")).toBeTruthy()
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
     })
 
-    it("hides the accordion when the first repeated value doesn't match the viewer", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: ["9-HH", "4-HH"] })
+    it("shows the pattern and a row per shared motivation", () => {
+      setMatchLabels({
+        [ACTIVITY.slug]: {
+          kind: "personality",
+          patternId: "4-HH",
+          sharedActivityTypesByMotivation: { explore_creative: ["Artistic", "Creative"], connect_with_people: ["Social"] },
+        },
+      })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+      expect(screen.getByText("Explore my creative side")).toBeTruthy()
+      expect(screen.getByText("Artistic and Creative")).toBeTruthy()
+      expect(screen.getByText("Connect with people and share experiences")).toBeTruthy()
+      expect(screen.getByText("Social")).toBeTruthy()
     })
 
-    it("hides the accordion while the viewer's weights are loading", () => {
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "4-HH" })
-      mockUsePatternWeights.mockReturnValue({ weights: undefined, status: "loading" })
+    it("doesn't show a pattern for an activity without a label", () => {
+      setInterests([ACTIVITY.field])
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+      expect(screen.queryByText(/You scored highly as/)).toBeNull()
     })
 
-    it("hides the accordion when the pattern param doesn't match the viewer's weights", () => {
-      // 9-HH is a candidate for this activity, but the viewer's dominant is 4-HH.
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "9-HH" })
+    it("doesn't show a pattern for a label without one", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: { explore_creative: ["Artistic"] } } })
       render(<ActivityDetailPage />)
 
-      expect(screen.queryByText(/You were matched/)).toBeNull()
+      expect(screen.getByText("Explore my creative side")).toBeTruthy()
+      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+    })
+
+    it("shows the interest row alongside the label's reasons when the activity's field is an interest", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
+      expect(screen.getByText(ACTIVITY.field)).toBeTruthy()
+      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+    })
+
+    it("shows the section with only the interest row for an unlabelled activity in one of the user's interests", () => {
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Why this matches you")).toBeTruthy()
+      expect(screen.getByText(/as one of your interests/)).toBeTruthy()
+      expect(screen.queryByText(/You scored highly as/)).toBeNull()
+    })
+
+    it("says the activity is the best pick of its type in the user's interests when picked for variety", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {}, pickedForVariety: true } })
+      setInterests([ACTIVITY.field])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText(ACTIVITY.type)).toBeTruthy()
+      expect(screen.getByText(/pick in your interests\./)).toBeTruthy()
+    })
+
+    it("leaves out 'in your interests' for a variety pick outside the user's interests", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {}, pickedForVariety: true } })
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText(/Your best-matching/)).toBeTruthy()
+      expect(screen.queryByText(/in your interests/)).toBeNull()
+    })
+
+    it("shows no variety row for a recommended activity that wasn't picked for variety", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: { explore_creative: ["Artistic"] } } })
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByText(/Your best-matching/)).toBeNull()
+    })
+
+    it("leaves out the interest row when the activity's field isn't one of the user's interests", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
+      setInterests(["Martial Arts"])
+      render(<ActivityDetailPage />)
+
+      expect(screen.getByText("Why this matches you")).toBeTruthy()
+      expect(screen.queryByText(/as one of your interests/)).toBeNull()
+    })
+
+    it("hides the section for an activity with no label or recommendations screen pattern", () => {
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByText("Why this matches you")).toBeNull()
+    })
+
+    it("fetches recommendations when none are loaded, then shows the reasons", async () => {
+      mockFetchRecommendations.mockImplementationOnce(async () => {
+        setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
+        return []
+      })
+      render(<ActivityDetailPage />)
+
+      expect(mockFetchRecommendations).toHaveBeenCalledTimes(1)
+      expect(await screen.findByText("Enchanting Visionary")).toBeTruthy()
+    })
+
+    it("doesn't fetch recommendations when they're already loaded", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} } })
+      render(<ActivityDetailPage />)
+
+      expect(mockFetchRecommendations).not.toHaveBeenCalled()
+    })
+
+    it("still shows the activity, and warns in dev, when fetching recommendations fails", async () => {
+      const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+      mockFetchRecommendations.mockRejectedValueOnce(new Error("network error"))
+      render(<ActivityDetailPage />)
+
+      await waitFor(() => expect(warn).toHaveBeenCalledWith("Couldn't load recommendations", expect.any(Error)))
+      expect(screen.getByTestId("activity-card")).toBeTruthy()
+      expect(screen.queryByText("Why this matches you")).toBeNull()
+      warn.mockRestore()
     })
 
     it("renders the match copy and reveals the short description on expand", () => {
       // 4-HH → Enchanting Visionary
-      mockUseLocalSearchParams.mockReturnValue({ slug: ACTIVITY.slug, pattern: "4-HH" })
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
       render(<ActivityDetailPage />)
 
       const trigger = screen.getByRole("button", {
         name: "Expand pattern details",
       })
       expect(
-        screen.getByText(/You were matched because you scored highly as a/),
+        screen.getByText(/You scored highly as/),
       ).toBeTruthy()
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
       const expectedDescription =

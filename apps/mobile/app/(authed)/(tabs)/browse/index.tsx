@@ -10,8 +10,10 @@ import { SearchField } from "@/components/ui/search-field"
 import { useActivitySearch } from "@/lib/browse/use-activity-search"
 import { useRandomActivities } from "@/lib/browse/use-random-activities"
 import { getActivityTypeIcon, getFieldIcon } from "@/lib/icons"
-import { useRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import { useMatchLabels } from "@/lib/recommendations/recommendation-store"
+import { useLoadRecommendationsIfMissing } from "@/lib/recommendations/use-load-recommendations-if-missing"
 import { colors } from "@/lib/theme/colors"
+import type { MatchLabel } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
 const FILTERS = [
@@ -29,10 +31,18 @@ const FILTERS = [
   },
 ]
 
+// Browse lists "In your recommendations" first, then "Personality match", then unlabelled activities.
+function matchLabelRank(matchLabel?: MatchLabel): number {
+  if (matchLabel?.kind === "recommended") return 2
+  if (matchLabel?.kind === "personality") return 1
+  return 0
+}
+
 export default function BrowsePage() {
   const randomActivities = useRandomActivities()
   const search = useActivitySearch()
-  const recommendedSlugs = useRecommendedSlugs()
+  const matchLabels = useMatchLabels()
+  useLoadRecommendationsIfMissing()
   const listRef = useRef<FlatList<ListedActivity>>(null)
   const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
 
@@ -41,11 +51,13 @@ export default function BrowsePage() {
   const shownActivities = search.searching ? search.results : randomActivities
   const activities = useMemo(
     () =>
-      (shownActivities ?? []).map((activity) => ({
-        ...activity,
-        recommended: recommendedSlugs.has(activity.slug),
-      })),
-    [shownActivities, recommendedSlugs],
+      (shownActivities ?? [])
+        .map((activity) => ({
+          ...activity,
+          matchLabel: matchLabels[activity.slug],
+        }))
+        .sort((a, b) => matchLabelRank(b.matchLabel) - matchLabelRank(a.matchLabel)),
+    [shownActivities, matchLabels],
   )
 
   function handlePageChange(nextPage: number) {

@@ -152,8 +152,17 @@ export type BFASTraitDefinition = {
   parent: PersonalityTrait
 }
 
+export type MotivationValue =
+  | "explore_creative"
+  | "learn_think_grow"
+  | "challenge_push_myself"
+  | "seek_adventure"
+  | "connect_with_people"
+  | "grow_and_achieve"
+  | "improve_wellbeing"
+
 export type Motivation = {
-  value: string
+  value: MotivationValue
   label: string
   associated_activity_types: ActivityType[]
 }
@@ -229,14 +238,20 @@ export type ScoredActivityType = {
 
 export type UserPatternWeights = Record<PatternTypeId, number>
 
-export type RecommendedActivity = Activity & {
-  dominantPatternId: PatternTypeId | null
+export type SharedActivityTypesByMotivation = Partial<Record<MotivationValue, ActivityType[]>>
+
+export type MatchLabel = {
+  kind: "recommended" | "personality"
+  patternId?: PatternTypeId
+  pickedForVariety?: boolean
+  sharedActivityTypesByMotivation: SharedActivityTypesByMotivation
 }
 
 export type RecommendationsResponse = {
-  recommendations: RecommendedActivity[]
+  recommendations: Activity[]
   patternWeights: UserPatternWeights
-  recommendedSlugs: string[]
+  matchLabels: Record<string, MatchLabel>
+  interests: ActivityField[]
 }
 
 export type PatternWeightsResponse = {

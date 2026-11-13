@@ -60,8 +60,8 @@ export function PatternMatchAccordion({ patternName, shortDescription }: Props) 
     >
       <View className="flex-row items-start">
         <Text className="flex-1 text-base leading-relaxed text-gray-800">
-          You were matched because you scored highly as a{" "}
-          <Text className="font-semibold text-gray-900">{patternName}</Text>.
+          You scored highly as{" "}
+          <Text className="font-semibold text-gray-900">{patternName}</Text>, which is a great fit for this activity.
         </Text>
         <Animated.View style={chevronStyle} className="ml-3 mt-1">
           <ChevronDown size={18} color={colors.gray[600]} />

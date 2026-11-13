@@ -104,19 +104,6 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
   assert.equal(getProfileByAuthUserId.mock.calls[0]?.arguments[0], AUTH_USER_ID)
 })
 
-test("GET /recommendations includes a dominantPatternId on every recommendation", async () => {
-  const res = await fetch(`${baseUrl}/recommendations`)
-  const body = (await res.json()) as RecommendationsResponse
-
-  const validIds = new Set<PatternTypeId>(PATTERN_TYPES.map((p) => p.id))
-  for (const rec of body.recommendations) {
-    assert.ok(
-      rec.dominantPatternId === null || validIds.has(rec.dominantPatternId),
-      `expected valid pattern id or null, got ${rec.dominantPatternId}`,
-    )
-  }
-})
-
 test("GET /recommendations includes patternWeights for all 40 patterns in [0, 1]", async () => {
   const res = await fetch(`${baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse
@@ -131,14 +118,26 @@ test("GET /recommendations includes patternWeights for all 40 patterns in [0, 1]
   }
 })
 
-test("GET /recommendations includes recommendedSlugs from the activity pool", async () => {
+test("GET /recommendations only labels activities from the pool, labelling the recommendations screen's activities recommended", async () => {
   const res = await fetch(`${baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse
 
   const poolSlugs = new Set(RECOMMENDATIONS.map((a) => a.slug))
-  assert.ok(body.recommendedSlugs.length > 0)
-  assert.ok(body.recommendedSlugs.length < RECOMMENDATIONS.length)
-  assert.ok(body.recommendedSlugs.every((slug) => poolSlugs.has(slug)))
+  assert.ok(Object.keys(body.matchLabels).every((slug) => poolSlugs.has(slug)))
+  assert.ok(body.recommendations.length > 0)
+  assert.ok(body.recommendations.every((a) => body.matchLabels[a.slug]?.kind === "recommended"))
+})
+
+test("GET /recommendations includes the user's onboarding interests, dropping any that aren't activity fields", async () => {
+  getProfileByAuthUserId.mock.mockImplementation(async () => ({
+    ...fakeProfile,
+    interests: ["Music", "Not A Field", "Coding"],
+  }))
+
+  const res = await fetch(`${baseUrl}/recommendations`)
+  const body = (await res.json()) as RecommendationsResponse
+
+  assert.deepEqual(body.interests, ["Music", "Coding"])
 })
 
 test("GET /recommendations returns 401 when there is no session", async () => {

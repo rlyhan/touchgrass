@@ -88,7 +88,9 @@ export function searchActivitiesHandler({ loadRecommendations }: SearchActivitie
     const query = q.toLowerCase()
     const matches = (await loadRecommendations()).filter(
       (activity) =>
-        (!type?.length || type.includes(activity.type)) &&
+        (!type?.length ||
+          type.includes(activity.type) ||
+          activity.related_types?.some((relatedType) => type.includes(relatedType))) &&
         (!field?.length || field.includes(activity.field)) &&
         [activity.title, activity.field, activity.type].some((value) =>
           value.toLowerCase().includes(query),

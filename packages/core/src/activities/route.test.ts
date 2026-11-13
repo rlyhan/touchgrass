@@ -34,7 +34,13 @@ const getActivityBySlug = mock.fn<(slug: string) => Promise<Activity | null>>(
 
 const searchable: Activity[] = [
   activity,
-  { ...activity, slug: "hike-a-coastal-trail", title: "Hike a Coastal Trail", type: "Active" },
+  {
+    ...activity,
+    slug: "hike-a-coastal-trail",
+    title: "Hike a Coastal Trail",
+    type: "Active",
+    related_types: ["Reflective"],
+  },
   { ...activity, slug: "learn-guitar-chords", title: "Learn Guitar Chords", field: "Music" },
 ]
 const loadRecommendations = mock.fn<() => Promise<Activity[]>>(async () => searchable)
@@ -106,6 +112,15 @@ test("GET /activities/search filters by any of the selected types", async () => 
   assert.equal(res.status, 200)
   const body = (await res.json()) as SearchBody
   assert.deepEqual(body.items.map((a) => a.slug), ["hike-a-coastal-trail"])
+})
+
+test("GET /activities/search filters by primary and related types, and totals every match", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?type=Reflective&limit=2`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.deepEqual(body.items.map((a) => a.slug), ["stargaze-from-a-rooftop", "hike-a-coastal-trail"])
+  assert.equal(body.total, 3)
 })
 
 test("GET /activities/search requires a match on both type and field", async () => {
