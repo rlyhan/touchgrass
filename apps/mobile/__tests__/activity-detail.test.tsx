@@ -313,7 +313,7 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
     })
 
-    it("shows the pattern and a row per shared motivation", () => {
+    it("shows the pattern and a pill per shared motivation", () => {
       setMatchLabels({
         [ACTIVITY.slug]: {
           kind: "personality",
@@ -324,10 +324,10 @@ describe("ActivityDetailPage", () => {
       render(<ActivityDetailPage />)
 
       expect(screen.getByText("Enchanting Visionary")).toBeTruthy()
-      expect(screen.getByText("Explore my creative side")).toBeTruthy()
-      expect(screen.getByText("Artistic and Creative")).toBeTruthy()
-      expect(screen.getByText("Connect with people and share experiences")).toBeTruthy()
-      expect(screen.getByText("Social")).toBeTruthy()
+      const motivationReasons = within(screen.getByTestId("motivation-reasons"))
+      expect(motivationReasons.getByText("Motivations")).toBeTruthy()
+      expect(motivationReasons.getByText("Explore my creative side")).toBeTruthy()
+      expect(motivationReasons.getByText("Connect with people and share experiences")).toBeTruthy()
     })
 
     it("doesn't show a pattern for an activity without a label", () => {
@@ -430,6 +430,13 @@ describe("ActivityDetailPage", () => {
       expect(screen.getByTestId("activity-card")).toBeTruthy()
       expect(screen.queryByText("Why this matches you")).toBeNull()
       warn.mockRestore()
+    })
+
+    it("leaves out the motivations heading when no motivation is shared", () => {
+      setMatchLabels({ [ACTIVITY.slug]: { kind: "personality", patternId: "4-HH", sharedActivityTypesByMotivation: {} } })
+      render(<ActivityDetailPage />)
+
+      expect(screen.queryByTestId("motivation-reasons")).toBeNull()
     })
 
     it("shows the matched pattern's name in the pattern box", () => {

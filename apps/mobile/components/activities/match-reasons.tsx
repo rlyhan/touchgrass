@@ -9,7 +9,7 @@ import type { ActivityField, ActivityType, PatternTypeId, SharedActivityTypesByM
 import { MOTIVATION_OPTIONS, PATTERN_TYPES } from "@touchgrass/types/constants"
 
 // "Why this matches you" on the activity page: square boxes for the matched pattern and the user's interest field,
-// then a row per shared motivation and one for the activity's type when the recommendations screen picked it for variety.
+// then a pill per shared motivation and a row for the activity's type when the recommendations screen picked it for variety.
 
 const PATTERN_BY_ID = Object.fromEntries(PATTERN_TYPES.map((p) => [p.id, p]))
 
@@ -80,14 +80,18 @@ export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {}, 
             ) : null}
           </View>
         ) : null}
-        {motivations.map((m) => (
-          <View key={m.value} className="rounded-2xl bg-gray-100 p-4">
-            <Text className="text-base leading-relaxed text-gray-800">
-              You chose <Text className="font-semibold text-gray-900">{m.label}</Text> as a motivation, and this
-              activity is <Text className="font-semibold text-gray-900">{joinWithAnd(sharedActivityTypesByMotivation[m.value] ?? [])}</Text>.
-            </Text>
+        {motivations.length > 0 ? (
+          <View testID="motivation-reasons">
+            <Text className="mb-2 text-base font-semibold text-gray-900">Motivations</Text>
+            <View className="flex-row flex-wrap gap-2">
+              {motivations.map((m) => (
+                <View key={m.value} className="rounded-full border border-emerald-500 px-3 py-1.5">
+                  <Text className="text-sm font-medium text-emerald-600">{m.label}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        ))}
+        ) : null}
         {varietyType ? (
           <View className="rounded-2xl bg-gray-100 p-4">
             <Text className="text-base leading-relaxed text-gray-800">
@@ -104,9 +108,4 @@ export function MatchReasons({ patternId, sharedActivityTypesByMotivation = {}, 
 function FieldIcon({ field }: { field: ActivityField }) {
   const Icon = getFieldIcon(field)
   return <Icon size={32} color={colors.warm.accent} strokeWidth={1.7} />
-}
-
-function joinWithAnd(items: string[]): string {
-  if (items.length <= 1) return items.join("")
-  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`
 }
