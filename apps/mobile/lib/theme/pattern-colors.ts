@@ -1,11 +1,12 @@
 // One distinct colour per personality pattern, shared by the dashboard ring,
 // the pattern icon outline and the activity detail pattern box.
 // Neighbouring patterns in a group get far-apart hues so a user's top three rarely clash.
+// Orange is reserved for the interest box, so no pattern uses an orange or amber hue.
 
 import type { PatternTypeId } from "@touchgrass/types"
 
 export const PATTERN_COLORS: Record<PatternTypeId, string> = {
-  "1-HH": "#F97316",
+  "1-HH": "#10B981",
   "1-HL": "#DC2626",
   "1-LH": "#14B8A6",
   "1-LL": "#6366F1",
@@ -18,7 +19,7 @@ export const PATTERN_COLORS: Record<PatternTypeId, string> = {
   "3-LH": "#0891B2",
   "3-LL": "#84CC16",
   "4-HH": "#C026D3",
-  "4-HL": "#EA580C",
+  "4-HL": "#CA8A04",
   "4-LH": "#3B82F6",
   "4-LL": "#78716C",
   "5-HH": "#2DD4BF",
@@ -26,23 +27,23 @@ export const PATTERN_COLORS: Record<PatternTypeId, string> = {
   "5-LH": "#1D4ED8",
   "5-LL": "#A855F7",
   "6-HH": "#E11D48",
-  "6-HL": "#FBBF24",
+  "6-HL": "#4D7C0F",
   "6-LH": "#7C3AED",
   "6-LL": "#0D9488",
   "7-HH": "#22C55E",
   "7-HL": "#F472B6",
   "7-LH": "#4F46E5",
-  "7-LL": "#B45309",
+  "7-LL": "#0F766E",
   "8-HH": "#2563EB",
   "8-HL": "#B91C1C",
   "8-LH": "#D946EF",
-  "8-LL": "#F59E0B",
+  "8-LL": "#15803D",
   "9-HH": "#9333EA",
   "9-HL": "#475569",
   "9-LH": "#06B6D4",
   "9-LL": "#65A30D",
   "10-HH": "#DB2777",
   "10-HL": "#0284C7",
-  "10-LH": "#C2410C",
+  "10-LH": "#7E22CE",
   "10-LL": "#059669",
 }
