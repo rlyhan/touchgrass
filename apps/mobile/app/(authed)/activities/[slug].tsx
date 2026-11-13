@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { ActivityCard } from "@/components/activities/activity-card"
 import { MatchReasons } from "@/components/activities/match-reasons"
@@ -43,6 +43,7 @@ export default function ActivityDetailPage() {
   const reasonPatternId = matchLabel?.patternId
   const sharedActivityTypesByMotivation = matchLabel?.sharedActivityTypesByMotivation
   const interests = useInterests()
+  const { bottom: bottomInset } = useSafeAreaInsets()
   useLoadRecommendationsIfMissing()
 
   const cached = slug ? getCachedActivity(slug) : undefined
@@ -110,9 +111,18 @@ export default function ActivityDetailPage() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       {/* Header with back button */}
-      <View className="z-10 bg-white/80 px-4 py-3" style={{ elevation: 4 }}>
+      <View
+        className="z-10 bg-white/80 px-4 py-3"
+        style={{
+          elevation: 4,
+          shadowColor: colors.black,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 4,
+        }}
+      >
         <Pressable
           onPress={handleBack}
           className="h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white"
@@ -124,7 +134,7 @@ export default function ActivityDetailPage() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 + bottomInset }}
         showsVerticalScrollIndicator={false}
       >
         <ActivityCard
