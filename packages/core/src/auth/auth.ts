@@ -3,8 +3,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { bearer } from "better-auth/plugins"
 import { expo } from "@better-auth/expo"
 
-import { db } from "./db/client.js"
-import { readAuthEnv } from "./auth-env.js"
+import { db } from "../db/client.js"
+import { readAuthEnv } from "./env.js"
 
 const { secret, baseUrl, trustedOrigins, corsOrigins } = readAuthEnv(process.env)
 

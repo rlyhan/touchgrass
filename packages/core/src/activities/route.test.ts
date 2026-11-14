@@ -53,6 +53,10 @@ before(() => {
     {
       insertProfile,
       getProfileByAuthUserId,
+      authHandler: (_req, res) => {
+        res.sendStatus(404)
+      },
+      corsOrigins: [],
       getSessionUserId,
       loadRecommendations,
       getActivityBySlug,

@@ -1,5 +1,8 @@
+import { toNodeHandler } from "better-auth/node"
+
 import { createApp } from "./app.js"
-import { getSessionUserId } from "./auth-session.js"
+import { auth, corsOrigins } from "./auth/auth.js"
+import { getSessionUserId } from "./auth/session.js"
 import { getProfileByAuthUserId, insertProfile } from "./db/profiles.js"
 import {
   createFetchActivitiesFromSanity,
@@ -17,6 +20,8 @@ const getActivityBySlug = async (slug: string) => {
 }
 
 const app = createApp({
+  authHandler: toNodeHandler(auth),
+  corsOrigins,
   insertProfile,
   getProfileByAuthUserId,
   getSessionUserId,

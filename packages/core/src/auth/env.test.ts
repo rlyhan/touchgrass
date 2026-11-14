@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
-import { readAuthEnv } from "./auth-env.js"
+import { readAuthEnv } from "./env.js"
 
 const validEnv = {
   BETTER_AUTH_SECRET: "secret",
