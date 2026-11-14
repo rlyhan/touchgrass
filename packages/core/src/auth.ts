@@ -4,33 +4,16 @@ import { bearer } from "better-auth/plugins"
 import { expo } from "@better-auth/expo"
 
 import { db } from "./db/client.js"
-import {
-  parseExtraTrustedOrigins,
-  resolveCorsOrigins,
-  resolveTrustedOrigins,
-} from "./trusted-origins.js"
+import { readAuthEnv } from "./auth-env.js"
 
-if (!process.env.BETTER_AUTH_SECRET) {
-  throw new Error("BETTER_AUTH_SECRET is not set")
-}
+const { secret, baseUrl, trustedOrigins, corsOrigins } = readAuthEnv(process.env)
 
-if (!process.env.BETTER_AUTH_URL) {
-  throw new Error("BETTER_AUTH_URL is not set")
-}
-
-export const trustedOrigins = resolveTrustedOrigins({
-  extraTrustedOrigins: parseExtraTrustedOrigins(
-    process.env.BETTER_AUTH_TRUSTED_ORIGINS,
-  ),
-  isProd: process.env.NODE_ENV === "production",
-})
-
-export const corsOrigins = resolveCorsOrigins(trustedOrigins)
+export { corsOrigins }
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
+  secret,
+  baseURL: baseUrl,
   trustedOrigins,
   emailAndPassword: {
     enabled: true,
