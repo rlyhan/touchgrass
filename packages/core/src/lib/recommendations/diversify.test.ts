@@ -205,3 +205,18 @@ test("diversifyAndOrder final ordering follows Top → Middle → Bottom across 
     ["top", "middle", "bottom"],
   )
 })
+
+test("diversifyAndOrder flags only the activity-type picks as picked for variety", () => {
+  const interests: ActivityField[] = ["Music", "Writing"]
+  const scored = [
+    makeRec("music-best", "Music", "Reflective", 0.9), // Pass 1
+    makeRec("writing-best", "Writing", "Analytical", 0.8), // Pass 1
+    makeRec("music-social", "Music", "Social", 0.7), // Pass 2: first Social in the pool, as Top comes before Middle
+    makeRec("art-social", "Art", "Social", 0.95), // Middle, Social already picked
+    makeRec("art-creative", "Art", "Creative", 0.65), // Pass 2 from Middle
+    makeRec("art-low", "Art", "Physical", 0.2), // Bottom
+  ]
+  const result = diversifyAndOrder(scored, interests)
+  const flagged = result.filter((r) => r.pickedForVariety).map((r) => r.rec.slug)
+  assert.deepEqual(flagged, ["music-social", "art-creative"])
+})

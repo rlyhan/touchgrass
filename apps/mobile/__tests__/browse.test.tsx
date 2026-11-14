@@ -12,6 +12,10 @@ jest.mock("@/lib/browse/api", () => ({
   searchActivities: jest.fn(),
 }))
 
+jest.mock("@/lib/recommendations/api", () => ({
+  fetchRecommendations: jest.fn(() => Promise.resolve([])),
+}))
+
 // ── heavy native deps ─────────────────────────────────────────────────────────
 jest.mock("expo-image", () => ({
   Image: { prefetch: jest.fn(() => Promise.resolve(true)) },
@@ -26,7 +30,8 @@ jest.mock("@/components/icons/grass-logo", () => require("@/test-utils/mocks").g
 jest.mock("@/components/activities/activity-card", () => require("@/test-utils/mocks").activityCardMock)
 
 import * as BrowseApi from "@/lib/browse/api"
-import { clearRecommendedSlugs, setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import * as RecommendationsApi from "@/lib/recommendations/api"
+import { clearRecommendationStore, setMatchLabels } from "@/lib/recommendations/recommendation-store"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import type { Activity } from "@touchgrass/types"
 import { Image } from "expo-image"
@@ -36,6 +41,7 @@ import BrowsePage from "@/app/(authed)/(tabs)/browse"
 const mockSearchActivities = jest.mocked(BrowseApi.searchActivities)
 const mockFetchRandomActivities = jest.mocked(BrowseApi.fetchRandomActivities)
 const mockPrefetch = jest.mocked(Image.prefetch)
+const mockFetchRecommendations = jest.mocked(RecommendationsApi.fetchRecommendations)
 
 const FIRST_PAGE = RECOMMENDATIONS.slice(0, 10)
 const SECOND_PAGE = RECOMMENDATIONS.slice(10, 13)
@@ -62,7 +68,7 @@ describe("BrowsePage", () => {
     jest.clearAllMocks()
     mockPrefetch.mockResolvedValue(true)
     mockFetchRandomActivities.mockResolvedValue(RECOMMENDATIONS.slice(20, 30))
-    clearRecommendedSlugs()
+    clearRecommendationStore()
   })
 
   afterEach(() => {
@@ -97,19 +103,66 @@ describe("BrowsePage", () => {
     expect(screen.queryByRole("button", { name: "Page 1" })).toBeNull()
   })
 
-  it("flags only the activities in the user's recommended slugs", async () => {
+  it("fetches recommendations when none are loaded, then labels the activities", async () => {
     const randomActivities = RECOMMENDATIONS.slice(20, 30)
-    const recommendedSlugs = [randomActivities[0].slug, randomActivities[3].slug]
+    const personalityMatchSlug = randomActivities[3].slug
+    mockFetchRecommendations.mockImplementationOnce(async () => {
+      setMatchLabels({ [personalityMatchSlug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} } })
+      return []
+    })
     render(<BrowsePage />)
     await act(async () => {})
 
-    await act(async () => setRecommendedSlugs(recommendedSlugs))
+    expect(mockFetchRecommendations).toHaveBeenCalledTimes(1)
+    const listed = screen.UNSAFE_getByType(FlatList).props.data
+    expect(listed[0]).toMatchObject({ slug: personalityMatchSlug, matchLabel: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} } })
+  })
 
-    const flaggedSlugs = screen
-      .UNSAFE_getByType(FlatList)
-      .props.data.filter((a: { recommended: boolean }) => a.recommended)
-      .map((a: { slug: string }) => a.slug)
-    expect(flaggedSlugs).toEqual(recommendedSlugs)
+  it("doesn't fetch recommendations when they're already loaded", async () => {
+    setMatchLabels({ [RECOMMENDATIONS[0].slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} } })
+    render(<BrowsePage />)
+    await act(async () => {})
+
+    expect(mockFetchRecommendations).not.toHaveBeenCalled()
+  })
+
+  it("gives each activity its match label and leaves the rest unlabelled", async () => {
+    const randomActivities = RECOMMENDATIONS.slice(20, 30)
+    const recommendedSlug = randomActivities[0].slug
+    const personalityMatchSlug = randomActivities[3].slug
+    render(<BrowsePage />)
+    await act(async () => {})
+
+    await act(async () =>
+      setMatchLabels({ [recommendedSlug]: { kind: "recommended", sharedActivityTypesByMotivation: {} }, [personalityMatchSlug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} } }),
+    )
+
+    const labelsBySlug = Object.fromEntries(
+      screen
+        .UNSAFE_getByType(FlatList)
+        .props.data.filter((a: { matchLabel?: object }) => a.matchLabel)
+        .map((a: { slug: string; matchLabel: object }) => [a.slug, a.matchLabel]),
+    )
+    expect(labelsBySlug).toEqual({
+      [recommendedSlug]: { kind: "recommended", sharedActivityTypesByMotivation: {} },
+      [personalityMatchSlug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
+    })
+  })
+
+  it("lists recommended activities first, then personality matches, otherwise keeping the page's order", async () => {
+    const [first, second, third, fourth, fifth] = FIRST_PAGE
+    mockSearchActivities.mockResolvedValue({ items: [first, second, third, fourth, fifth], total: 5 })
+    setMatchLabels({
+      [second.slug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
+      [third.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} },
+      [fourth.slug]: { kind: "personality", patternId: "4-LH", sharedActivityTypesByMotivation: {} },
+      [fifth.slug]: { kind: "recommended", sharedActivityTypesByMotivation: {} },
+    })
+    render(<BrowsePage />)
+
+    await act(async () => typeQuery("guitar"))
+
+    expect(listedTitles()).toEqual([third.title, fifth.title, second.title, fourth.title, first.title])
   })
 
   it("lets card taps through while the keyboard is open and dismisses it on scroll", async () => {

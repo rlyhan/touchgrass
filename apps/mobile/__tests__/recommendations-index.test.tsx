@@ -39,7 +39,7 @@ jest.mock("@/components/activities/activity-card", () => require("@/test-utils/m
 // ── typed references to mocked modules ────────────────────────────────────────
 import * as Api from "@/lib/recommendations/api"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import type { RecommendedActivity } from "@touchgrass/types"
+import type { Activity } from "@touchgrass/types"
 import * as ExpoRouter from "expo-router"
 
 const mockPush = jest.mocked(ExpoRouter.router.push)
@@ -47,10 +47,7 @@ const mockReplace = jest.mocked(ExpoRouter.router.replace)
 const mockFetchRecommendations = jest.mocked(Api.fetchRecommendations)
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
-const RECS: RecommendedActivity[] = [
-  { ...RECOMMENDATIONS[0], dominantPatternId: "4-HH" },
-  { ...RECOMMENDATIONS[1], dominantPatternId: null },
-]
+const RECS: Activity[] = [RECOMMENDATIONS[0], RECOMMENDATIONS[1]]
 
 import RecommendationsPage from "@/app/(authed)/(tabs)/recommendations"
 
@@ -80,7 +77,7 @@ describe("RecommendationsPage", () => {
     expect(screen.getByText(RECS[1].title)).toBeTruthy()
   })
 
-  it("pushes the detail route with the dominant pattern when a card is pressed", async () => {
+  it("pushes the activity's detail route when a card is pressed", async () => {
     mockFetchRecommendations.mockResolvedValue(RECS)
     render(<RecommendationsPage />)
 
@@ -89,21 +86,7 @@ describe("RecommendationsPage", () => {
     })
     fireEvent.press(card)
 
-    expect(mockPush).toHaveBeenCalledWith(
-      `/activities/${RECS[0].slug}?pattern=4-HH`,
-    )
-  })
-
-  it("pushes the detail route without a pattern when none was resolved", async () => {
-    mockFetchRecommendations.mockResolvedValue(RECS)
-    render(<RecommendationsPage />)
-
-    const card = await screen.findByRole("button", {
-      name: `View details for ${RECS[1].title}`,
-    })
-    fireEvent.press(card)
-
-    expect(mockPush).toHaveBeenCalledWith(`/activities/${RECS[1].slug}`)
+    expect(mockPush).toHaveBeenCalledWith(`/activities/${RECS[0].slug}`)
   })
 
   it("pushes the browse route when the browse CTA is pressed", async () => {
