@@ -6,6 +6,7 @@ import type {
   RecommendationsResponse,
 } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
+import { requireUser } from "../auth/require-user.js"
 import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendations/get-recommendations.js"
 import { getOCEANScores } from "../lib/recommendations/personality/ocean.js"
@@ -23,13 +24,7 @@ export function getRecommendationsHandler({
   getSessionUserId,
   loadRecommendations,
 }: GetRecommendationsDeps) {
-  return async function handler(req: Request, res: Response): Promise<void> {
-    const authUserId = await getSessionUserId(req)
-    if (!authUserId) {
-      res.status(401).json({ error: "Not authenticated" })
-      return
-    }
-
+  return requireUser(getSessionUserId, async (req: Request, res: Response, authUserId: string) => {
     const profile = await getProfileByAuthUserId(authUserId)
     if (!profile) {
       res.status(404).json({ error: "Profile not found" })
@@ -52,5 +47,5 @@ export function getRecommendationsHandler({
     const recommendations = scored.map((s) => s.rec)
     const body: RecommendationsResponse = { recommendations, patternWeights, matchLabels, interests }
     res.status(200).json(body)
-  }
+  })
 }

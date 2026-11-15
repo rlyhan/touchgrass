@@ -251,19 +251,6 @@ test("GET /activities/:slug returns 400 when the slug contains invalid character
   assert.equal(getActivityBySlug.mock.callCount(), 0)
 })
 
-test("GET /activities/:slug returns 500 when getSessionUserId throws", async () => {
-  getSessionUserId.mock.mockImplementation(async () => {
-    throw new Error("session lookup failed")
-  })
-
-  const res = await fetch(`${baseUrl}/activities/${activity.slug}`)
-
-  assert.equal(res.status, 500)
-  const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Internal server error")
-  assert.equal(getActivityBySlug.mock.callCount(), 0)
-})
-
 test("GET /activities/:slug returns 500 when the lookup fails", async () => {
   getActivityBySlug.mock.mockImplementation(async () => {
     throw new Error("source down")

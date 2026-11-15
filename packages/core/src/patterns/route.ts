@@ -1,5 +1,6 @@
 import type { Request, Response } from "express"
 
+import { requireUser } from "../auth/require-user.js"
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import type { Profile } from "../db/schema.js"
 import { getOCEANScores } from "../lib/recommendations/personality/ocean.js"
@@ -14,13 +15,7 @@ export function getPatternWeightsHandler({
   getProfileByAuthUserId,
   getSessionUserId,
 }: GetPatternWeightsDeps) {
-  return async function handler(req: Request, res: Response): Promise<void> {
-    const authUserId = await getSessionUserId(req)
-    if (!authUserId) {
-      res.status(401).json({ error: "Not authenticated" })
-      return
-    }
-
+  return requireUser(getSessionUserId, async (req: Request, res: Response, authUserId: string) => {
     const profile = await getProfileByAuthUserId(authUserId)
     if (!profile) {
       res.status(404).json({ error: "Profile not found" })
@@ -32,5 +27,5 @@ export function getPatternWeightsHandler({
     )
     const body: PatternWeightsResponse = { patternWeights }
     res.status(200).json(body)
-  }
+  })
 }
