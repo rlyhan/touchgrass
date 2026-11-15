@@ -8,8 +8,7 @@ import express, {
 } from "express"
 import rateLimit from "express-rate-limit"
 
-import { auth, corsOrigins } from "./auth.js"
-import { toNodeHandler } from "better-auth/node"
+import { mountAuth } from "./auth/routes.js"
 import {
   type GetActivityDeps,
   type SearchActivitiesDeps,
@@ -30,7 +29,13 @@ import {
   getPatternWeightsHandler,
 } from "./patterns/route.js"
 
-export type AppDeps = CreateProfileDeps &
+export type AuthDeps = {
+  authHandler: RequestHandler
+  corsOrigins: string[]
+}
+
+export type AppDeps = AuthDeps &
+  CreateProfileDeps &
   GetRecommendationsDeps &
   GetActivityDeps &
   SearchActivitiesDeps &
@@ -59,7 +64,7 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   app.set("trust proxy", 1)
   app.use(
     cors({
-      origin: corsOrigins,
+      origin: deps.corsOrigins,
       credentials: true,
     }),
   )
@@ -67,13 +72,10 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   const maybeLimit = (limiter: RequestHandler): RequestHandler[] =>
     options.disableRateLimits ? [] : [limiter]
 
-  if (!options.disableRateLimits) {
-    app.use("/api/auth/sign-in", authLimiter)
-    app.use("/api/auth/sign-up", authLimiter)
-    app.use("/api/auth/forget-password", authLimiter)
-  }
-
-  app.all("/api/auth/{*splat}", toNodeHandler(auth))
+  mountAuth(app, {
+    handler: deps.authHandler,
+    limiter: options.disableRateLimits ? undefined : authLimiter,
+  })
 
   app.use(express.json())
 

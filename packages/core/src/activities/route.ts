@@ -4,6 +4,7 @@ import { z } from "zod"
 import type { Activity } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
+import { requireUser } from "../auth/require-user.js"
 import type { LoadRecommendations } from "../recommendations/source.js"
 
 export type GetActivityDeps = {
@@ -21,16 +22,7 @@ export function getActivityHandler({
   getActivityBySlug,
   getSessionUserId,
 }: GetActivityDeps) {
-  return async function handler(
-    req: Request<{ slug: string }>,
-    res: Response,
-  ): Promise<void> {
-    const authUserId = await getSessionUserId(req)
-    if (!authUserId) {
-      res.status(401).json({ error: "Not authenticated" })
-      return
-    }
-
+  return requireUser<Request<{ slug: string }>>(getSessionUserId, async (req, res) => {
     const parsedSlug = slugSchema.safeParse(req.params.slug)
     if (!parsedSlug.success) {
       res.status(400).json({
@@ -48,7 +40,7 @@ export function getActivityHandler({
       return
     }
     res.status(200).json({ activity })
-  }
+  })
 }
 
 export type SearchActivitiesDeps = {
