@@ -82,7 +82,8 @@ describe("ActivityCard", () => {
 
   it("shows no match label without one", () => {
     render(<ActivityCard {...BASE_PROPS} />)
-    expect(screen.queryByText(/match/)).toBeNull()
+    expect(screen.queryByText("Personality match")).toBeNull()
+    expect(screen.queryByText("In your recommendations")).toBeNull()
   })
 
   const labelsWithText: [MatchLabel, string][] = [
