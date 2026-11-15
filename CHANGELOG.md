@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.8.0] - 2026-11-14 — Feat: Pattern colours and activity page redesign
+
+Gives each personality pattern its own colour and a shared geometric icon, and redesigns the activity page's match reasons, about section and instructions for readability.
+
+### Mobile (`apps/mobile`)
+
+- Added `PATTERN_COLORS` (`lib/theme/pattern-colors.ts`), one distinct colour per pattern, used by the dashboard rings and the activity page pattern box. Orange is reserved for interests, so no pattern uses an orange or amber hue.
+- Added a `PatternIcon` component (hexagon, diamond and dot, outlined in the pattern's colour).
+- Dashboard rings use the pattern's colour and show the icon in the centre; the match percentage moved into the detail box that opens on tap.
+- "Why this matches you" on the activity page now shows the matched pattern and the user's interest field as square boxes (pattern colour tint, and pale orange with the field's icon), a compact variety row with the activity type's icon, and the shared motivations as green outlined pills. Removed `PatternMatchAccordion`, so the pattern's short description no longer appears on this page.
+- The about section is a full-width pale green band, and instructions show each step as a box joined by a numbered trail.
+- The activity page header has an iOS shadow, and content scrolls under the home indicator instead of stopping at a white safe-area band.
+
+## [1.7.0] - 2026-11-10 — Feat: Browse match labels and wider type filter
+
+Replaces browse's "Recommended for you" badge with labels explaining why an activity matches, lists recommended activities first on each page, and fixes the activity type filter missing most matches.
+
+### API (`packages/core`)
+
+- `GET /activities/search` type filters now match an activity's `related_types` as well as its primary type ("Creative" goes from 6 results to 36).
+- `GET /recommendations` returns `recommendations`, `patternWeights`, `matchLabels` (keyed by slug) and the user's `interests`. `recommendedSlugs` and `dominantPatternId` are no longer returned.
+- Each match label has a `kind`: `recommended` (one of the top 10 on the recommendations screen) or `personality` (any other activity whose base score is strictly above the user's mean + 1 SD and that has a pattern the user scores 0.6+ on). Activities with neither are left out.
+- Interests affect which activities are recommended, since they shape the interest-aware diversification that picks the top 10, but never change a score or a personality reason. A `personality` label depends only on personality.
+- Labels carry their reasons: `patternId` (strong personality matches only), `sharedActivityTypesByMotivation`, and `pickedForVariety` (`recommended` only).
+- Label logic lives in `match-labels.ts`; scoring is unchanged.
+- Requires `fly deploy` on each Fly app. Older APIs omit `matchLabels`, so cards show no label until the API is updated.
+
+### Mobile (`apps/mobile`)
+
+- Browse cards show "In your recommendations" or "Personality match" in place of "Recommended for you"; unlabelled activities show no badge.
+- Within each page, `recommended` activities are listed first, then `personality` ones, then the rest, keeping the page's order otherwise. Sorting across pages isn't included.
+- Match labels and interests are stored when recommendations load, and cleared on sign-out.
+
+### Docs (`context`)
+
+- Documented `matchLabels`, the two label kinds and which factors affect each.
+
 ## [1.6.0] - 2026-10-15 — Feat: Browse filters by activity type and field
 
 Adds multi-select Activity type and Field filters to browse, applied by the API.

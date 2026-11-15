@@ -70,6 +70,19 @@ describe("TopPatternsSection", () => {
     ).toBeTruthy()
   })
 
+  it("shows the pattern's match percentage in the detail box", () => {
+    const weights = makeWeights({ "4-HH": 0.95 })
+    render(<TopPatternsSection patternWeights={weights} />)
+    const pattern = PATTERN_TYPES.find((p) => p.id === "4-HH")!
+
+    fireEvent.press(
+      screen.getByRole("button", { name: `Show details for ${pattern.name}` }),
+    )
+    expect(
+      within(screen.getByTestId("pattern-detail-panel")).getByText("95% match"),
+    ).toBeTruthy()
+  })
+
   it("hides the description when the selected ring is tapped again", () => {
     jest.useFakeTimers()
     try {

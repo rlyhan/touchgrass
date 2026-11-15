@@ -2,6 +2,8 @@ import { ActivityField, ActivityType, ScoredRecommendation } from "@touchgrass/t
 import { BucketedRecommendation, classifyBucket, TOP_BUCKET_MIN_SCORE } from "./interests/buckets.js"
 import { pickOnePerInterest } from "./interests/interest-pass.js"
 
+export type DiversifiedRecommendation = ScoredRecommendation & { pickedForVariety?: boolean }
+
 /*
  * Diversifies the top recommendation slots and produces the final ordering.
  *
@@ -13,7 +15,8 @@ import { pickOnePerInterest } from "./interests/interest-pass.js"
  *     so Pass 2 can avoid duplicating it.
  *   Pass 2 — Activity-type diversification (always runs):
  *     Walk the high-`sortScore` pool (remaining Top ∪ Middle with `sortScore >= 0.6`) in order
- *     and pick the first rec for each previously-unseen activity type.
+ *     and pick the first rec for each previously-unseen activity type. These are returned with
+ *     `pickedForVariety`, so the activity page can say why they were picked.
  *
  * After the picks, the remaining recs are appended in bucket order (Top → Middle → Bottom).
  * Within each bucket, recs are sorted by `sortScore` descending — for Middle this means the
@@ -23,7 +26,7 @@ import { pickOnePerInterest } from "./interests/interest-pass.js"
 export function diversifyAndOrder(
     scored: ScoredRecommendation[],
     interests: ActivityField[],
-): ScoredRecommendation[] {
+): DiversifiedRecommendation[] {
     const interestSet = new Set<ActivityField>(interests)
     const bucketed = scored.map((s) => classifyBucket(s, interestSet))
 
@@ -47,10 +50,11 @@ export function diversifyAndOrder(
         ...top,
         ...middle.filter((m) => m.sortScore >= TOP_BUCKET_MIN_SCORE),
     ]
+    const varietyPicks: BucketedRecommendation[] = []
     for (const b of typeDiversifyPool) {
         if (pickedSlugs.has(b.rec.slug)) continue
         if (seenTypes.has(b.rec.type)) continue
-        picks.push(b)
+        varietyPicks.push(b)
         pickedSlugs.add(b.rec.slug)
         seenTypes.add(b.rec.type)
     }
@@ -61,5 +65,9 @@ export function diversifyAndOrder(
         ...bottom.filter((bt) => !pickedSlugs.has(bt.rec.slug)),
     ]
 
-    return [...picks, ...remaining].map((b) => ({ rec: b.rec, score: b.score }))
+    return [
+        ...picks.map((b) => ({ rec: b.rec, score: b.score })),
+        ...varietyPicks.map((b) => ({ rec: b.rec, score: b.score, pickedForVariety: true })),
+        ...remaining.map((b) => ({ rec: b.rec, score: b.score })),
+    ]
 }

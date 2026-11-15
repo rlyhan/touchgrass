@@ -34,7 +34,13 @@ const getActivityBySlug = mock.fn<(slug: string) => Promise<Activity | null>>(
 
 const searchable: Activity[] = [
   activity,
-  { ...activity, slug: "hike-a-coastal-trail", title: "Hike a Coastal Trail", type: "Active" },
+  {
+    ...activity,
+    slug: "hike-a-coastal-trail",
+    title: "Hike a Coastal Trail",
+    type: "Active",
+    related_types: ["Reflective"],
+  },
   { ...activity, slug: "learn-guitar-chords", title: "Learn Guitar Chords", field: "Music" },
 ]
 const loadRecommendations = mock.fn<() => Promise<Activity[]>>(async () => searchable)
@@ -47,6 +53,10 @@ before(() => {
     {
       insertProfile,
       getProfileByAuthUserId,
+      authHandler: (_req, res) => {
+        res.sendStatus(404)
+      },
+      corsOrigins: [],
       getSessionUserId,
       loadRecommendations,
       getActivityBySlug,
@@ -106,6 +116,15 @@ test("GET /activities/search filters by any of the selected types", async () => 
   assert.equal(res.status, 200)
   const body = (await res.json()) as SearchBody
   assert.deepEqual(body.items.map((a) => a.slug), ["hike-a-coastal-trail"])
+})
+
+test("GET /activities/search filters by primary and related types, and totals every match", async () => {
+  const res = await fetch(`${baseUrl}/activities/search?type=Reflective&limit=2`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as SearchBody
+  assert.deepEqual(body.items.map((a) => a.slug), ["stargaze-from-a-rooftop", "hike-a-coastal-trail"])
+  assert.equal(body.total, 3)
 })
 
 test("GET /activities/search requires a match on both type and field", async () => {
@@ -229,19 +248,6 @@ test("GET /activities/:slug returns 400 when the slug contains invalid character
   const body = (await res.json()) as { errors: { path: unknown[]; message: string }[] }
   assert.ok(Array.isArray(body.errors))
   assert.ok(body.errors.length > 0)
-  assert.equal(getActivityBySlug.mock.callCount(), 0)
-})
-
-test("GET /activities/:slug returns 500 when getSessionUserId throws", async () => {
-  getSessionUserId.mock.mockImplementation(async () => {
-    throw new Error("session lookup failed")
-  })
-
-  const res = await fetch(`${baseUrl}/activities/${activity.slug}`)
-
-  assert.equal(res.status, 500)
-  const body = (await res.json()) as { error: string }
-  assert.equal(body.error, "Internal server error")
   assert.equal(getActivityBySlug.mock.callCount(), 0)
 })
 

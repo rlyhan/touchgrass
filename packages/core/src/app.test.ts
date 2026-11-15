@@ -5,7 +5,10 @@ import { after, before, mock, test } from "node:test"
 
 import type { Request } from "express"
 
+import { toNodeHandler } from "better-auth/node"
+
 import { createApp } from "./app.js"
+import { auth, corsOrigins } from "./auth/auth.js"
 import type { NewProfile, Profile } from "./db/schema.js"
 
 const fakeProfile: Profile = {
@@ -53,6 +56,8 @@ before(() => {
     {
       insertProfile,
       getProfileByAuthUserId,
+      authHandler: toNodeHandler(auth),
+      corsOrigins,
       getSessionUserId,
       loadRecommendations: async () => [],
       getActivityBySlug: async () => null,

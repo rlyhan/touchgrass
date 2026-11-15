@@ -10,7 +10,6 @@ import { calculateMotivationBoost } from "./motivation/boost.js"
 import { calculateRecommendationBaseScore } from "./personality/base-score.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
-import { scoreRecommendation } from "./score.js"
 
 const mockUserBfas: BFASScores = {
   Openness: 97,
@@ -27,41 +26,24 @@ const mockUserBfas: BFASScores = {
 
 const creativeMotivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
 
-function recommendedCutoff(scores: number[]): number {
-  const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length
-  const sd = Math.sqrt(scores.reduce((sum, score) => sum + (score - mean) ** 2, 0) / scores.length)
-  return mean + sd * 0.5
-}
-
-test("getRecommendations doesn't put activities in recommendedSlugs just because many motivations inflate every score", () => {
-  const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
-  const allMotivations = [...MOTIVATION_OPTIONS]
-  const oneMotivationCutoff = recommendedCutoff(
-    RECOMMENDATIONS.map((rec) => scoreRecommendation(weights, rec, [creativeMotivation]).score),
-  )
-  const allMotivationScores = RECOMMENDATIONS.map((rec) => scoreRecommendation(weights, rec, allMotivations).score)
-
-  assert.ok(RECOMMENDATIONS.every((rec) => calculateMotivationBoost(weights, rec, allMotivations) > 0))
-  assert.ok(allMotivationScores.every((score) => score >= oneMotivationCutoff))
-
-  const { recommendedSlugs } = getRecommendations(mockUserBfas, allMotivations, [], RECOMMENDATIONS)
-  assert.ok(recommendedSlugs.length < RECOMMENDATIONS.length / 2)
-})
-
-test("getRecommendations returns the same recommendedSlugs whatever the user's interests", () => {
+test("getRecommendations gives the same personality reasons whatever the user's interests", () => {
   const withoutInterests = getRecommendations(mockUserBfas, [creativeMotivation], [], RECOMMENDATIONS)
   const withEveryInterest = getRecommendations(mockUserBfas, [creativeMotivation], [...ACTIVITY_FIELDS], RECOMMENDATIONS)
+  const patternsBySlug = (matchLabels: typeof withoutInterests.matchLabels) =>
+    Object.fromEntries(Object.entries(matchLabels).flatMap(([slug, label]) => (label.patternId ? [[slug, label.patternId]] : [])))
 
-  assert.deepEqual(withEveryInterest.recommendedSlugs, withoutInterests.recommendedSlugs)
+  assert.ok(Object.keys(patternsBySlug(withoutInterests.matchLabels)).length > 0)
+  assert.deepEqual(patternsBySlug(withEveryInterest.matchLabels), patternsBySlug(withoutInterests.matchLabels))
 })
 
-test("getRecommendations leaves the best personality fit out of recommendedSlugs when it gets no motivation boost", () => {
+test("getRecommendations gives the best personality fit with no motivation boost a personality match, off the recommendations screen", () => {
   const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
   const [strongestUnboostedFit] = RECOMMENDATIONS.filter(
     (rec) => calculateMotivationBoost(weights, rec, [creativeMotivation]) === 0,
   ).sort((a, b) => calculateRecommendationBaseScore(weights, b) - calculateRecommendationBaseScore(weights, a))
 
-  const { recommendedSlugs } = getRecommendations(mockUserBfas, [creativeMotivation], [], RECOMMENDATIONS)
+  const { recommendations, matchLabels } = getRecommendations(mockUserBfas, [creativeMotivation], [], RECOMMENDATIONS)
   assert.ok(strongestUnboostedFit)
-  assert.equal(recommendedSlugs.includes(strongestUnboostedFit.slug), false)
+  assert.ok(recommendations.every(({ rec }) => rec.slug !== strongestUnboostedFit.slug))
+  assert.equal(matchLabels[strongestUnboostedFit.slug]?.kind, "personality")
 })

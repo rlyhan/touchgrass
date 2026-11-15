@@ -1,5 +1,6 @@
 import type { Request, Response } from "express"
 
+import { requireUser } from "../auth/require-user.js"
 import type { NewProfile, Profile } from "../db/schema.js"
 import { onboardingFormSchema } from "./schema.js"
 
@@ -14,13 +15,7 @@ export function createProfileHandler({
   getProfileByAuthUserId,
   getSessionUserId,
 }: CreateProfileDeps) {
-  return async function handler(req: Request, res: Response): Promise<void> {
-    const authUserId = await getSessionUserId(req)
-    if (!authUserId) {
-      res.status(401).json({ error: "Not authenticated" })
-      return
-    }
-
+  return requireUser(getSessionUserId, async (req: Request, res: Response, authUserId: string) => {
     const parsed = onboardingFormSchema.safeParse(req.body)
     if (!parsed.success) {
       res.status(400).json({
@@ -60,5 +55,5 @@ export function createProfileHandler({
       }
       throw error
     }
-  }
+  })
 }

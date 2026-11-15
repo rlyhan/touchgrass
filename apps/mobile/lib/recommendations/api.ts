@@ -1,14 +1,17 @@
 import type {
   Activity,
   RecommendationsResponse,
-  RecommendedActivity,
 } from "@touchgrass/types"
 
 import { UnauthenticatedError } from "@/lib/auth/errors"
 import { authedFetch } from "@/lib/auth/fetch"
 import { apiUrl } from "@/lib/config"
 import { setCachedPatternWeights } from "@/lib/patterns/cache"
-import { setRecommendedSlugs } from "@/lib/recommendations/recommended-slugs"
+import {
+  getRecommendationsGeneration,
+  setInterests,
+  setMatchLabels,
+} from "@/lib/recommendations/recommendation-store"
 
 export { UnauthenticatedError } from "@/lib/auth/errors"
 
@@ -25,7 +28,8 @@ export class ProfileNotFoundError extends Error {
   }
 }
 
-export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
+export async function fetchRecommendations(): Promise<Activity[]> {
+  const generation = getRecommendationsGeneration()
   const response = await authedFetch(apiUrl("/recommendations"))
 
   if (response.status === 401) {
@@ -41,14 +45,15 @@ export async function fetchRecommendations(): Promise<RecommendedActivity[]> {
   }
 
   const body = (await response.json()) as RecommendationsResponse
+  const recommendations = body.recommendations ?? []
+  // A logout during the request means this response belongs to the previous user.
+  if (generation !== getRecommendationsGeneration()) return recommendations
   if (body.patternWeights) {
     setCachedPatternWeights(body.patternWeights)
   }
-  setRecommendedSlugs(body.recommendedSlugs ?? [])
-  const recommendations = body.recommendations ?? []
-  for (const { dominantPatternId: _dominantPatternId, ...activity } of recommendations) {
-    activityCache.set(activity.slug, activity)
-  }
+  setMatchLabels(body.matchLabels ?? {})
+  setInterests(body.interests ?? [])
+  for (const activity of recommendations) activityCache.set(activity.slug, activity)
   return recommendations
 }
 

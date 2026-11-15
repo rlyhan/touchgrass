@@ -3,7 +3,7 @@
 This is the standard workflow for every feature, fix, refactor, or infrastructure change.
 
 1. **Branch**
-   - Create a new branch from `main` or the parent branch listed in `@context/current-feature.md`.
+   - Create a new branch from `qa`. Only if the work builds on an unmerged feature branch, branch from that parent feature branch instead and list it in `@context/current-feature.md`.
    - Use descriptive branch names:
      - `feature/[feature-name]`
      - `fix/[fix-name]`
@@ -15,7 +15,7 @@ This is the standard workflow for every feature, fix, refactor, or infrastructur
    - Convert requirements into actionable implementation tasks before coding.
 
 3. **Sync**
-   - Pull/rebase the latest parent or `main` branch before implementation.
+   - Pull/rebase the latest parent or `qa` branch before implementation.
 
 4. **Implement**
    - Implement requirements incrementally.
@@ -45,7 +45,8 @@ This is the standard workflow for every feature, fix, refactor, or infrastructur
      - Clear `@context/current-feature.md`
 
 9. **Merge**
-   - Merge into the parent branch or `main`.
+   - Squash and merge the PR into the parent branch or `qa`, so each feature is one readable commit.
+   - To release, merge the `qa` → `main` PR with a merge commit. Never squash or rebase this PR, because `main` and `qa` will then conflict on the next release.
 
 10. **Delete Branch**
    - Delete the branch after merge.
