@@ -3,7 +3,8 @@ import { diversifyAndOrder } from "./diversify.js";
 import { getMatchLabels } from "./match-labels.js";
 import { getOCEANScores } from "./personality/ocean.js";
 import { getUserPatternWeights } from "./personality/patterns.js";
-import { getSlugSet, scoreRecommendation } from "./score.js";
+import { scoreRecommendation } from "./score.js";
+import { getSlugSet } from "./utils.js";
 
 const MAX_RECOMMENDATIONS = 10
 

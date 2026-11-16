@@ -9,7 +9,7 @@ import { getRecommendations } from "./get-recommendations.js"
 import { getSharedActivityTypesBetweenActivityAndUserMotivations } from "./motivation/shared-activity-types.js"
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
-import { getHighBaseScoreActivities } from "./score.js"
+import { getHighBaseScoreActivities } from "./personality/high-base-score.js"
 import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
 
 const mockUserBfas: BFASScores = {

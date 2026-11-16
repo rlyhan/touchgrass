@@ -1,7 +1,8 @@
 import type { Activity, MatchLabel, Motivation, PatternTypeId } from "@touchgrass/types"
 import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
 import { getSharedActivityTypesBetweenActivityAndUserMotivations } from "./motivation/shared-activity-types.js"
-import { getHighBaseScoreActivities, getSlugSet } from "./score.js"
+import { getHighBaseScoreActivities } from "./personality/high-base-score.js"
+import { getSlugSet } from "./utils.js"
 
 // Match labels browse shows for each activity: which label it earns, and the reasons it carries.
 
