@@ -19,7 +19,7 @@ import {
 import {
   type CreateProfileDeps,
   createProfileHandler,
-} from "./routes/profiles/route.js"
+} from "./routes/profile/route.js"
 import {
   type GetRecommendationsDeps,
   getRecommendationsHandler,
