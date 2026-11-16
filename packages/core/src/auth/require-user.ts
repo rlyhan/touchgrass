@@ -1,7 +1,11 @@
 import type { Request, Response } from "express"
 
+export type SessionDeps = {
+  getSessionUserId: (req: Request) => Promise<string | null>
+}
+
 export function requireUser<Req extends Request = Request>(
-  getSessionUserId: (req: Request) => Promise<string | null>,
+  getSessionUserId: SessionDeps["getSessionUserId"],
   handler: (req: Req, res: Response, authUserId: string) => Promise<void>,
 ) {
   return async function guarded(req: Req, res: Response): Promise<void> {

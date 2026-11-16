@@ -6,28 +6,28 @@ import express, {
   type RequestHandler,
   type Response,
 } from "express"
-import rateLimit from "express-rate-limit"
 
 import { mountAuth } from "./auth/routes.js"
+import { authLimiter, profileLimiter, readLimiter } from "./rate-limit.js"
 import {
   type GetActivityDeps,
   type SearchActivitiesDeps,
   getActivityHandler,
   randomActivitiesHandler,
   searchActivitiesHandler,
-} from "./activities/route.js"
+} from "./routes/activities/route.js"
 import {
   type CreateProfileDeps,
   createProfileHandler,
-} from "./onboarding/route.js"
+} from "./routes/profiles/route.js"
 import {
   type GetRecommendationsDeps,
   getRecommendationsHandler,
-} from "./recommendations/route.js"
+} from "./routes/recommendations/route.js"
 import {
   type GetPatternWeightsDeps,
   getPatternWeightsHandler,
-} from "./patterns/route.js"
+} from "./routes/pattern-weights/route.js"
 
 export type AuthDeps = {
   authHandler: RequestHandler
@@ -44,20 +44,6 @@ export type AppDeps = AuthDeps &
 export type AppOptions = {
   disableRateLimits?: boolean
 }
-
-function createLimiter(windowMs: number, limit: number) {
-  return rateLimit({
-    windowMs,
-    limit,
-    standardHeaders: "draft-7",
-    legacyHeaders: false,
-    message: { error: "Too many requests" },
-  })
-}
-
-const authLimiter = createLimiter(15 * 60 * 1000, 20)
-const profileLimiter = createLimiter(60 * 60 * 1000, 10)
-const readLimiter = createLimiter(60 * 1000, 120)
 
 export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   const app = express()

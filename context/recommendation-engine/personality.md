@@ -2,7 +2,7 @@
 
 Personality produces each activity's **base score**: how well the activity's types fit the user's personality. It is the only factor that applies to every activity, and the starting point the motivation boost is added to (see [`recommendation-engine.md`](../recommendation-engine.md)).
 
-Code: [`packages/core/src/lib/recommendations/personality/`](../../packages/core/src/lib/recommendations/personality/), with a `.test.ts` next to each file.
+Code: [`packages/core/src/engine/personality/`](../../packages/core/src/engine/personality/), with a `.test.ts` next to each file.
 
 - **Affects:** every activity's base score, `getTopActivityTypes`, the `personality` match label and the personality reason (`patternId`) on any label.
 - **Never affected by:** motivations or interests.
@@ -75,7 +75,7 @@ Neither is enough alone. The base score check is relative, so a user with middli
 
 ### Also built on personality
 
-- **Dominant pattern** — `getDominantPatternId` (in `@touchgrass/types/dominant-pattern`) picks the user's highest-weighted pattern among an activity's primary + related patterns. It's the high-scoring pattern check in step 4, and becomes a label's `patternId` ("You scored highly as …" on the activity page). It returns `null` below `MIN_DOMINANT_WEIGHT = 0.6` so the copy never overclaims.
+- **Dominant pattern** — `getDominantPatternId` (in `personality/dominant-pattern.ts`) picks the user's highest-weighted pattern among an activity's primary + related patterns. It's the high-scoring pattern check in step 4, and becomes a label's `patternId` ("You scored highly as …" on the activity page). It returns `null` below `MIN_DOMINANT_WEIGHT = 0.6` so the copy never overclaims.
 - **Top activity types** — `getTopActivityTypes` (`top-activity-types.ts`) ranks all activity types by primary affinity alone and returns the top N (default 6). Not currently used by the app.
 
 ---
@@ -100,5 +100,5 @@ Neither is enough alone. The base score check is relative, so a user with middli
 - **Related types are pooled, not averaged per type.** More related types means each one counts for less. (`base-score.test.ts`)
 - **A pattern shared by several related types counts once per type.** Creative and Artistic both include `4-HH`, so with both as related types `4-HH` is weighted twice in the secondary pool. `getDominantPatternId` deduplicates; the base score doesn't. (`base-score.test.ts`, `dominant-pattern.test.ts`)
 - **The same pattern can belong to unrelated types** (e.g. `9-HH` is in both Creative and Analytical). This matters for motivations, which match by type, not pattern. (`motivation/boost.test.ts`)
-- **Personality alone rarely reaches the recommendations screen.** An activity with a strong base score but no motivation boost usually ranks below boosted ones, so it misses the top 10. It still gets the `personality` match label, which uses the base score alone (covered in `factor-contracts.test.ts`).
-- **Users with middling scores may get no personality matches.** Without a pattern at 0.6 or more, the high-scoring pattern check fails on every activity, even though some still pass the top personality fit check (see step 4). A user who scores 50 on every aspect never gets one. (`get-recommendations.test.ts`)
+- **Personality alone rarely reaches the recommendations screen.** An activity with a strong base score but no motivation boost usually ranks below boosted ones, so it misses the top 10. It still gets the `personality` match label, which uses the base score alone (covered in `get-recommendations.factor-contracts.test.ts`).
+- **Users with middling scores may get no personality matches.** Without a pattern at 0.6 or more, the high-scoring pattern check fails on every activity, even though some still pass the top personality fit check (see step 4). A user who scores 50 on every aspect never gets one. (`match-labels.test.ts`)
