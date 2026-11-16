@@ -7,6 +7,7 @@ import type { Request } from "express"
 
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
+import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
 import { createApp } from "../../app.js"
 import type { Profile } from "../../db/schema/index.js"
@@ -24,18 +25,7 @@ const fakeProfile: Profile = {
   location: "London",
   employment: "Employed",
   interests: [],
-  personality: {
-    Openness: 97,
-    Intellect: 61,
-    Industriousness: 63,
-    Orderliness: 60,
-    Enthusiasm: 16,
-    Assertiveness: 19,
-    Compassion: 91,
-    Politeness: 83,
-    Volatility: 68,
-    Withdrawal: 63,
-  },
+  personality: MOCK_USER_BFAS,
   motivations: [],
   createdAt: new Date("2026-01-01T00:00:00Z"),
 }

@@ -1,6 +1,8 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
+import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
+
 import { onboardingFormSchema } from "./schema.js"
 
 const validPayload = {
@@ -12,18 +14,7 @@ const validPayload = {
   location: "London",
   employment: "Employed" as const,
   interests: ["Music", "Coding"],
-  personality: {
-    Openness: 97,
-    Intellect: 61,
-    Industriousness: 63,
-    Orderliness: 60,
-    Enthusiasm: 16,
-    Assertiveness: 19,
-    Compassion: 91,
-    Politeness: 83,
-    Volatility: 68,
-    Withdrawal: 63,
-  },
+  personality: MOCK_USER_BFAS,
   motivations: ["explore_creative", "learn_think_grow"],
 }
 
