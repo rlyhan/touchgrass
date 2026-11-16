@@ -9,15 +9,12 @@ import {
   createSanityClient,
   readSanityConfigFromEnv,
 } from "./catalog/sanity-source.js"
-import { createActivityLoader } from "./catalog/source.js"
+import { createActivityBySlugGetter, createActivityLoader } from "./catalog/source.js"
 
 const sanityClient = createSanityClient(readSanityConfigFromEnv())
 const fetchActivitiesFromSanity = createFetchActivitiesFromSanity(sanityClient)
 const loadActivities = createActivityLoader(fetchActivitiesFromSanity)
-const getActivityBySlug = async (slug: string) => {
-  const activities = await loadActivities()
-  return activities.find((a) => a.slug === slug) ?? null
-}
+const getActivityBySlug = createActivityBySlugGetter(loadActivities)
 
 const app = createApp({
   authHandler: toNodeHandler(auth),

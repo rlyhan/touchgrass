@@ -3,7 +3,7 @@ import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
-import { createActivityLoader, type SanityActivity } from "./source.js"
+import { createActivityBySlugGetter, createActivityLoader, type SanityActivity } from "./source.js"
 
 test("returns all mocks when Sanity has no activities", async () => {
   const load = createActivityLoader(async () => [])
@@ -148,4 +148,18 @@ test("merged result has no duplicates by slug", async () => {
 
   const slugs = result.map((r) => r.slug)
   assert.equal(new Set(slugs).size, slugs.length)
+})
+
+test("createActivityBySlugGetter returns the activity with the given slug", async () => {
+  const target = RECOMMENDATIONS[0]
+  assert.ok(target, "expected at least one mock")
+  const getActivityBySlug = createActivityBySlugGetter(async () => RECOMMENDATIONS)
+
+  assert.equal(await getActivityBySlug(target.slug), target)
+})
+
+test("createActivityBySlugGetter returns null for an unknown slug", async () => {
+  const getActivityBySlug = createActivityBySlugGetter(async () => RECOMMENDATIONS)
+
+  assert.equal(await getActivityBySlug("no-such-activity"), null)
 })

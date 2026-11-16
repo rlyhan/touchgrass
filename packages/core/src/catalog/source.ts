@@ -43,6 +43,13 @@ export function createActivityLoader(
   }
 }
 
+export function createActivityBySlugGetter(loadActivities: LoadActivities) {
+  return async (slug: string): Promise<Activity | null> => {
+    const activities = await loadActivities()
+    return activities.find((a) => a.slug === slug) ?? null
+  }
+}
+
 function mergeNonNull(base: Activity, override: SanityActivity): Activity {
   const result: Activity = { ...base }
   for (const key of Object.keys(override) as (keyof SanityActivity)[]) {
