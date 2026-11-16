@@ -1,13 +1,12 @@
 import type { Request, Response } from "express"
 
-import { requireUser } from "../../auth/require-user.js"
+import { requireUser, type SessionDeps } from "../../auth/require-user.js"
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import type { Profile } from "../../db/schema/index.js"
 import { getUserPatternWeightsFromBfas } from "../../engine/personality/patterns.js"
 
-export type GetPatternWeightsDeps = {
+export type GetPatternWeightsDeps = SessionDeps & {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
-  getSessionUserId: (req: Request) => Promise<string | null>
 }
 
 export function getPatternWeightsHandler({

@@ -4,12 +4,11 @@ import { z } from "zod"
 import type { Activity } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
-import { requireUser } from "../../auth/require-user.js"
+import { requireUser, type SessionDeps } from "../../auth/require-user.js"
 import type { LoadActivities } from "../../catalog/source.js"
 
-export type GetActivityDeps = {
+export type GetActivityDeps = SessionDeps & {
   getActivityBySlug: (slug: string) => Promise<Activity | null>
-  getSessionUserId: (req: Request) => Promise<string | null>
 }
 
 const slugSchema = z
