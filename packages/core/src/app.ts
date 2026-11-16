@@ -6,9 +6,9 @@ import express, {
   type RequestHandler,
   type Response,
 } from "express"
-import rateLimit from "express-rate-limit"
 
 import { mountAuth } from "./auth/routes.js"
+import { authLimiter, profileLimiter, readLimiter } from "./rate-limit.js"
 import {
   type GetActivityDeps,
   type SearchActivitiesDeps,
@@ -44,20 +44,6 @@ export type AppDeps = AuthDeps &
 export type AppOptions = {
   disableRateLimits?: boolean
 }
-
-function createLimiter(windowMs: number, limit: number) {
-  return rateLimit({
-    windowMs,
-    limit,
-    standardHeaders: "draft-7",
-    legacyHeaders: false,
-    message: { error: "Too many requests" },
-  })
-}
-
-const authLimiter = createLimiter(15 * 60 * 1000, 20)
-const profileLimiter = createLimiter(60 * 60 * 1000, 10)
-const readLimiter = createLimiter(60 * 1000, 120)
 
 export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
   const app = express()
