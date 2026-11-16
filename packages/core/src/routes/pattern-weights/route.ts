@@ -3,8 +3,7 @@ import type { Request, Response } from "express"
 import { requireUser } from "../../auth/require-user.js"
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import type { Profile } from "../../db/schema.js"
-import { getOCEANScores } from "../../engine/personality/ocean.js"
-import { getUserPatternWeights } from "../../engine/personality/patterns.js"
+import { getUserPatternWeightsFromBfas } from "../../engine/personality/patterns.js"
 
 export type GetPatternWeightsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
@@ -22,9 +21,7 @@ export function getPatternWeightsHandler({
       return
     }
 
-    const patternWeights = getUserPatternWeights(
-      getOCEANScores(profile.personality),
-    )
+    const patternWeights = getUserPatternWeightsFromBfas(profile.personality)
     const body: PatternWeightsResponse = { patternWeights }
     res.status(200).json(body)
   })

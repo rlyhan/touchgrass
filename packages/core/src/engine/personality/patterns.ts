@@ -1,5 +1,6 @@
-import { OCEANScores, PatternType, PatternTypeId } from '@touchgrass/types'
+import { BFASScores, OCEANScores, PatternType, PatternTypeId } from '@touchgrass/types'
 import { PATTERN_TYPES } from '@touchgrass/types/constants'
+import { getOCEANScores } from './ocean.js'
 
 /*
  * Calculates how well a user's OCEAN scores match a specific NEO pattern.
@@ -26,6 +27,10 @@ export const getUserPatternWeights = (userOcean: OCEANScores): Record<PatternTyp
     })
     return weights
 }
+
+/* Calculates pattern weights for all 40 NEO patterns straight from a user's BFAS scores (BFAS → OCEAN → pattern weights). */
+export const getUserPatternWeightsFromBfas = (userBfas: BFASScores): Record<PatternType['id'], number> =>
+    getUserPatternWeights(getOCEANScores(userBfas))
 
 /*
  * Averages a user's pattern weights across a set of activity patterns.

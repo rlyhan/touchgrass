@@ -9,8 +9,7 @@ import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants
 import { requireUser } from "../../auth/require-user.js"
 import type { Profile } from "../../db/schema.js"
 import { getRecommendations } from "../../engine/get-recommendations.js"
-import { getOCEANScores } from "../../engine/personality/ocean.js"
-import { getUserPatternWeights } from "../../engine/personality/patterns.js"
+import { getUserPatternWeightsFromBfas } from "../../engine/personality/patterns.js"
 import type { LoadActivities } from "../../catalog/source.js"
 
 export type GetRecommendationsDeps = {
@@ -37,7 +36,7 @@ export function getRecommendationsHandler({
     const interests = profile.interests.filter((i): i is ActivityField =>
       (ACTIVITY_FIELDS as readonly string[]).includes(i),
     )
-    const patternWeights = getUserPatternWeights(getOCEANScores(personality))
+    const patternWeights = getUserPatternWeightsFromBfas(personality)
     const { recommendations: scored, matchLabels } = getRecommendations(
       personality,
       motivations,

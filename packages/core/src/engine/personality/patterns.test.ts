@@ -1,9 +1,16 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
-import type { OCEANScores, PatternType, PatternTypeId } from "@touchgrass/types"
+import type { BFASScores, OCEANScores, PatternType, PatternTypeId } from "@touchgrass/types"
+import { BFAS_TRAITS, PATTERN_TYPES } from "@touchgrass/types/constants"
 
-import { calculateActivityPatternAffinity, calculatePatternStrength } from "./patterns.js"
+import { getOCEANScores } from "./ocean.js"
+import {
+  calculateActivityPatternAffinity,
+  calculatePatternStrength,
+  getUserPatternWeights,
+  getUserPatternWeightsFromBfas,
+} from "./patterns.js"
 
 const userOcean: OCEANScores = {
   Openness: 80,
@@ -89,4 +96,18 @@ test("calculateActivityPatternAffinity treats missing pattern ids as 0", () => {
     "2-HH",
   ])
   assert.ok(Math.abs(affinity - 1 / 3) < 1e-9)
+})
+
+test("getUserPatternWeightsFromBfas gives every pattern a weight of 0.5 to a user who scores 50 on every aspect", () => {
+  const neutral = Object.fromEntries(BFAS_TRAITS.map((trait) => [trait.key, 50])) as BFASScores
+  const weights = getUserPatternWeightsFromBfas(neutral)
+
+  assert.equal(Object.keys(weights).length, PATTERN_TYPES.length)
+  for (const weight of Object.values(weights)) assert.equal(weight, 0.5)
+})
+
+test("getUserPatternWeightsFromBfas matches converting BFAS to OCEAN and then to pattern weights", () => {
+  const bfas = Object.fromEntries(BFAS_TRAITS.map((trait, i) => [trait.key, (i * 11) % 100])) as BFASScores
+
+  assert.deepEqual(getUserPatternWeightsFromBfas(bfas), getUserPatternWeights(getOCEANScores(bfas)))
 })

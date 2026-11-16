@@ -1,8 +1,7 @@
 import { Activity, ActivityField, BFASScores, MatchLabel, Motivation, ScoredRecommendation } from "@touchgrass/types";
 import { diversifyAndOrder } from "./diversify.js";
 import { getMatchLabels } from "./match-labels.js";
-import { getOCEANScores } from "./personality/ocean.js";
-import { getUserPatternWeights } from "./personality/patterns.js";
+import { getUserPatternWeightsFromBfas } from "./personality/patterns.js";
 import { scoreRecommendation } from "./score.js";
 import { getSlugSet } from "./utils.js";
 
@@ -21,8 +20,7 @@ export function getRecommendations(
     activities: Activity[],
 ): { recommendations: ScoredRecommendation[]; matchLabels: Record<string, MatchLabel> } {
     // Get the user's alignment to each NEO pattern from their BFAS scores.
-    const bfasToOCEAN = getOCEANScores(userTraits)
-    const userPatternWeights = getUserPatternWeights(bfasToOCEAN)
+    const userPatternWeights = getUserPatternWeightsFromBfas(userTraits)
 
     // Score every activity (personality + motivation), then take the top MAX_RECOMMENDATIONS for the recommendations screen.
     const scoredRecommendations = activities.map((rec) => scoreRecommendation(userPatternWeights, rec, motivations))
