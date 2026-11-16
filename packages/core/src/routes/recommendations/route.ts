@@ -7,15 +7,15 @@ import type {
 } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 import { requireUser, type SessionDeps } from "../../auth/require-user.js"
-import type { Profile } from "../../db/schema/index.js"
+import type { ProfileLookupDeps } from "../../db/queries.js"
 import { getRecommendations } from "../../engine/get-recommendations.js"
 import { getUserPatternWeightsFromBfas } from "../../engine/personality/patterns.js"
 import type { LoadActivities } from "../../catalog/source.js"
 
-export type GetRecommendationsDeps = SessionDeps & {
-  getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
-  loadActivities: LoadActivities
-}
+export type GetRecommendationsDeps = SessionDeps &
+  ProfileLookupDeps & {
+    loadActivities: LoadActivities
+  }
 
 export function getRecommendationsHandler({
   getProfileByAuthUserId,

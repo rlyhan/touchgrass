@@ -4,6 +4,10 @@ import { bfasScoresSchema } from "./validation.js"
 import { db } from "./client.js"
 import { type NewProfile, type Profile, profiles } from "./schema/index.js"
 
+export type ProfileLookupDeps = {
+  getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
+}
+
 // jsonb columns are typed via Drizzle's .$type<T>() at compile time only, so
 // every read and write goes through Zod here to guarantee the row matches the
 // shape downstream code expects.

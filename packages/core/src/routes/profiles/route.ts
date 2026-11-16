@@ -1,13 +1,14 @@
 import type { Request, Response } from "express"
 
 import { requireUser, type SessionDeps } from "../../auth/require-user.js"
+import type { ProfileLookupDeps } from "../../db/queries.js"
 import type { NewProfile, Profile } from "../../db/schema/index.js"
 import { onboardingFormSchema } from "./schema.js"
 
-export type CreateProfileDeps = SessionDeps & {
-  insertProfile: (newProfile: NewProfile) => Promise<Profile>
-  getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
-}
+export type CreateProfileDeps = SessionDeps &
+  ProfileLookupDeps & {
+    insertProfile: (newProfile: NewProfile) => Promise<Profile>
+  }
 
 export function createProfileHandler({
   insertProfile,
