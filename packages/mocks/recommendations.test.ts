@@ -1,8 +1,9 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
-import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_PATTERNS } from "@touchgrass/types/constants"
+
+import { RECOMMENDATIONS } from "./recommendations.js"
 
 // The recommendation algorithm looks up each activity's primary `type` and every
 // `related_types` entry in ACTIVITY_TYPE_PATTERNS, falling back to [] on a miss
