@@ -1,5 +1,5 @@
 import type { Activity, MatchLabel, Motivation, PatternTypeId } from "@touchgrass/types"
-import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
+import { getDominantPatternId } from "./personality/dominant-pattern.js"
 import { getSharedActivityTypesBetweenActivityAndUserMotivations } from "./motivation/shared-activity-types.js"
 import { getHighBaseScoreActivities } from "./personality/high-base-score.js"
 import { isStrongPersonality } from "./personality/strong-personality.js"

@@ -75,7 +75,7 @@ Neither is enough alone. The base score check is relative, so a user with middli
 
 ### Also built on personality
 
-- **Dominant pattern** — `getDominantPatternId` (in `@touchgrass/types/dominant-pattern`) picks the user's highest-weighted pattern among an activity's primary + related patterns. It's the high-scoring pattern check in step 4, and becomes a label's `patternId` ("You scored highly as …" on the activity page). It returns `null` below `MIN_DOMINANT_WEIGHT = 0.6` so the copy never overclaims.
+- **Dominant pattern** — `getDominantPatternId` (in `personality/dominant-pattern.ts`) picks the user's highest-weighted pattern among an activity's primary + related patterns. It's the high-scoring pattern check in step 4, and becomes a label's `patternId` ("You scored highly as …" on the activity page). It returns `null` below `MIN_DOMINANT_WEIGHT = 0.6` so the copy never overclaims.
 - **Top activity types** — `getTopActivityTypes` (`top-activity-types.ts`) ranks all activity types by primary affinity alone and returns the top N (default 6). Not currently used by the app.
 
 ---

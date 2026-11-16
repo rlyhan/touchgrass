@@ -10,7 +10,7 @@ import { getSharedActivityTypesBetweenActivityAndUserMotivations } from "./motiv
 import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
 import { getHighBaseScoreActivities } from "./personality/high-base-score.js"
-import { getDominantPatternId } from "@touchgrass/types/dominant-pattern"
+import { getDominantPatternId } from "./personality/dominant-pattern.js"
 
 const mockUserBfas: BFASScores = {
   Openness: 97,
