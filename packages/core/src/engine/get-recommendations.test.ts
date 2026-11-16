@@ -2,34 +2,22 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
+import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 import type { ActivityField, BFASScores } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import { getRecommendations } from "./get-recommendations.js"
 
-const mockUserBfas: BFASScores = {
-  Openness: 97,
-  Intellect: 61,
-  Industriousness: 63,
-  Orderliness: 60,
-  Enthusiasm: 16,
-  Assertiveness: 19,
-  Compassion: 91,
-  Politeness: 83,
-  Volatility: 68,
-  Withdrawal: 63,
-}
-
 const creativeMotivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
 
 test("getRecommendations returns up to 10 recommendations", () => {
-  const scored = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS).recommendations
+  const scored = getRecommendations(MOCK_USER_BFAS, [], [], RECOMMENDATIONS).recommendations
   assert.ok(scored.length <= 10)
   assert.ok(scored.length > 0)
 })
 
 test("getRecommendations only returns items from the available recommendation pool", () => {
-  const scored = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS).recommendations
+  const scored = getRecommendations(MOCK_USER_BFAS, [], [], RECOMMENDATIONS).recommendations
   const slugs = new Set(RECOMMENDATIONS.map((r) => r.slug))
   for (const { rec } of scored) {
     assert.ok(slugs.has(rec.slug), `unknown recommendation slug: ${rec.slug}`)
@@ -40,8 +28,8 @@ test("getRecommendations interest boost can surface recs beyond the score-only t
   // Adding an interest should never reduce the number of interest-matching recs in the output.
   const interests: ActivityField[] = ["Music"]
   const interestSet = new Set<ActivityField>(interests)
-  const without = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS).recommendations
-  const withBoost = getRecommendations(mockUserBfas, [], interests, RECOMMENDATIONS).recommendations
+  const without = getRecommendations(MOCK_USER_BFAS, [], [], RECOMMENDATIONS).recommendations
+  const withBoost = getRecommendations(MOCK_USER_BFAS, [], interests, RECOMMENDATIONS).recommendations
 
   const matchCountWithout = without.filter(({ rec }) => interestSet.has(rec.field)).length
   const matchCountWith = withBoost.filter(({ rec }) => interestSet.has(rec.field)).length
@@ -53,13 +41,13 @@ test("getRecommendations interest boost can surface recs beyond the score-only t
 })
 
 test("getRecommendations output has no duplicate activity types", () => {
-  const results = getRecommendations(mockUserBfas, [], [], RECOMMENDATIONS).recommendations
+  const results = getRecommendations(MOCK_USER_BFAS, [], [], RECOMMENDATIONS).recommendations
   const types = results.map(({ rec }) => rec.type)
   assert.equal(new Set(types).size, types.length, `duplicate types: [${types.join(", ")}]`)
 })
 
 test("getRecommendations with Art interest includes at least one Art-field rec", () => {
-  const results = getRecommendations(mockUserBfas, [], ["Art"], RECOMMENDATIONS).recommendations
+  const results = getRecommendations(MOCK_USER_BFAS, [], ["Art"], RECOMMENDATIONS).recommendations
   const artCount = results.filter(({ rec }) => rec.field === "Art").length
   assert.ok(artCount >= 1, `expected >= 1 Art-field rec, got ${artCount}`)
 })
@@ -88,7 +76,7 @@ test("getRecommendations: high-Openness/Extraversion user with explore_creative 
 test("getRecommendations: Art interest + explore_creative motivation surfaces Art-field creative-type recs", () => {
   // Art interest promotes Art-field recs; motivation boosts Creative/Artistic types.
   // Together they should surface at least one rec that satisfies both (e.g. rec_061, rec_064).
-  const results = getRecommendations(mockUserBfas, [creativeMotivation], ["Art"], RECOMMENDATIONS).recommendations
+  const results = getRecommendations(MOCK_USER_BFAS, [creativeMotivation], ["Art"], RECOMMENDATIONS).recommendations
   const creativeTypes = new Set(creativeMotivation.associated_activity_types)
   const artCreativeCount = results.filter(
     ({ rec }) => rec.field === "Art" && creativeTypes.has(rec.type),

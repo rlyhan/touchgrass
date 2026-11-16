@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./recommendations": "./recommendations.ts"
+    "./recommendations": "./recommendations.ts",
+    "./user": "./user.ts"
   }
 }

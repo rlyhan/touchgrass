@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
+import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 import type { Activity, ActivityType, BFASScores, Motivation, SharedActivityTypesByMotivation } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
@@ -10,19 +11,6 @@ import { getOCEANScores } from "./personality/ocean.js"
 import { getUserPatternWeights } from "./personality/patterns.js"
 import { getHighBaseScoreActivities } from "./personality/high-base-score.js"
 import { getDominantPatternId } from "./personality/dominant-pattern.js"
-
-const mockUserBfas: BFASScores = {
-  Openness: 97,
-  Intellect: 61,
-  Industriousness: 63,
-  Orderliness: 60,
-  Enthusiasm: 16,
-  Assertiveness: 19,
-  Compassion: 91,
-  Politeness: 83,
-  Volatility: 68,
-  Withdrawal: 63,
-}
 
 const creativeAdventureAndPeople = MOTIVATION_OPTIONS.filter((m) =>
   ["explore_creative", "seek_adventure", "connect_with_people"].includes(m.value),
@@ -47,14 +35,14 @@ function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
 }
 
 test("getRecommendations labels the recommendations screen's activities recommended", () => {
-  const { recommendations, matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const { recommendations, matchLabels } = getRecommendations(MOCK_USER_BFAS, creativeAdventureAndPeople, [], RECOMMENDATIONS)
 
   assert.ok(recommendations.length > 0)
   for (const { rec } of recommendations) assert.equal(matchLabels[rec.slug]?.kind, "recommended", rec.slug)
 })
 
 test("getRecommendations marks the recommendations screen's activity-type picks as picked for variety, one per type", () => {
-  const { matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, ["Art", "Music"], RECOMMENDATIONS)
+  const { matchLabels } = getRecommendations(MOCK_USER_BFAS, creativeAdventureAndPeople, ["Art", "Music"], RECOMMENDATIONS)
   const varietyPicks = RECOMMENDATIONS.filter((rec) => matchLabels[rec.slug]?.pickedForVariety)
 
   assert.ok(varietyPicks.length > 0)
@@ -63,8 +51,8 @@ test("getRecommendations marks the recommendations screen's activity-type picks 
 })
 
 test("getRecommendations labels every other strong personality match personality and leaves the rest unlabelled", () => {
-  const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
-  const { recommendations, matchLabels } = getRecommendations(mockUserBfas, creativeAdventureAndPeople, [], RECOMMENDATIONS)
+  const strongPersonalitySlugs = strongPersonalitySlugsFor(MOCK_USER_BFAS)
+  const { recommendations, matchLabels } = getRecommendations(MOCK_USER_BFAS, creativeAdventureAndPeople, [], RECOMMENDATIONS)
   const recommendedSlugSet = new Set(recommendations.map(({ rec }) => rec.slug))
 
   assert.ok(Object.values(matchLabels).some((label) => label.kind === "personality"))
@@ -76,9 +64,9 @@ test("getRecommendations labels every other strong personality match personality
 })
 
 test("getRecommendations gives a labelled activity a pattern only when it's over one SD above the mean base score with a high-scoring pattern", () => {
-  const strongPersonalitySlugs = strongPersonalitySlugsFor(mockUserBfas)
+  const strongPersonalitySlugs = strongPersonalitySlugsFor(MOCK_USER_BFAS)
 
-  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+  const { matchLabels } = getRecommendations(MOCK_USER_BFAS, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
   const withPatternSlugs = Object.entries(matchLabels).filter(([, label]) => label.patternId).map(([slug]) => slug)
   const expected = Object.keys(matchLabels).filter((slug) => strongPersonalitySlugs.includes(slug))
 
@@ -87,8 +75,8 @@ test("getRecommendations gives a labelled activity a pattern only when it's over
 })
 
 test("getRecommendations names the user's best pattern as each label's personality reason", () => {
-  const weights = getUserPatternWeights(getOCEANScores(mockUserBfas))
-  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+  const weights = getUserPatternWeights(getOCEANScores(MOCK_USER_BFAS))
+  const { matchLabels } = getRecommendations(MOCK_USER_BFAS, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
 
   for (const rec of RECOMMENDATIONS) {
     const patternId = matchLabels[rec.slug]?.patternId
@@ -97,7 +85,7 @@ test("getRecommendations names the user's best pattern as each label's personali
 })
 
 test("getRecommendations lists each overlapping motivation by value with only the activity types it shares", () => {
-  const { matchLabels } = getRecommendations(mockUserBfas, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
+  const { matchLabels } = getRecommendations(MOCK_USER_BFAS, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
 
   for (const rec of RECOMMENDATIONS) {
     const label = matchLabels[rec.slug]
@@ -137,7 +125,7 @@ test("getRecommendations gives no personality reason to a user with middling sco
 })
 
 test("getRecommendations gives no personality reason to a user who scores 50 on every aspect", () => {
-  const neutralUser = Object.fromEntries(Object.keys(mockUserBfas).map((aspect) => [aspect, 50])) as BFASScores
+  const neutralUser = Object.fromEntries(Object.keys(MOCK_USER_BFAS).map((aspect) => [aspect, 50])) as BFASScores
 
   const { matchLabels } = getRecommendations(neutralUser, creativeAdventureAndPeople, [], RECOMMENDATIONS)
   assert.ok(Object.values(matchLabels).every((label) => label.patternId === undefined))

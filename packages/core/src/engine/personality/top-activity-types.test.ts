@@ -1,36 +1,24 @@
 import { strict as assert } from "node:assert"
 import { test } from "node:test"
 
+import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 import type { BFASScores } from "@touchgrass/types"
 import { ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
 import { getTopActivityTypes } from "./top-activity-types.js"
 
-const mockUserBfas: BFASScores = {
-  Openness: 97,
-  Intellect: 61,
-  Industriousness: 63,
-  Orderliness: 60,
-  Enthusiasm: 16,
-  Assertiveness: 19,
-  Compassion: 91,
-  Politeness: 83,
-  Volatility: 68,
-  Withdrawal: 63,
-}
-
 test("getTopActivityTypes returns 6 activity types by default", () => {
-  const top = getTopActivityTypes(mockUserBfas)
+  const top = getTopActivityTypes(MOCK_USER_BFAS)
   assert.equal(top.length, 6)
 })
 
 test("getTopActivityTypes honours a custom count", () => {
-  const top = getTopActivityTypes(mockUserBfas, 3)
+  const top = getTopActivityTypes(MOCK_USER_BFAS, 3)
   assert.equal(top.length, 3)
 })
 
 test("getTopActivityTypes returns results sorted by descending score", () => {
-  const top = getTopActivityTypes(mockUserBfas)
+  const top = getTopActivityTypes(MOCK_USER_BFAS)
   for (let i = 1; i < top.length; i++) {
     const prev = top[i - 1]
     const curr = top[i]
@@ -42,7 +30,7 @@ test("getTopActivityTypes returns results sorted by descending score", () => {
 })
 
 test("getTopActivityTypes returns distinct activity types from the known pool", () => {
-  const top = getTopActivityTypes(mockUserBfas)
+  const top = getTopActivityTypes(MOCK_USER_BFAS)
   const knownTypes = new Set<string>(ACTIVITY_TYPES)
   const seen = new Set<string>()
   for (const { type } of top) {
