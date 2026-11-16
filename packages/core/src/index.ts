@@ -3,7 +3,7 @@ import { toNodeHandler } from "better-auth/node"
 import { createApp } from "./app.js"
 import { auth, corsOrigins } from "./auth/auth.js"
 import { getSessionUserId } from "./auth/session.js"
-import { getProfileByAuthUserId, insertProfile } from "./db/profile-queries.js"
+import { getProfileByAuthUserId, insertProfile } from "./db/queries.js"
 import {
   createFetchActivitiesFromSanity,
   createSanityClient,

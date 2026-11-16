@@ -188,7 +188,7 @@ test("GET /recommendations returns 500 when the lookup fails", async () => {
 })
 
 test("GET /recommendations returns 500 when the DB layer rejects malformed personality", async () => {
-  // The real db/profile-queries layer parses jsonb personality with Zod and throws on
+  // The real db/queries layer parses jsonb personality with Zod and throws on
   // malformed rows, so a corrupted jsonb value surfaces as a thrown error here.
   getProfileByAuthUserId.mock.mockImplementation(async () => {
     throw new Error("Invalid personality")
