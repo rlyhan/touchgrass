@@ -11,9 +11,9 @@ import {
 
 import type { BFASScores } from "@touchgrass/types"
 
-import { user } from "./auth-schema.js"
+import { user } from "./auth.js"
 
-export * from "./auth-schema.js"
+export * from "./auth.js"
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),

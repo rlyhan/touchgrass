@@ -9,7 +9,7 @@ import type { PatternWeightsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
 
 import { createApp } from "../../app.js"
-import type { Profile } from "../../db/schema.js"
+import type { Profile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
 

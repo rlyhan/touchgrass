@@ -14,7 +14,7 @@ import { PATTERN_TYPES } from "@touchgrass/types/constants"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
 import { createApp } from "../../app.js"
-import type { NewProfile, Profile } from "../../db/schema.js"
+import type { NewProfile, Profile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
 

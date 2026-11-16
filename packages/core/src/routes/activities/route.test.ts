@@ -8,7 +8,7 @@ import type { Request } from "express"
 import type { Activity } from "@touchgrass/types"
 
 import { createApp } from "../../app.js"
-import type { NewProfile, Profile } from "../../db/schema.js"
+import type { NewProfile, Profile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
 

@@ -9,7 +9,7 @@ import { toNodeHandler } from "better-auth/node"
 
 import { createApp } from "./app.js"
 import { auth, corsOrigins } from "./auth/auth.js"
-import type { NewProfile, Profile } from "./db/schema.js"
+import type { NewProfile, Profile } from "./db/schema/index.js"
 
 const fakeProfile: Profile = {
   id: "00000000-0000-0000-0000-000000000001",
