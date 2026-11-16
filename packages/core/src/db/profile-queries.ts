@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 
-import { bfasScoresSchema } from "../routes/profiles/schema.js"
+import { bfasScoresSchema } from "./validation.js"
 import { db } from "./client.js"
 import { type NewProfile, type Profile, profiles } from "./schema.js"
 
