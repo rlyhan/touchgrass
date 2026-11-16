@@ -11,7 +11,7 @@ import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendations/get-recommendations.js"
 import { getOCEANScores } from "../lib/recommendations/personality/ocean.js"
 import { getUserPatternWeights } from "../lib/recommendations/personality/patterns.js"
-import type { LoadActivities } from "./source.js"
+import type { LoadActivities } from "../catalog/source.js"
 
 export type GetRecommendationsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>

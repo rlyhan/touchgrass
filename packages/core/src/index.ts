@@ -8,8 +8,8 @@ import {
   createFetchActivitiesFromSanity,
   createSanityClient,
   readSanityConfigFromEnv,
-} from "./recommendations/sanity-source.js"
-import { createActivityLoader } from "./recommendations/source.js"
+} from "./catalog/sanity-source.js"
+import { createActivityLoader } from "./catalog/source.js"
 
 const sanityClient = createSanityClient(readSanityConfigFromEnv())
 const fetchActivitiesFromSanity = createFetchActivitiesFromSanity(sanityClient)
