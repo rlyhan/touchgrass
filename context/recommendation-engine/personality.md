@@ -2,7 +2,7 @@
 
 Personality produces each activity's **base score**: how well the activity's types fit the user's personality. It is the only factor that applies to every activity, and the starting point the motivation boost is added to (see [`recommendation-engine.md`](../recommendation-engine.md)).
 
-Code: [`packages/core/src/lib/recommendations/personality/`](../../packages/core/src/lib/recommendations/personality/), with a `.test.ts` next to each file.
+Code: [`packages/core/src/engine/personality/`](../../packages/core/src/engine/personality/), with a `.test.ts` next to each file.
 
 - **Affects:** every activity's base score, `getTopActivityTypes`, the `personality` match label and the personality reason (`patternId`) on any label.
 - **Never affected by:** motivations or interests.

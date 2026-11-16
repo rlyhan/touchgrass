@@ -42,7 +42,7 @@ Each factor has its own doc covering what it affects, what it never affects, and
 
 ## Algorithm Flow
 
-Everything lives in [`packages/core/src/lib/recommendations/`](../packages/core/src/lib/recommendations/):
+Everything lives in [`packages/core/src/engine/`](../packages/core/src/engine/):
 
 | Path | Role |
 |---|---|
