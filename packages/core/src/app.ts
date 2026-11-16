@@ -15,19 +15,19 @@ import {
   getActivityHandler,
   randomActivitiesHandler,
   searchActivitiesHandler,
-} from "./activities/route.js"
+} from "./routes/activities/route.js"
 import {
   type CreateProfileDeps,
   createProfileHandler,
-} from "./profiles/route.js"
+} from "./routes/profiles/route.js"
 import {
   type GetRecommendationsDeps,
   getRecommendationsHandler,
-} from "./recommendations/route.js"
+} from "./routes/recommendations/route.js"
 import {
   type GetPatternWeightsDeps,
   getPatternWeightsHandler,
-} from "./pattern-weights/route.js"
+} from "./routes/pattern-weights/route.js"
 
 export type AuthDeps = {
   authHandler: RequestHandler

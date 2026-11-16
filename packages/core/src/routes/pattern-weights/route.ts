@@ -1,10 +1,10 @@
 import type { Request, Response } from "express"
 
-import { requireUser } from "../auth/require-user.js"
+import { requireUser } from "../../auth/require-user.js"
 import type { PatternWeightsResponse } from "@touchgrass/types"
-import type { Profile } from "../db/schema.js"
-import { getOCEANScores } from "../engine/personality/ocean.js"
-import { getUserPatternWeights } from "../engine/personality/patterns.js"
+import type { Profile } from "../../db/schema.js"
+import { getOCEANScores } from "../../engine/personality/ocean.js"
+import { getUserPatternWeights } from "../../engine/personality/patterns.js"
 
 export type GetPatternWeightsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>

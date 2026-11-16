@@ -6,12 +6,12 @@ import type {
   RecommendationsResponse,
 } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
-import { requireUser } from "../auth/require-user.js"
-import type { Profile } from "../db/schema.js"
-import { getRecommendations } from "../engine/get-recommendations.js"
-import { getOCEANScores } from "../engine/personality/ocean.js"
-import { getUserPatternWeights } from "../engine/personality/patterns.js"
-import type { LoadActivities } from "../catalog/source.js"
+import { requireUser } from "../../auth/require-user.js"
+import type { Profile } from "../../db/schema.js"
+import { getRecommendations } from "../../engine/get-recommendations.js"
+import { getOCEANScores } from "../../engine/personality/ocean.js"
+import { getUserPatternWeights } from "../../engine/personality/patterns.js"
+import type { LoadActivities } from "../../catalog/source.js"
 
 export type GetRecommendationsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>

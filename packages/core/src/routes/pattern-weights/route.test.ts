@@ -8,8 +8,8 @@ import type { Request } from "express"
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
 
-import { createApp } from "../app.js"
-import type { Profile } from "../db/schema.js"
+import { createApp } from "../../app.js"
+import type { Profile } from "../../db/schema.js"
 
 const AUTH_USER_ID = "auth_user_abc"
 

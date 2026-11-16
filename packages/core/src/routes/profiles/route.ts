@@ -1,7 +1,7 @@
 import type { Request, Response } from "express"
 
-import { requireUser } from "../auth/require-user.js"
-import type { NewProfile, Profile } from "../db/schema.js"
+import { requireUser } from "../../auth/require-user.js"
+import type { NewProfile, Profile } from "../../db/schema.js"
 import { onboardingFormSchema } from "./schema.js"
 
 export type CreateProfileDeps = {

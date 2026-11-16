@@ -4,8 +4,8 @@ import { z } from "zod"
 import type { Activity } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
-import { requireUser } from "../auth/require-user.js"
-import type { LoadActivities } from "../catalog/source.js"
+import { requireUser } from "../../auth/require-user.js"
+import type { LoadActivities } from "../../catalog/source.js"
 
 export type GetActivityDeps = {
   getActivityBySlug: (slug: string) => Promise<Activity | null>
