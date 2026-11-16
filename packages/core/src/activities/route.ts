@@ -5,7 +5,7 @@ import type { Activity } from "@touchgrass/types"
 import { ACTIVITY_FIELDS, ACTIVITY_TYPES } from "@touchgrass/types/constants"
 
 import { requireUser } from "../auth/require-user.js"
-import type { LoadRecommendations } from "../recommendations/source.js"
+import type { LoadActivities } from "../recommendations/source.js"
 
 export type GetActivityDeps = {
   getActivityBySlug: (slug: string) => Promise<Activity | null>
@@ -44,7 +44,7 @@ export function getActivityHandler({
 }
 
 export type SearchActivitiesDeps = {
-  loadRecommendations: LoadRecommendations
+  loadActivities: LoadActivities
 }
 
 function commaSeparated<T extends string>(values: readonly T[]) {
@@ -63,7 +63,7 @@ const searchQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
 })
 
-export function searchActivitiesHandler({ loadRecommendations }: SearchActivitiesDeps) {
+export function searchActivitiesHandler({ loadActivities }: SearchActivitiesDeps) {
   return async function handler(req: Request, res: Response): Promise<void> {
     const parsedQuery = searchQuerySchema.safeParse(req.query)
     if (!parsedQuery.success) {
@@ -78,7 +78,7 @@ export function searchActivitiesHandler({ loadRecommendations }: SearchActivitie
 
     const { q, type, field, offset, limit } = parsedQuery.data
     const query = q.toLowerCase()
-    const matches = (await loadRecommendations()).filter(
+    const matches = (await loadActivities()).filter(
       (activity) =>
         (!type?.length ||
           type.includes(activity.type) ||
@@ -100,9 +100,9 @@ const randomQuerySchema = z.object({
 })
 
 export function randomActivitiesHandler({
-  loadRecommendations,
+  loadActivities,
 }: {
-  loadRecommendations: LoadRecommendations
+  loadActivities: LoadActivities
 }) {
   return async function handler(req: Request, res: Response): Promise<void> {
     const parsedQuery = randomQuerySchema.safeParse(req.query)
@@ -116,7 +116,7 @@ export function randomActivitiesHandler({
       return
     }
 
-    const pool = [...(await loadRecommendations())]
+    const pool = [...(await loadActivities())]
     const activities: Activity[] = []
     while (activities.length < parsedQuery.data.count && pool.length > 0) {
       activities.push(...pool.splice(Math.floor(Math.random() * pool.length), 1))

@@ -54,7 +54,7 @@ const getProfileByAuthUserId = mock.fn<
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
-const loadRecommendations = mock.fn<() => Promise<Activity[]>>(
+const loadActivities = mock.fn<() => Promise<Activity[]>>(
   async () => RECOMMENDATIONS,
 )
 
@@ -71,7 +71,7 @@ before(() => {
       },
       corsOrigins: [],
       getSessionUserId,
-      loadRecommendations,
+      loadActivities,
       getActivityBySlug: async () => null,
     },
     { disableRateLimits: true },

@@ -43,7 +43,7 @@ const searchable: Activity[] = [
   },
   { ...activity, slug: "learn-guitar-chords", title: "Learn Guitar Chords", field: "Music" },
 ]
-const loadRecommendations = mock.fn<() => Promise<Activity[]>>(async () => searchable)
+const loadActivities = mock.fn<() => Promise<Activity[]>>(async () => searchable)
 
 let server: Server
 let baseUrl: string
@@ -58,7 +58,7 @@ before(() => {
       },
       corsOrigins: [],
       getSessionUserId,
-      loadRecommendations,
+      loadActivities,
       getActivityBySlug,
     },
     { disableRateLimits: true },
@@ -79,7 +79,7 @@ beforeEach(() => {
   getActivityBySlug.mock.mockImplementation(async (slug) =>
     slug === activity.slug ? activity : null,
   )
-  loadRecommendations.mock.resetCalls()
+  loadActivities.mock.resetCalls()
 })
 
 type SearchBody = { items: Activity[]; total: number }
@@ -147,14 +147,14 @@ test("GET /activities/search returns 400 for an unknown filter value", async () 
   const res = await fetch(`${baseUrl}/activities/search?field=Juggling`)
 
   assert.equal(res.status, 400)
-  assert.equal(loadRecommendations.mock.callCount(), 0)
+  assert.equal(loadActivities.mock.callCount(), 0)
 })
 
 test("GET /activities/search returns 400 when limit is out of range", async () => {
   const res = await fetch(`${baseUrl}/activities/search?q=a&limit=500`)
 
   assert.equal(res.status, 400)
-  assert.equal(loadRecommendations.mock.callCount(), 0)
+  assert.equal(loadActivities.mock.callCount(), 0)
 })
 
 test("GET /activities/search works without a session", async () => {
@@ -200,7 +200,7 @@ test("GET /activities/random returns 400 when count is out of range", async () =
   const res = await fetch(`${baseUrl}/activities/random?count=0`)
 
   assert.equal(res.status, 400)
-  assert.equal(loadRecommendations.mock.callCount(), 0)
+  assert.equal(loadActivities.mock.callCount(), 0)
 })
 
 test("GET /activities/random works without a session and is not routed to the slug lookup", async () => {

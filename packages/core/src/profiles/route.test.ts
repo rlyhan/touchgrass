@@ -73,7 +73,7 @@ before(() => {
       },
       corsOrigins: [],
       getSessionUserId,
-      loadRecommendations: async () => [],
+      loadActivities: async () => [],
       getActivityBySlug: async () => null,
     },
     { disableRateLimits: true },

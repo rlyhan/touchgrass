@@ -11,18 +11,18 @@ import type { Profile } from "../db/schema.js"
 import { getRecommendations } from "../lib/recommendations/get-recommendations.js"
 import { getOCEANScores } from "../lib/recommendations/personality/ocean.js"
 import { getUserPatternWeights } from "../lib/recommendations/personality/patterns.js"
-import type { LoadRecommendations } from "./source.js"
+import type { LoadActivities } from "./source.js"
 
 export type GetRecommendationsDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
   getSessionUserId: (req: Request) => Promise<string | null>
-  loadRecommendations: LoadRecommendations
+  loadActivities: LoadActivities
 }
 
 export function getRecommendationsHandler({
   getProfileByAuthUserId,
   getSessionUserId,
-  loadRecommendations,
+  loadActivities,
 }: GetRecommendationsDeps) {
   return requireUser(getSessionUserId, async (req: Request, res: Response, authUserId: string) => {
     const profile = await getProfileByAuthUserId(authUserId)
@@ -42,7 +42,7 @@ export function getRecommendationsHandler({
       personality,
       motivations,
       interests,
-      await loadRecommendations(),
+      await loadActivities(),
     )
     const recommendations = scored.map((s) => s.rec)
     const body: RecommendationsResponse = { recommendations, patternWeights, matchLabels, interests }

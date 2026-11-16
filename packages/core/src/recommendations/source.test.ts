@@ -3,10 +3,10 @@ import { test } from "node:test"
 
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
-import { createRecommendationLoader, type SanityActivity } from "./source.js"
+import { createActivityLoader, type SanityActivity } from "./source.js"
 
 test("returns all mocks when Sanity has no activities", async () => {
-  const load = createRecommendationLoader(async () => [])
+  const load = createActivityLoader(async () => [])
 
   const result = await load()
 
@@ -21,7 +21,7 @@ test("Sanity activities with a matching slug override the mock's fields", async 
     title: "Title From Sanity",
   }
 
-  const result = await createRecommendationLoader(async () => [override])()
+  const result = await createActivityLoader(async () => [override])()
 
   const matched = result.find((r) => r.slug === target.slug)
   assert.ok(matched)
@@ -38,7 +38,7 @@ test("null/undefined Sanity fields fall through to the mock value", async () => 
     imageUrl: null,
   } as unknown as SanityActivity
 
-  const result = await createRecommendationLoader(async () => [partial])()
+  const result = await createActivityLoader(async () => [partial])()
 
   const matched = result.find((r) => r.slug === target.slug)
   assert.ok(matched)
@@ -56,7 +56,7 @@ test("Sanity-only activities (no matching mock) pass through as-is", async () =>
     estimated_time: "1 hour",
   }
 
-  const result = await createRecommendationLoader(async () => [sanityOnly])()
+  const result = await createActivityLoader(async () => [sanityOnly])()
 
   assert.equal(result.length, RECOMMENDATIONS.length + 1)
   assert.equal(result[0]?.slug, "brand-new-sanity-activity")
@@ -74,7 +74,7 @@ test("instructions from Sanity are merged onto a matching mock", async () => {
     ],
   }
 
-  const result = await createRecommendationLoader(async () => [override])()
+  const result = await createActivityLoader(async () => [override])()
 
   const matched = result.find((r) => r.slug === target.slug)
   assert.ok(matched)
@@ -90,7 +90,7 @@ test("null instructions from Sanity fall through to the mock's value", async () 
     instructions: null,
   } as unknown as SanityActivity
 
-  const result = await createRecommendationLoader(async () => [partial])()
+  const result = await createActivityLoader(async () => [partial])()
 
   const matched = result.find((r) => r.slug === target.slug)
   assert.ok(matched)
@@ -113,7 +113,7 @@ test("Sanity-only activities with null optional fields are included (not dropped
     related_types: null,
   } as unknown as SanityActivity
 
-  const result = await createRecommendationLoader(async () => [sanityOnly])()
+  const result = await createActivityLoader(async () => [sanityOnly])()
 
   const matched = result.find((r) => r.slug === "shoot-a-60-second-short-film")
   assert.ok(matched, "Sanity-only activity with null optional fields should not be dropped")
@@ -130,7 +130,7 @@ test("Sanity-only activities missing required Activity fields are dropped", asyn
     title: "Incomplete",
   }
 
-  const result = await createRecommendationLoader(async () => [incomplete])()
+  const result = await createActivityLoader(async () => [incomplete])()
 
   assert.equal(result.length, RECOMMENDATIONS.length)
   assert.ok(!result.find((r) => r.slug === "incomplete-sanity-only"))
@@ -144,7 +144,7 @@ test("merged result has no duplicates by slug", async () => {
     title: "Override",
   }
 
-  const result = await createRecommendationLoader(async () => [override])()
+  const result = await createActivityLoader(async () => [override])()
 
   const slugs = result.map((r) => r.slug)
   assert.equal(new Set(slugs).size, slugs.length)

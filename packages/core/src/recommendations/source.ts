@@ -9,12 +9,12 @@ import { activitySchema } from "./schema.js"
 // through to the mock value" so partial Sanity docs don't break the UI.
 export type SanityActivity = Partial<Activity> & Pick<Activity, "title" | "slug">
 
-export type LoadRecommendations = () => Promise<Activity[]>
+export type LoadActivities = () => Promise<Activity[]>
 export type LoadSanityActivities = () => Promise<SanityActivity[]>
 
-export function createRecommendationLoader(
+export function createActivityLoader(
   fetchFromSanity: LoadSanityActivities,
-): LoadRecommendations {
+): LoadActivities {
   return async () => {
     const fromSanity = await fetchFromSanity()
     const sanityBySlug = new Map(fromSanity.map((s) => [s.slug, s]))

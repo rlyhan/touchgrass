@@ -59,7 +59,7 @@ before(() => {
       authHandler: toNodeHandler(auth),
       corsOrigins,
       getSessionUserId,
-      loadRecommendations: async () => [],
+      loadActivities: async () => [],
       getActivityBySlug: async () => null,
     },
     { disableRateLimits: true },
