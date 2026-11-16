@@ -19,7 +19,7 @@ import {
 import {
   type CreateProfileDeps,
   createProfileHandler,
-} from "./onboarding/route.js"
+} from "./profiles/route.js"
 import {
   type GetRecommendationsDeps,
   getRecommendationsHandler,
@@ -27,7 +27,7 @@ import {
 import {
   type GetPatternWeightsDeps,
   getPatternWeightsHandler,
-} from "./patterns/route.js"
+} from "./pattern-weights/route.js"
 
 export type AuthDeps = {
   authHandler: RequestHandler
