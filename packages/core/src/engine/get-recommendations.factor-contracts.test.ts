@@ -8,8 +8,7 @@ import { ACTIVITY_FIELDS, MOTIVATION_OPTIONS } from "@touchgrass/types/constants
 import { getRecommendations } from "./get-recommendations.js"
 import { calculateMotivationBoost } from "./motivation/boost.js"
 import { calculateRecommendationBaseScore } from "./personality/base-score.js"
-import { getOCEANScores } from "./personality/ocean.js"
-import { getUserPatternWeights } from "./personality/patterns.js"
+import { getUserPatternWeightsFromBfas } from "./personality/patterns.js"
 
 const creativeMotivation = MOTIVATION_OPTIONS.find((m) => m.value === "explore_creative")!
 
@@ -24,7 +23,7 @@ test("getRecommendations gives the same personality reasons whatever the user's 
 })
 
 test("getRecommendations gives the best personality fit with no motivation boost a personality match, off the recommendations screen", () => {
-  const weights = getUserPatternWeights(getOCEANScores(MOCK_USER_BFAS))
+  const weights = getUserPatternWeightsFromBfas(MOCK_USER_BFAS)
   const [strongestUnboostedFit] = RECOMMENDATIONS.filter(
     (rec) => calculateMotivationBoost(weights, rec, [creativeMotivation]) === 0,
   ).sort((a, b) => calculateRecommendationBaseScore(weights, b) - calculateRecommendationBaseScore(weights, a))

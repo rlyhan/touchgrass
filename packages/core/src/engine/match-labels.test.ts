@@ -7,8 +7,7 @@ import type { Activity, ActivityType, BFASScores, Motivation, SharedActivityType
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 import { getRecommendations } from "./get-recommendations.js"
-import { getOCEANScores } from "./personality/ocean.js"
-import { getUserPatternWeights } from "./personality/patterns.js"
+import { getUserPatternWeightsFromBfas } from "./personality/patterns.js"
 import { getHighBaseScoreActivities } from "./personality/high-base-score.js"
 import { getDominantPatternId } from "./personality/dominant-pattern.js"
 
@@ -28,7 +27,7 @@ function motivationLabelsOf(sharedActivityTypesByMotivation: SharedActivityTypes
 }
 
 function strongPersonalitySlugsFor(bfas: BFASScores): string[] {
-  const weights = getUserPatternWeights(getOCEANScores(bfas))
+  const weights = getUserPatternWeightsFromBfas(bfas)
   return getHighBaseScoreActivities(weights, RECOMMENDATIONS)
     .filter((rec) => getDominantPatternId(weights, rec) !== null)
     .map((rec) => rec.slug)
@@ -75,7 +74,7 @@ test("getRecommendations gives a labelled activity a pattern only when it's over
 })
 
 test("getRecommendations names the user's best pattern as each label's personality reason", () => {
-  const weights = getUserPatternWeights(getOCEANScores(MOCK_USER_BFAS))
+  const weights = getUserPatternWeightsFromBfas(MOCK_USER_BFAS)
   const { matchLabels } = getRecommendations(MOCK_USER_BFAS, [...MOTIVATION_OPTIONS], [], RECOMMENDATIONS)
 
   for (const rec of RECOMMENDATIONS) {
@@ -114,7 +113,7 @@ test("getRecommendations gives no personality reason to a user with middling sco
     Volatility: 52,
     Withdrawal: 48,
   }
-  const weights = getUserPatternWeights(getOCEANScores(middlingUser))
+  const weights = getUserPatternWeightsFromBfas(middlingUser)
 
   assert.ok(Object.values(weights).every((weight) => weight < 0.6))
   assert.ok(getHighBaseScoreActivities(weights, RECOMMENDATIONS).length > 0)

@@ -4,8 +4,7 @@ import { test } from "node:test"
 import type { Activity, BFASScores, PatternTypeId } from "@touchgrass/types"
 
 import { calculateRecommendationBaseScore } from "./base-score.js"
-import { getOCEANScores } from "./ocean.js"
-import { getUserPatternWeights } from "./patterns.js"
+import { getUserPatternWeightsFromBfas } from "./patterns.js"
 
 const makeRec = (
   type: Activity["type"],
@@ -121,7 +120,7 @@ test("calculateRecommendationBaseScore counts a pattern once per related type it
 
 test("calculateRecommendationBaseScore gives a neutral user 0.5 without related types and 0.6 with them", () => {
   // 50 on every trait → every pattern weight is 0.5, so the related-type bonus alone adds 0.5*0.2
-  const weights = getUserPatternWeights(getOCEANScores(neutralBfas))
+  const weights = getUserPatternWeightsFromBfas(neutralBfas)
   assert.equal(calculateRecommendationBaseScore(weights, makeRec("Creative")), 0.5)
   const withRelated = calculateRecommendationBaseScore(weights, makeRec("Creative", ["Social"]))
   assert.ok(Math.abs(withRelated - 0.6) < 1e-9, `expected 0.6, got ${withRelated}`)
