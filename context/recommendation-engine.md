@@ -50,7 +50,7 @@ Everything lives in [`packages/core/src/engine/`](../packages/core/src/engine/):
 | `score.ts` | `scoreRecommendation` — the only place factors combine (`base + boost`) |
 | `diversify.ts` | `diversifyAndOrder` — final order for the recommendations screen |
 | `get-recommendations.ts` | `getRecommendations` — runs the steps below, takes the top 10 and computes `matchLabels` |
-| `factor-contracts.test.ts` | Rules that span factors: interests never change personality reasons, and personality alone earns a `personality` match off the recommendations screen |
+| `get-recommendations.factor-contracts.test.ts` | Rules that span factors: interests never change personality reasons, and personality alone earns a `personality` match off the recommendations screen |
 
 ### 1–3. Personality → base score
 
