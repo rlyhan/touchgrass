@@ -87,8 +87,8 @@ beforeEach(() => {
   getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
 })
 
-test("POST /profiles returns 201 with the created profile on a valid payload", async () => {
-  const res = await fetch(`${baseUrl}/profiles`, {
+test("POST /profile returns 201 with the created profile on a valid payload", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -107,10 +107,10 @@ test("POST /profiles returns 201 with the created profile on a valid payload", a
   assert.equal(calledWith?.authUserId, AUTH_USER_ID)
 })
 
-test("POST /profiles returns 401 when there is no session", async () => {
+test("POST /profile returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/profiles`, {
+  const res = await fetch(`${baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -120,8 +120,8 @@ test("POST /profiles returns 401 when there is no session", async () => {
   assert.equal(insertProfile.mock.callCount(), 0)
 })
 
-test("POST /profiles returns 400 with sanitized validation errors on an invalid payload", async () => {
-  const res = await fetch(`${baseUrl}/profiles`, {
+test("POST /profile returns 400 with sanitized validation errors on an invalid payload", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...validPayload, name: "" }),
@@ -138,10 +138,10 @@ test("POST /profiles returns 400 with sanitized validation errors on an invalid 
   assert.equal(insertProfile.mock.callCount(), 0)
 })
 
-test("POST /profiles returns 409 when a profile already exists", async () => {
+test("POST /profile returns 409 when a profile already exists", async () => {
   getProfileByAuthUserId.mock.mockImplementation(async () => fakeCreatedProfile)
 
-  const res = await fetch(`${baseUrl}/profiles`, {
+  const res = await fetch(`${baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -153,11 +153,11 @@ test("POST /profiles returns 409 when a profile already exists", async () => {
   assert.equal(insertProfile.mock.callCount(), 0)
 })
 
-test("POST /profiles returns 409 on DB unique constraint violation (race condition)", async () => {
+test("POST /profile returns 409 on DB unique constraint violation (race condition)", async () => {
   const constraintError = Object.assign(new Error("unique violation"), { code: "23505" })
   insertProfile.mock.mockImplementation(async () => { throw constraintError })
 
-  const res = await fetch(`${baseUrl}/profiles`, {
+  const res = await fetch(`${baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -168,12 +168,12 @@ test("POST /profiles returns 409 on DB unique constraint violation (race conditi
   assert.equal(body.error, "Profile already exists")
 })
 
-test("POST /profiles returns 500 when getProfileByAuthUserId throws", async () => {
+test("POST /profile returns 500 when getProfileByAuthUserId throws", async () => {
   getProfileByAuthUserId.mock.mockImplementation(async () => {
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/profiles`, {
+  const res = await fetch(`${baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -185,12 +185,12 @@ test("POST /profiles returns 500 when getProfileByAuthUserId throws", async () =
   assert.equal(insertProfile.mock.callCount(), 0)
 })
 
-test("POST /profiles returns 500 when the database insert fails", async () => {
+test("POST /profile returns 500 when the database insert fails", async () => {
   insertProfile.mock.mockImplementation(async () => {
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/profiles`, {
+  const res = await fetch(`${baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),

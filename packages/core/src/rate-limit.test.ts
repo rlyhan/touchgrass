@@ -72,13 +72,13 @@ after(() => {
   server.close()
 })
 
-test("POST /profiles is rate-limited after the per-IP threshold", async () => {
+test("POST /profile is rate-limited after the per-IP threshold", async () => {
   // The profile limiter is 10 / hour. Fire 11 requests; the last one must 429.
   // Each successful call would mutate insertProfile's mock state, so reset
   // getProfileByAuthUserId to always return null and accept whatever happens.
   let lastStatus = 0
   for (let i = 0; i < 11; i++) {
-    const res = await fetch(`${baseUrl}/profiles`, {
+    const res = await fetch(`${baseUrl}/profile`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({}),
