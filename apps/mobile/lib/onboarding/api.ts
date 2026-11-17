@@ -32,7 +32,7 @@ export async function fetchHasProfile(): Promise<boolean> {
 export async function createProfile(
   values: OnboardingFormValues,
 ): Promise<CreateProfileResponse> {
-  const response = await authedFetch(apiUrl("/profiles"), {
+  const response = await authedFetch(apiUrl("/profile"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

@@ -69,7 +69,8 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
     res.json({ ok: true })
   })
 
-  app.post("/profiles", ...maybeLimit(profileLimiter), createProfileHandler(deps))
+  // "/profiles" is a legacy alias for already-deployed clients; remove once they have updated.
+  app.post(["/profile", "/profiles"], ...maybeLimit(profileLimiter), createProfileHandler(deps))
   app.get("/recommendations", ...maybeLimit(readLimiter), getRecommendationsHandler(deps))
   app.get("/pattern-weights", ...maybeLimit(readLimiter), getPatternWeightsHandler(deps))
   // Must be registered before /activities/:slug, which would otherwise match "search" and "random".
