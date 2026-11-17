@@ -2,7 +2,7 @@
 
 Motivation produces each activity's **motivation boost**, which is added to the personality base score to give the final score (`final = base + boost`). It rewards activities whose types match what the user said they want from a hobby.
 
-Code: [`packages/core/src/lib/recommendations/motivation/`](../../packages/core/src/lib/recommendations/motivation/), with a `.test.ts` next to each file.
+Code: [`packages/core/src/engine/motivation/`](../../packages/core/src/engine/motivation/), with a `.test.ts` next to each file.
 
 - **Affects:** the final score, so the order of the recommendations screen: which activities reach the top 10 and get the `recommended` match label. The motivation reasons on a label use direct type overlap rather than the boost (see [`recommendation-engine.md`](../recommendation-engine.md)).
 - **Depends on:** personality — the boost is built from the user's pattern weights (see [Personality](personality.md)).
@@ -70,4 +70,4 @@ Then divide the total by `normalizationFactor` (default `5`). Done by `calculate
 - **The boost adds up across motivations instead of averaging.** Each extra motivation can only add shared patterns, so users who select more motivations get higher final scores across the board. (`boost.test.ts`)
 - **Selecting the same motivation twice changes nothing**, because types and shared patterns are deduplicated. (`boost.test.ts`)
 - **Every pattern weight contributes; there's no threshold.** A weak exact match still adds, and a strong neighbour can lift a weak target via adjacency. (`boost.test.ts`)
-- **The boost usually outweighs personality.** One matching type gives a neutral user about +0.84, more than the typical spread of base scores, so a strong personality fit with no matching type typically ranks below a weaker fit that matches a motivation. (`factor-contracts.test.ts`)
+- **The boost usually outweighs personality.** One matching type gives a neutral user about +0.84, more than the typical spread of base scores, so a strong personality fit with no matching type typically ranks below a weaker fit that matches a motivation. (`get-recommendations.factor-contracts.test.ts`)

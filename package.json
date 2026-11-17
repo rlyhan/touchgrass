@@ -12,6 +12,8 @@
     "android": "npm run android --workspace=@touchgrass/mobile",
     "web": "npm run web --workspace=@touchgrass/mobile",
     "lint": "npm run lint --workspace=@touchgrass/mobile",
+    "typecheck": "npm run typecheck --workspace=@touchgrass/core --workspace=@touchgrass/mocks",
+    "test": "npm test --workspace=@touchgrass/core --workspace=@touchgrass/mocks",
     "storybook": "npm run storybook --workspace=@touchgrass/mobile",
     "storybook:ios": "npm run storybook:ios --workspace=@touchgrass/mobile",
     "storybook:android": "npm run storybook:android --workspace=@touchgrass/mobile",
