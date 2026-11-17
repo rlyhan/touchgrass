@@ -200,3 +200,39 @@ test("POST /profile returns 500 when the database insert fails", async () => {
   const body = (await res.json()) as { error: string }
   assert.equal(body.error, "Internal server error")
 })
+
+test("GET /profile returns 200 with the signed-in user's profile", async () => {
+  getProfileByAuthUserId.mock.mockImplementation(async () => fakeCreatedProfile)
+
+  const res = await fetch(`${baseUrl}/profile`)
+
+  assert.equal(res.status, 200)
+  const body = (await res.json()) as { profile: Profile }
+  assert.equal(body.profile.id, fakeCreatedProfile.id)
+  assert.deepEqual(body.profile.interests, fakeCreatedProfile.interests)
+  assert.deepEqual(getProfileByAuthUserId.mock.calls[0]?.arguments, [AUTH_USER_ID])
+})
+
+test("GET /profile returns 404 when the user has no profile", async () => {
+  const res = await fetch(`${baseUrl}/profile`)
+
+  assert.equal(res.status, 404)
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Profile not found")
+})
+
+test("GET /profile returns 401 when there is no session", async () => {
+  getSessionUserId.mock.mockImplementation(async () => null)
+
+  const res = await fetch(`${baseUrl}/profile`)
+
+  assert.equal(res.status, 401)
+  assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("GET /profiles is not exposed on the legacy alias", async () => {
+  const res = await fetch(`${baseUrl}/profiles`)
+
+  assert.equal(res.status, 404)
+  assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
+})

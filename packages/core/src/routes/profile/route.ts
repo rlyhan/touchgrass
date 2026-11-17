@@ -5,6 +5,19 @@ import type { ProfileLookupDeps } from "../../db/queries.js"
 import type { NewProfile, Profile } from "../../db/schema/index.js"
 import { onboardingFormSchema } from "./schema.js"
 
+export type GetProfileDeps = SessionDeps & ProfileLookupDeps
+
+export function getProfileHandler({ getProfileByAuthUserId, getSessionUserId }: GetProfileDeps) {
+  return requireUser(getSessionUserId, async (_req: Request, res: Response, authUserId: string) => {
+    const profile = await getProfileByAuthUserId(authUserId)
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found" })
+      return
+    }
+    res.status(200).json({ profile })
+  })
+}
+
 export type CreateProfileDeps = SessionDeps &
   ProfileLookupDeps & {
     insertProfile: (newProfile: NewProfile) => Promise<Profile>

@@ -15,11 +15,8 @@ export type CreateProfileResponse = {
   profile: { id: string }
 }
 
-// There's no dedicated profile lookup endpoint, so this probes the cheapest
-// profile-backed one: /pattern-weights answers 404 when the signed-in user has
-// no profile yet and 200 once onboarding has created one.
 export async function fetchHasProfile(): Promise<boolean> {
-  const response = await authedFetch(apiUrl("/pattern-weights"))
+  const response = await authedFetch(apiUrl("/profile"))
 
   if (response.status === 401) throw new UnauthenticatedError()
   if (response.status === 404) return false

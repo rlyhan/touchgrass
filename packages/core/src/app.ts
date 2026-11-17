@@ -19,6 +19,7 @@ import {
 import {
   type CreateProfileDeps,
   createProfileHandler,
+  getProfileHandler,
 } from "./routes/profile/route.js"
 import {
   type GetRecommendationsDeps,
@@ -71,6 +72,7 @@ export function createApp(deps: AppDeps, options: AppOptions = {}): Express {
 
   // "/profiles" is a legacy alias for already-deployed clients; remove once they have updated.
   app.post(["/profile", "/profiles"], ...maybeLimit(profileLimiter), createProfileHandler(deps))
+  app.get("/profile", ...maybeLimit(readLimiter), getProfileHandler(deps))
   app.get("/recommendations", ...maybeLimit(readLimiter), getRecommendationsHandler(deps))
   app.get("/pattern-weights", ...maybeLimit(readLimiter), getPatternWeightsHandler(deps))
   // Must be registered before /activities/:slug, which would otherwise match "search" and "random".
