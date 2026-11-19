@@ -1,24 +1,18 @@
-// Starts a real createApp() server for route tests. Every dependency has a
-// harmless default, so each test file only passes the mocks it asserts on.
+// Starts a real createApp() server for route tests. Any dependency not passed in
+// falls back to the defaults in mocks.ts.
 import type { Server } from "node:http"
 import type { AddressInfo } from "node:net"
 import { after, before } from "node:test"
 
 import { type AppDeps, type AppOptions, createApp } from "../app.js"
+import { defaultDataDeps } from "./mocks.js"
 
 const defaultDeps: AppDeps = {
   authHandler: (_req, res) => {
     res.sendStatus(404)
   },
   corsOrigins: [],
-  getSessionUserId: async () => null,
-  insertProfile: async () => {
-    throw new Error("insertProfile is not mocked in this test file")
-  },
-  getProfileByAuthUserId: async () => null,
-  updateProfileByAuthUserId: async () => null,
-  loadActivities: async () => [],
-  getActivityBySlug: async () => null,
+  ...defaultDataDeps,
 }
 
 export function setupTestApp(

@@ -1,32 +1,20 @@
 import { strict as assert } from "node:assert"
-import { beforeEach, mock, test } from "node:test"
-
-import type { Request } from "express"
+import { test } from "node:test"
 
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
 
-import { AUTH_USER_ID, makeProfile } from "../../test-utils/profile.js"
+import { createMocks } from "../../test-utils/mocks.js"
+import { makeProfile } from "../../test-utils/profile.js"
 import { setupTestApp } from "../../test-utils/test-app.js"
-import type { Profile } from "../../db/schema/index.js"
 
 const fakeProfile = makeProfile({ interests: [], motivations: [] })
 
-const getProfileByAuthUserId = mock.fn<
-  (authUserId: string) => Promise<Profile | null>
->(async () => fakeProfile)
-const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
-  async () => AUTH_USER_ID,
-)
-
-const api = setupTestApp({ getProfileByAuthUserId, getSessionUserId })
-
-beforeEach(() => {
-  getProfileByAuthUserId.mock.resetCalls()
-  getProfileByAuthUserId.mock.mockImplementation(async () => fakeProfile)
-  getSessionUserId.mock.resetCalls()
-  getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
+const mocks = createMocks({
+  getProfileByAuthUserId: async () => fakeProfile,
 })
+const { getSessionUserId, getProfileByAuthUserId } = mocks
+const api = setupTestApp(mocks)
 
 test("GET /pattern-weights returns all 40 pattern weights in [0, 1]", async () => {
   const res = await fetch(`${api.baseUrl}/pattern-weights`)

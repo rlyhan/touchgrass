@@ -1,11 +1,9 @@
 import { strict as assert } from "node:assert"
-import { beforeEach, mock, test } from "node:test"
-
-import type { Request } from "express"
+import { test } from "node:test"
 
 import type { Activity } from "@touchgrass/types"
 
-import { AUTH_USER_ID } from "../../test-utils/profile.js"
+import { createMocks } from "../../test-utils/mocks.js"
 import { setupTestApp } from "../../test-utils/test-app.js"
 
 const activity: Activity = {
@@ -16,13 +14,6 @@ const activity: Activity = {
   field: "Nature",
   estimated_time: "1 hour",
 }
-
-const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
-  async () => AUTH_USER_ID,
-)
-const getActivityBySlug = mock.fn<(slug: string) => Promise<Activity | null>>(
-  async (slug) => (slug === activity.slug ? activity : null),
-)
 
 const searchable: Activity[] = [
   activity,
@@ -35,19 +26,12 @@ const searchable: Activity[] = [
   },
   { ...activity, slug: "learn-guitar-chords", title: "Learn Guitar Chords", field: "Music" },
 ]
-const loadActivities = mock.fn<() => Promise<Activity[]>>(async () => searchable)
-
-const api = setupTestApp({ getSessionUserId, loadActivities, getActivityBySlug })
-
-beforeEach(() => {
-  getSessionUserId.mock.resetCalls()
-  getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
-  getActivityBySlug.mock.resetCalls()
-  getActivityBySlug.mock.mockImplementation(async (slug) =>
-    slug === activity.slug ? activity : null,
-  )
-  loadActivities.mock.resetCalls()
+const mocks = createMocks({
+  getActivityBySlug: async (slug) => (slug === activity.slug ? activity : null),
+  loadActivities: async () => searchable,
 })
+const { getSessionUserId, loadActivities, getActivityBySlug } = mocks
+const api = setupTestApp(mocks)
 
 type SearchBody = { items: Activity[]; total: number }
 

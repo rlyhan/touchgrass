@@ -1,40 +1,22 @@
 import { strict as assert } from "node:assert"
-import { beforeEach, mock, test } from "node:test"
+import { test } from "node:test"
 
-import type { Request } from "express"
-
-import type {
-  Activity,
-  PatternTypeId,
-  RecommendationsResponse,
-} from "@touchgrass/types"
+import type { RecommendationsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 
+import { createMocks } from "../../test-utils/mocks.js"
 import { AUTH_USER_ID, makeProfile } from "../../test-utils/profile.js"
 import { setupTestApp } from "../../test-utils/test-app.js"
-import type { Profile } from "../../db/schema/index.js"
 
 const fakeProfile = makeProfile()
 
-const getProfileByAuthUserId = mock.fn<
-  (authUserId: string) => Promise<Profile | null>
->(async () => fakeProfile)
-const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
-  async () => AUTH_USER_ID,
-)
-const loadActivities = mock.fn<() => Promise<Activity[]>>(
-  async () => RECOMMENDATIONS,
-)
-
-const api = setupTestApp({ getProfileByAuthUserId, getSessionUserId, loadActivities })
-
-beforeEach(() => {
-  getProfileByAuthUserId.mock.resetCalls()
-  getProfileByAuthUserId.mock.mockImplementation(async () => fakeProfile)
-  getSessionUserId.mock.resetCalls()
-  getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
+const mocks = createMocks({
+  getProfileByAuthUserId: async () => fakeProfile,
+  loadActivities: async () => RECOMMENDATIONS,
 })
+const { getSessionUserId, getProfileByAuthUserId } = mocks
+const api = setupTestApp(mocks)
 
 test("GET /recommendations returns 200 with recommendations for the signed-in user", async () => {
   const res = await fetch(`${api.baseUrl}/recommendations`)

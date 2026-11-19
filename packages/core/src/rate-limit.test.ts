@@ -4,10 +4,7 @@ import { beforeEach, test } from "node:test"
 import { profileLimiter, readLimiter } from "./rate-limit.js"
 import { setupTestApp } from "./test-utils/test-app.js"
 
-const api = setupTestApp(
-  { getSessionUserId: async () => "auth_user_rate_limit" },
-  { disableRateLimits: false },
-)
+const api = setupTestApp({}, { disableRateLimits: false })
 
 // The limiters are shared module instances keyed by IP, so POST and PATCH /profile
 // would otherwise share one budget across tests.

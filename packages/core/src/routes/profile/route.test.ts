@@ -1,13 +1,12 @@
 import { strict as assert } from "node:assert"
-import { beforeEach, mock, test } from "node:test"
-
-import type { Request } from "express"
+import { test } from "node:test"
 
 import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
+import { createMocks } from "../../test-utils/mocks.js"
 import { AUTH_USER_ID, makeProfile } from "../../test-utils/profile.js"
 import { setupTestApp } from "../../test-utils/test-app.js"
-import type { NewProfile, Profile, UpdateProfile } from "../../db/schema/index.js"
+import type { Profile } from "../../db/schema/index.js"
 
 const validPayload = {
   name: "Ada Lovelace",
@@ -25,36 +24,16 @@ const validPayload = {
 const fakeCreatedProfile = makeProfile()
 const fakeUpdatedProfile = makeProfile({ interests: [...validPayload.interests, "Hiking"] })
 
-const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
-  async () => fakeCreatedProfile,
-)
-const getProfileByAuthUserId = mock.fn<
-  (authUserId: string) => Promise<Profile | null>
->(async () => null)
-const updateProfileByAuthUserId = mock.fn<
-  (authUserId: string, updates: UpdateProfile) => Promise<Profile | null>
->(async () => fakeUpdatedProfile)
-const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
-  async () => AUTH_USER_ID,
-)
-
-const api = setupTestApp({
+const mocks = createMocks({
+  insertProfile: async () => fakeCreatedProfile,
+})
+const {
+  getSessionUserId,
   insertProfile,
   getProfileByAuthUserId,
   updateProfileByAuthUserId,
-  getSessionUserId,
-})
-
-beforeEach(() => {
-  insertProfile.mock.resetCalls()
-  insertProfile.mock.mockImplementation(async () => fakeCreatedProfile)
-  getProfileByAuthUserId.mock.resetCalls()
-  getProfileByAuthUserId.mock.mockImplementation(async () => null)
-  updateProfileByAuthUserId.mock.resetCalls()
-  updateProfileByAuthUserId.mock.mockImplementation(async () => null)
-  getSessionUserId.mock.resetCalls()
-  getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
-})
+} = mocks
+const api = setupTestApp(mocks)
 
 test("POST /profile returns 201 with the created profile on a valid payload", async () => {
   const res = await fetch(`${api.baseUrl}/profile`, {
