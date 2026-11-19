@@ -1,7 +1,5 @@
 import { strict as assert } from "node:assert"
-import type { Server } from "node:http"
-import type { AddressInfo } from "node:net"
-import { after, before, beforeEach, mock, test } from "node:test"
+import { beforeEach, mock, test } from "node:test"
 
 import type { Request } from "express"
 
@@ -9,7 +7,7 @@ import type { PatternWeightsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
 import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
-import { createApp } from "../../app.js"
+import { setupTestApp } from "../../test-utils/test-app.js"
 import type { Profile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
@@ -33,40 +31,11 @@ const fakeProfile: Profile = {
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
 >(async () => fakeProfile)
-const updateProfileByAuthUserId = mock.fn<
-  (authUserId: string, updates: Partial<Profile>) => Promise<Profile | null>
->(async () => fakeProfile)
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
 
-let server: Server
-let baseUrl: string
-
-before(() => {
-  const app = createApp(
-    {
-      insertProfile: async () => fakeProfile,
-      getProfileByAuthUserId,
-      updateProfileByAuthUserId,
-      authHandler: (_req, res) => {
-        res.sendStatus(404)
-      },
-      corsOrigins: [],
-      getSessionUserId,
-      loadActivities: async () => [],
-      getActivityBySlug: async () => null,
-    },
-    { disableRateLimits: true },
-  )
-  server = app.listen(0)
-  const { port } = server.address() as AddressInfo
-  baseUrl = `http://127.0.0.1:${port}`
-})
-
-after(() => {
-  server.close()
-})
+const api = setupTestApp({ getProfileByAuthUserId, getSessionUserId })
 
 beforeEach(() => {
   getProfileByAuthUserId.mock.resetCalls()
@@ -76,7 +45,7 @@ beforeEach(() => {
 })
 
 test("GET /pattern-weights returns all 40 pattern weights in [0, 1]", async () => {
-  const res = await fetch(`${baseUrl}/pattern-weights`)
+  const res = await fetch(`${api.baseUrl}/pattern-weights`)
 
   assert.equal(res.status, 200)
   const body = (await res.json()) as PatternWeightsResponse
@@ -93,7 +62,7 @@ test("GET /pattern-weights returns all 40 pattern weights in [0, 1]", async () =
 test("GET /pattern-weights returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/pattern-weights`)
+  const res = await fetch(`${api.baseUrl}/pattern-weights`)
 
   assert.equal(res.status, 401)
   assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
@@ -102,7 +71,7 @@ test("GET /pattern-weights returns 401 when there is no session", async () => {
 test("GET /pattern-weights returns 404 when the user has no profile yet", async () => {
   getProfileByAuthUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/pattern-weights`)
+  const res = await fetch(`${api.baseUrl}/pattern-weights`)
 
   assert.equal(res.status, 404)
   const body = (await res.json()) as { error: string }
@@ -114,7 +83,7 @@ test("GET /pattern-weights returns 500 when the lookup throws", async () => {
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/pattern-weights`)
+  const res = await fetch(`${api.baseUrl}/pattern-weights`)
 
   assert.equal(res.status, 500)
 })

@@ -1,13 +1,11 @@
 import { strict as assert } from "node:assert"
-import type { Server } from "node:http"
-import type { AddressInfo } from "node:net"
-import { after, before, beforeEach, mock, test } from "node:test"
+import { beforeEach, mock, test } from "node:test"
 
 import type { Request } from "express"
 
 import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
-import { createApp } from "../../app.js"
+import { setupTestApp } from "../../test-utils/test-app.js"
 import type { NewProfile, Profile, UpdateProfile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
@@ -58,32 +56,11 @@ const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
 
-let server: Server
-let baseUrl: string
-
-before(() => {
-  const app = createApp(
-    {
-      insertProfile,
-      getProfileByAuthUserId,
-      updateProfileByAuthUserId,
-      authHandler: (_req, res) => {
-        res.sendStatus(404)
-      },
-      corsOrigins: [],
-      getSessionUserId,
-      loadActivities: async () => [],
-      getActivityBySlug: async () => null,
-    },
-    { disableRateLimits: true },
-  )
-  server = app.listen(0)
-  const { port } = server.address() as AddressInfo
-  baseUrl = `http://127.0.0.1:${port}`
-})
-
-after(() => {
-  server.close()
+const api = setupTestApp({
+  insertProfile,
+  getProfileByAuthUserId,
+  updateProfileByAuthUserId,
+  getSessionUserId,
 })
 
 beforeEach(() => {
@@ -98,7 +75,7 @@ beforeEach(() => {
 })
 
 test("POST /profile returns 201 with the created profile on a valid payload", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -120,7 +97,7 @@ test("POST /profile returns 201 with the created profile on a valid payload", as
 test("POST /profile returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -131,7 +108,7 @@ test("POST /profile returns 401 when there is no session", async () => {
 })
 
 test("POST /profile returns 400 with sanitized validation errors on an invalid payload", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...validPayload, name: "" }),
@@ -151,7 +128,7 @@ test("POST /profile returns 400 with sanitized validation errors on an invalid p
 test("POST /profile returns 409 when a profile already exists", async () => {
   getProfileByAuthUserId.mock.mockImplementation(async () => fakeCreatedProfile)
 
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -167,7 +144,7 @@ test("POST /profile returns 409 on DB unique constraint violation (race conditio
   const constraintError = Object.assign(new Error("unique violation"), { code: "23505" })
   insertProfile.mock.mockImplementation(async () => { throw constraintError })
 
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -183,7 +160,7 @@ test("POST /profile returns 500 when getProfileByAuthUserId throws", async () =>
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -200,7 +177,7 @@ test("POST /profile returns 500 when the database insert fails", async () => {
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(validPayload),
@@ -214,7 +191,7 @@ test("POST /profile returns 500 when the database insert fails", async () => {
 test("GET /profile returns 200 with the signed-in user's profile", async () => {
   getProfileByAuthUserId.mock.mockImplementation(async () => fakeCreatedProfile)
 
-  const res = await fetch(`${baseUrl}/profile`)
+  const res = await fetch(`${api.baseUrl}/profile`)
 
   assert.equal(res.status, 200)
   const body = (await res.json()) as { profile: Profile }
@@ -224,7 +201,7 @@ test("GET /profile returns 200 with the signed-in user's profile", async () => {
 })
 
 test("GET /profile returns 404 when the user has no profile", async () => {
-  const res = await fetch(`${baseUrl}/profile`)
+  const res = await fetch(`${api.baseUrl}/profile`)
 
   assert.equal(res.status, 404)
   const body = (await res.json()) as { error: string }
@@ -234,14 +211,14 @@ test("GET /profile returns 404 when the user has no profile", async () => {
 test("GET /profile returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/profile`)
+  const res = await fetch(`${api.baseUrl}/profile`)
 
   assert.equal(res.status, 401)
   assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
 })
 
 test("GET /profiles is not exposed on the legacy alias", async () => {
-  const res = await fetch(`${baseUrl}/profiles`)
+  const res = await fetch(`${api.baseUrl}/profiles`)
 
   assert.equal(res.status, 404)
   assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
@@ -250,7 +227,7 @@ test("GET /profiles is not exposed on the legacy alias", async () => {
 test("PATCH /profile returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -265,7 +242,7 @@ test("PATCH /profile returns 401 when there is no session", async () => {
 test("PATCH /profile returns 204 on a valid update", async () => {
   updateProfileByAuthUserId.mock.mockImplementation(async () => fakeUpdatedProfile)
 
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -290,7 +267,7 @@ test("PATCH /profile returns 204 on a valid update", async () => {
 })
 
 test("PATCH /profile returns 404 when the user has no profile", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ interests: ["Hiking"] }),
@@ -303,7 +280,7 @@ test("PATCH /profile returns 404 when the user has no profile", async () => {
 })
 
 test("PATCH /profile returns 400 for an empty body", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
@@ -314,7 +291,7 @@ test("PATCH /profile returns 400 for an empty body", async () => {
 })
 
 test("PATCH /profile returns 400 when motivations is empty", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ motivations: [] }),
@@ -325,7 +302,7 @@ test("PATCH /profile returns 400 when motivations is empty", async () => {
 })
 
 test("PATCH /profile returns 400 for a partial personality update", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ personality: {
@@ -339,7 +316,7 @@ test("PATCH /profile returns 400 for a partial personality update", async () => 
 })
 
 test("PATCH /profile returns 400 for an unknown interest", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ interests: ["NotAField"] }),
@@ -350,7 +327,7 @@ test("PATCH /profile returns 400 for an unknown interest", async () => {
 })
 
 test("PATCH /profile returns 400 for field that isn't personality, interests or motivations", async () => {
-  const res = await fetch(`${baseUrl}/profile`, {
+  const res = await fetch(`${api.baseUrl}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ interests: ["Hiking"], name: "Mallory" }),
