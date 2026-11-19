@@ -5,9 +5,8 @@ import type { Request } from "express"
 
 import type { Activity } from "@touchgrass/types"
 
+import { AUTH_USER_ID } from "../../test-utils/profile.js"
 import { setupTestApp } from "../../test-utils/test-app.js"
-
-const AUTH_USER_ID = "auth_user_abc"
 
 const activity: Activity = {
   slug: "stargaze-from-a-rooftop",

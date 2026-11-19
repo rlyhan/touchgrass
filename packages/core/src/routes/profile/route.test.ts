@@ -5,10 +5,9 @@ import type { Request } from "express"
 
 import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
+import { AUTH_USER_ID, makeProfile } from "../../test-utils/profile.js"
 import { setupTestApp } from "../../test-utils/test-app.js"
 import type { NewProfile, Profile, UpdateProfile } from "../../db/schema/index.js"
-
-const AUTH_USER_ID = "auth_user_abc"
 
 const validPayload = {
   name: "Ada Lovelace",
@@ -23,25 +22,8 @@ const validPayload = {
   motivations: ["explore_creative", "learn_think_grow"],
 }
 
-const fakeCreatedProfile: Profile = {
-  id: "00000000-0000-0000-0000-000000000001",
-  authUserId: AUTH_USER_ID,
-  name: validPayload.name,
-  birthdate: validPayload.birthdate,
-  heightCm: 172,
-  gender: validPayload.gender,
-  build: validPayload.build,
-  location: validPayload.location,
-  employment: validPayload.employment,
-  interests: validPayload.interests,
-  personality: validPayload.personality,
-  motivations: validPayload.motivations,
-  createdAt: new Date("2026-01-01T00:00:00Z"),
-}
-const fakeUpdatedProfile: Profile = {
-  ...fakeCreatedProfile,
-  interests: [...validPayload.interests, "Hiking"]
-}
+const fakeCreatedProfile = makeProfile()
+const fakeUpdatedProfile = makeProfile({ interests: [...validPayload.interests, "Hiking"] })
 
 const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
   async () => fakeCreatedProfile,

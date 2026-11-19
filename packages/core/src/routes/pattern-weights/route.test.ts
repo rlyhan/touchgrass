@@ -5,28 +5,12 @@ import type { Request } from "express"
 
 import type { PatternWeightsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
-import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
+import { AUTH_USER_ID, makeProfile } from "../../test-utils/profile.js"
 import { setupTestApp } from "../../test-utils/test-app.js"
 import type { Profile } from "../../db/schema/index.js"
 
-const AUTH_USER_ID = "auth_user_abc"
-
-const fakeProfile: Profile = {
-  id: "00000000-0000-0000-0000-000000000001",
-  authUserId: AUTH_USER_ID,
-  name: "Ada Lovelace",
-  birthdate: "1990-04-12",
-  heightCm: 172,
-  gender: "Female",
-  build: "Athletic",
-  location: "London",
-  employment: "Employed",
-  interests: [],
-  personality: MOCK_USER_BFAS,
-  motivations: [],
-  createdAt: new Date("2026-01-01T00:00:00Z"),
-}
+const fakeProfile = makeProfile({ interests: [], motivations: [] })
 
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
