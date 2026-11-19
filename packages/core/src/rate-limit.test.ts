@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert"
-import { test } from "node:test"
+import { beforeEach, test } from "node:test"
 
+import { profileLimiter, readLimiter } from "./rate-limit.js"
 import { setupTestApp } from "./test-utils/test-app.js"
 
 const api = setupTestApp(
@@ -8,26 +9,34 @@ const api = setupTestApp(
   { disableRateLimits: false },
 )
 
+// The limiters are shared module instances keyed by IP, so POST and PATCH /profile
+// would otherwise share one budget across tests.
+beforeEach(async () => {
+  await profileLimiter.resetKey("127.0.0.1")
+  await readLimiter.resetKey("127.0.0.1")
+})
+
 test("POST /profile is rate-limited after the per-IP threshold", async () => {
-  // The profile limiter is 10 / hour. Fire 11 requests; the last one must 429.
-  let lastStatus = 0
+  // The profile limiter is 10 / hour. Only the 11th request may 429.
+  const statuses: number[] = []
   for (let i = 0; i < 11; i++) {
     const res = await fetch(`${api.baseUrl}/profile`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({}),
     })
-    lastStatus = res.status
+    statuses.push(res.status)
     // Drain body to avoid leaking sockets
     await res.text()
   }
 
-  assert.equal(lastStatus, 429)
+  assert.ok(!statuses.slice(0, -1).includes(429), `limited too early: ${statuses.join(",")}`)
+  assert.equal(statuses.at(-1), 429)
 })
 
 test("PATCH /profile is rate-limited after the per-IP threshold", async () => {
-  // The profile limiter is 10 / hour. Fire 11 requests; the last one must 429.
-  let lastStatus = 0
+  // The profile limiter is 10 / hour. Only the 11th request may 429.
+  const statuses: number[] = []
   for (let i = 0; i < 11; i++) {
     const res = await fetch(`${api.baseUrl}/profile`, {
       method: "PATCH",
@@ -36,22 +45,24 @@ test("PATCH /profile is rate-limited after the per-IP threshold", async () => {
         interests: ["hiking"],
       }),
     })
-    lastStatus = res.status
+    statuses.push(res.status)
     // Drain body to avoid leaking sockets
     await res.text()
   }
 
-  assert.equal(lastStatus, 429)
+  assert.ok(!statuses.slice(0, -1).includes(429), `limited too early: ${statuses.join(",")}`)
+  assert.equal(statuses.at(-1), 429)
 })
 
 test("GET /recommendations is rate-limited after the per-IP threshold", async () => {
-  // The read limiter is 120 / minute. Fire 121 requests; the last one must 429.
-  let lastStatus = 0
+  // The read limiter is 120 / minute. Only the 121st request may 429.
+  const statuses: number[] = []
   for (let i = 0; i < 121; i++) {
     const res = await fetch(`${api.baseUrl}/recommendations`)
-    lastStatus = res.status
+    statuses.push(res.status)
     await res.text()
   }
 
-  assert.equal(lastStatus, 429)
+  assert.ok(!statuses.slice(0, -1).includes(429), `limited too early: ${statuses.join(",")}`)
+  assert.equal(statuses.at(-1), 429)
 })
