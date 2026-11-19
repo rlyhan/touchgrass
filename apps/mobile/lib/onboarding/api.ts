@@ -26,6 +26,27 @@ export async function fetchHasProfile(): Promise<boolean> {
   return true
 }
 
+export type ProfilePreferences = Pick<
+  OnboardingFormValues,
+  "interests" | "personality" | "motivations"
+>
+
+export async function fetchProfilePreferences(): Promise<ProfilePreferences | null> {
+  const response = await authedFetch(apiUrl("/profile"))
+
+  if (response.status === 401) throw new UnauthenticatedError()
+  if (response.status === 404) return null
+  if (!response.ok) {
+    throw new Error(`Failed to load profile (${response.status})`)
+  }
+  const { profile } = (await response.json()) as { profile: ProfilePreferences }
+  return {
+    interests: profile.interests,
+    personality: profile.personality,
+    motivations: profile.motivations,
+  }
+}
+
 export async function createProfile(
   values: OnboardingFormValues,
 ): Promise<CreateProfileResponse> {

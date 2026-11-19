@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { Modal } from "react-native"
 
 jest.mock("expo-router", () => ({
-  router: { replace: jest.fn() },
+  router: { replace: jest.fn(), push: jest.fn() },
 }))
 
 jest.mock("@/lib/auth/client", () => ({
@@ -34,6 +34,7 @@ const mockUseSession = jest.mocked(Auth.useSession)
 const mockClearCache = jest.mocked(PatternsCache.clearPatternWeightsCache)
 const mockClearRecommendationStore = jest.mocked(RecommendationStore.clearRecommendationStore)
 const mockReplace = jest.mocked(ExpoRouter.router.replace)
+const mockPush = jest.mocked(ExpoRouter.router.push)
 
 function sessionWithName(name: string | undefined) {
   mockUseSession.mockReturnValue({
@@ -94,6 +95,16 @@ describe("MenuDrawer", () => {
     fireEvent(tree.UNSAFE_getByType(Modal), "requestClose")
 
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it("closes and opens the preferences flow from Edit preferences", () => {
+    const onClose = jest.fn()
+    render(<MenuDrawer visible onClose={onClose} />)
+
+    fireEvent.press(screen.getByRole("button", { name: "Edit preferences" }))
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(mockPush).toHaveBeenCalledWith("/preferences/interests")
   })
 
   it("logs out, clears cached weights, closes and goes to sign-in", async () => {
