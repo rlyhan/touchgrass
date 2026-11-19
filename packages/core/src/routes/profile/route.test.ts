@@ -8,7 +8,7 @@ import type { Request } from "express"
 import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
 import { createApp } from "../../app.js"
-import type { NewProfile, Profile } from "../../db/schema/index.js"
+import type { NewProfile, Profile, UpdateProfile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
 
@@ -40,6 +40,10 @@ const fakeCreatedProfile: Profile = {
   motivations: validPayload.motivations,
   createdAt: new Date("2026-01-01T00:00:00Z"),
 }
+const fakeUpdatedProfile: Profile = {
+  ...fakeCreatedProfile,
+  interests: [...validPayload.interests, "Hiking"]
+}
 
 const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
   async () => fakeCreatedProfile,
@@ -47,6 +51,9 @@ const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
 >(async () => null)
+const updateProfileByAuthUserId = mock.fn<
+  (authUserId: string, updates: UpdateProfile) => Promise<Profile | null>
+>(async () => fakeUpdatedProfile)
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
@@ -59,6 +66,7 @@ before(() => {
     {
       insertProfile,
       getProfileByAuthUserId,
+      updateProfileByAuthUserId,
       authHandler: (_req, res) => {
         res.sendStatus(404)
       },
@@ -83,6 +91,8 @@ beforeEach(() => {
   insertProfile.mock.mockImplementation(async () => fakeCreatedProfile)
   getProfileByAuthUserId.mock.resetCalls()
   getProfileByAuthUserId.mock.mockImplementation(async () => null)
+  updateProfileByAuthUserId.mock.resetCalls()
+  updateProfileByAuthUserId.mock.mockImplementation(async () => null)
   getSessionUserId.mock.resetCalls()
   getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
 })
@@ -235,4 +245,117 @@ test("GET /profiles is not exposed on the legacy alias", async () => {
 
   assert.equal(res.status, 404)
   assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("PATCH /profile returns 401 when there is no session", async () => {
+  getSessionUserId.mock.mockImplementation(async () => null)
+
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      interests: [...fakeCreatedProfile.interests, "Hiking"],
+    }),
+  })
+
+  assert.equal(res.status, 401)
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("PATCH /profile returns 204 on a valid update", async () => {
+  updateProfileByAuthUserId.mock.mockImplementation(async () => fakeUpdatedProfile)
+
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      interests: [...fakeCreatedProfile.interests, "Hiking"],
+      personality: {
+        ...fakeCreatedProfile.personality,
+        "Intellect": 60
+      },
+      motivations: ["explore_creative"]
+    }),
+  })
+
+  assert.equal(res.status, 204)
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 1)
+  assert.deepEqual(updateProfileByAuthUserId.mock.calls[0]?.arguments, [
+    AUTH_USER_ID,
+    { interests: [...fakeCreatedProfile.interests, "Hiking"],
+      personality: { ...fakeCreatedProfile.personality, "Intellect": 60 },
+      motivations: ["explore_creative"]
+    },
+  ])
+})
+
+test("PATCH /profile returns 404 when the user has no profile", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ interests: ["Hiking"] }),
+  })
+
+  assert.equal(res.status, 404)
+  const body = (await res.json()) as { error: string }
+  assert.equal(body.error, "Profile not found")
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 1)
+})
+
+test("PATCH /profile returns 400 for an empty body", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  })
+
+  assert.equal(res.status, 400)
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("PATCH /profile returns 400 when motivations is empty", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ motivations: [] }),
+  })
+
+  assert.equal(res.status, 400)
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("PATCH /profile returns 400 for a partial personality update", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ personality: {
+      "Openness": 50,
+      "Intellect": 60
+    } }),
+  })
+
+  assert.equal(res.status, 400)
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("PATCH /profile returns 400 for an unknown interest", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ interests: ["NotAField"] }),
+  })
+
+  assert.equal(res.status, 400)
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 0)
+})
+
+test("PATCH /profile returns 400 for field that isn't personality, interests or motivations", async () => {
+  const res = await fetch(`${baseUrl}/profile`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ interests: ["Hiking"], name: "Mallory" }),
+  })
+
+  assert.equal(res.status, 400)
+  assert.equal(updateProfileByAuthUserId.mock.callCount(), 0)
 })

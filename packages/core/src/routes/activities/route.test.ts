@@ -8,7 +8,7 @@ import type { Request } from "express"
 import type { Activity } from "@touchgrass/types"
 
 import { createApp } from "../../app.js"
-import type { NewProfile, Profile } from "../../db/schema/index.js"
+import type { NewProfile, Profile, UpdateProfile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
 
@@ -24,6 +24,9 @@ const activity: Activity = {
 const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>()
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
+>()
+const updateProfileByAuthUserId = mock.fn<
+  (authUserId: string, updates: UpdateProfile) => Promise<Profile | null>
 >()
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
@@ -53,6 +56,7 @@ before(() => {
     {
       insertProfile,
       getProfileByAuthUserId,
+      updateProfileByAuthUserId,
       authHandler: (_req, res) => {
         res.sendStatus(404)
       },

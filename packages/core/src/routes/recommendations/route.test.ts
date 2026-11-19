@@ -15,7 +15,7 @@ import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
 import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
 import { createApp } from "../../app.js"
-import type { NewProfile, Profile } from "../../db/schema/index.js"
+import type { NewProfile, Profile, UpdateProfile } from "../../db/schema/index.js"
 
 const AUTH_USER_ID = "auth_user_abc"
 
@@ -41,6 +41,9 @@ const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
 >(async () => fakeProfile)
+const updateProfileByAuthUserId = mock.fn<
+  (authUserId: string, updates: UpdateProfile) => Promise<Profile | null>
+>()
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
@@ -56,6 +59,7 @@ before(() => {
     {
       insertProfile,
       getProfileByAuthUserId,
+      updateProfileByAuthUserId,
       authHandler: (_req, res) => {
         res.sendStatus(404)
       },

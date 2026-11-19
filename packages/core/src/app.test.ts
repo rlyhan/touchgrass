@@ -9,7 +9,7 @@ import { toNodeHandler } from "better-auth/node"
 
 import { createApp } from "./app.js"
 import { auth, corsOrigins } from "./auth/auth.js"
-import type { NewProfile, Profile } from "./db/schema/index.js"
+import type { NewProfile, Profile, UpdateProfile } from "./db/schema/index.js"
 
 const fakeProfile: Profile = {
   id: "00000000-0000-0000-0000-000000000001",
@@ -37,6 +37,10 @@ const fakeProfile: Profile = {
   motivations: [],
   createdAt: new Date("2026-01-01T00:00:00Z"),
 }
+const updatedFakeProfile: Profile = {
+  ...fakeProfile,
+  interests: [...fakeProfile.interests, "Hiking"],
+}
 
 const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
   async () => fakeProfile,
@@ -44,6 +48,9 @@ const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
 >(async () => fakeProfile)
+const updateProfileByAuthUserId = mock.fn<
+  (authUserId: string, updates: UpdateProfile) => Promise<Profile | null>
+>(async () => updatedFakeProfile)
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => "auth_user_abc",
 )
@@ -56,6 +63,7 @@ before(() => {
     {
       insertProfile,
       getProfileByAuthUserId,
+      updateProfileByAuthUserId,
       authHandler: toNodeHandler(auth),
       corsOrigins,
       getSessionUserId,

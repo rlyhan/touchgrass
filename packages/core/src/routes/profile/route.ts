@@ -2,8 +2,8 @@ import type { Request, Response } from "express"
 
 import { requireUser, type SessionDeps } from "../../auth/require-user.js"
 import type { ProfileLookupDeps } from "../../db/queries.js"
-import type { NewProfile, Profile } from "../../db/schema/index.js"
-import { onboardingFormSchema } from "./schema.js"
+import type { NewProfile, Profile, UpdateProfile } from "../../db/schema/index.js"
+import { onboardingFormSchema, profileUpdateSchema } from "./schema.js"
 
 export type GetProfileDeps = SessionDeps & ProfileLookupDeps
 
@@ -68,5 +68,30 @@ export function createProfileHandler({
       }
       throw error
     }
+  })
+}
+
+export type UpdateProfileDeps = SessionDeps &
+  {
+    updateProfileByAuthUserId: (authUserId: string, updates: UpdateProfile) => Promise<Profile | null>
+  }
+
+export function updateProfileHandler({ updateProfileByAuthUserId, getSessionUserId }: UpdateProfileDeps) {
+  return requireUser(getSessionUserId, async (req: Request, res: Response, authUserId: string) => {
+    const parsed = profileUpdateSchema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({
+        errors: parsed.error.issues.map(({ path, message }) => ({ path, message })),
+      })
+      return
+    }
+
+    const payload = parsed.data
+    const updatedProfile = await updateProfileByAuthUserId(authUserId, payload)
+    if (!updatedProfile) {
+      res.status(404).json({ error: "Profile not found" })
+      return
+    }
+    res.status(204).send()
   })
 }

@@ -33,6 +33,9 @@ const fakeProfile: Profile = {
 const getProfileByAuthUserId = mock.fn<
   (authUserId: string) => Promise<Profile | null>
 >(async () => fakeProfile)
+const updateProfileByAuthUserId = mock.fn<
+  (authUserId: string, updates: Partial<Profile>) => Promise<Profile | null>
+>(async () => fakeProfile)
 const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
   async () => AUTH_USER_ID,
 )
@@ -45,6 +48,7 @@ before(() => {
     {
       insertProfile: async () => fakeProfile,
       getProfileByAuthUserId,
+      updateProfileByAuthUserId,
       authHandler: (_req, res) => {
         res.sendStatus(404)
       },
