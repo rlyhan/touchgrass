@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.9.0] - 2026-11-20 — Feat: Edit preferences
+
+Signed-in users can reopen the interests, personality and motivation steps from the menu with their saved answers prefilled, save changes, and see recommendations refreshed for the new answers.
+
+### API (`packages/core`)
+
+- Added `GET /profile`, which returns the signed-in user's profile, or 404 if they haven't finished onboarding.
+- Added `PATCH /profile`, which updates only `interests`, `personality` and `motivations`. The body is strict and needs at least one of them; `personality` must be a full set of scores. Returns 204, and shares the profile rate limiter with `POST /profile`.
+- Route tests share their server setup, mocks and profile fixture through `src/test-utils` (`setupTestApp`, `createMocks`, `makeProfile`). Rate limiters are reset between rate-limit tests so each one starts from zero.
+- Requires `fly deploy` on each Fly app before the mobile app ships. Older APIs return 404 for `GET /profile`, which the new `fetchHasProfile` reads as "no profile", sending existing users to onboarding.
+
+### Mobile (`apps/mobile`)
+
+- "Edit preferences" in the menu drawer opens a three-step flow under `app/(authed)/preferences/`, prefilled from `GET /profile`. It shows a spinner while loading, an error with "Try again", sends users without a profile to onboarding and signed-out users to sign-in.
+- The interests, personality and motivation step UI is shared between onboarding and the edit flow (`components/onboarding/*-step.tsx`).
+- "Save changes" sends `PATCH /profile`, shows "Saving…" and an inline error on failure, then returns to recommendations.
+- After a save, the pattern-weights cache and recommendation store are cleared. The recommendations screen reloads whenever the store is cleared, and browse and the activity page refetch their match labels.
+- `fetchHasProfile` uses `GET /profile` instead of probing `/pattern-weights`.
+
 ## [1.8.0] - 2026-11-14 — Feat: Pattern colours and activity page redesign
 
 Gives each personality pattern its own colour and a shared geometric icon, and redesigns the activity page's match reasons, about section and instructions for readability.

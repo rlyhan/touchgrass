@@ -46,3 +46,7 @@ export const profiles = pgTable("profiles", {
 
 export type Profile = typeof profiles.$inferSelect
 export type NewProfile = typeof profiles.$inferInsert
+export type UpdateProfile = Partial<Pick<
+  NewProfile,
+  "interests" | "personality" | "motivations"
+>>

@@ -43,7 +43,7 @@ export function OnboardingScreenShell({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View className="relative items-center justify-center px-5 pt-4">
-          {step > 1 && backHref && (
+          {backHref && (
             <TouchableOpacity
               onPress={() =>
                 router.canGoBack() ? router.back() : router.replace(backHref)

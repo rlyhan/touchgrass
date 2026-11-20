@@ -1,89 +1,25 @@
 import { strict as assert } from "node:assert"
-import type { Server } from "node:http"
-import type { AddressInfo } from "node:net"
-import { after, before, beforeEach, mock, test } from "node:test"
+import { test } from "node:test"
 
-import type { Request } from "express"
-
-import type {
-  Activity,
-  PatternTypeId,
-  RecommendationsResponse,
-} from "@touchgrass/types"
+import type { RecommendationsResponse } from "@touchgrass/types"
 import { PATTERN_TYPES } from "@touchgrass/types/constants"
 import { RECOMMENDATIONS } from "@touchgrass/mocks/recommendations"
-import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
 
-import { createApp } from "../../app.js"
-import type { NewProfile, Profile } from "../../db/schema/index.js"
+import { createMocks } from "../../test-utils/mocks.js"
+import { AUTH_USER_ID, makeProfile } from "../../test-utils/profile.js"
+import { setupTestApp } from "../../test-utils/test-app.js"
 
-const AUTH_USER_ID = "auth_user_abc"
+const fakeProfile = makeProfile()
 
-const fakeProfile: Profile = {
-  id: "00000000-0000-0000-0000-000000000001",
-  authUserId: AUTH_USER_ID,
-  name: "Ada Lovelace",
-  birthdate: "1990-04-12",
-  heightCm: 172,
-  gender: "Female",
-  build: "Athletic",
-  location: "London",
-  employment: "Employed",
-  interests: ["Music", "Coding"],
-  personality: MOCK_USER_BFAS,
-  motivations: ["explore_creative", "learn_think_grow"],
-  createdAt: new Date("2026-01-01T00:00:00Z"),
-}
-
-const insertProfile = mock.fn<(newProfile: NewProfile) => Promise<Profile>>(
-  async () => fakeProfile,
-)
-const getProfileByAuthUserId = mock.fn<
-  (authUserId: string) => Promise<Profile | null>
->(async () => fakeProfile)
-const getSessionUserId = mock.fn<(req: Request) => Promise<string | null>>(
-  async () => AUTH_USER_ID,
-)
-const loadActivities = mock.fn<() => Promise<Activity[]>>(
-  async () => RECOMMENDATIONS,
-)
-
-let server: Server
-let baseUrl: string
-
-before(() => {
-  const app = createApp(
-    {
-      insertProfile,
-      getProfileByAuthUserId,
-      authHandler: (_req, res) => {
-        res.sendStatus(404)
-      },
-      corsOrigins: [],
-      getSessionUserId,
-      loadActivities,
-      getActivityBySlug: async () => null,
-    },
-    { disableRateLimits: true },
-  )
-  server = app.listen(0)
-  const { port } = server.address() as AddressInfo
-  baseUrl = `http://127.0.0.1:${port}`
+const mocks = createMocks({
+  getProfileByAuthUserId: async () => fakeProfile,
+  loadActivities: async () => RECOMMENDATIONS,
 })
-
-after(() => {
-  server.close()
-})
-
-beforeEach(() => {
-  getProfileByAuthUserId.mock.resetCalls()
-  getProfileByAuthUserId.mock.mockImplementation(async () => fakeProfile)
-  getSessionUserId.mock.resetCalls()
-  getSessionUserId.mock.mockImplementation(async () => AUTH_USER_ID)
-})
+const { getSessionUserId, getProfileByAuthUserId } = mocks
+const api = setupTestApp(mocks)
 
 test("GET /recommendations returns 200 with recommendations for the signed-in user", async () => {
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
 
   assert.equal(res.status, 200)
   const body = (await res.json()) as RecommendationsResponse
@@ -99,7 +35,7 @@ test("GET /recommendations returns 200 with recommendations for the signed-in us
 })
 
 test("GET /recommendations includes patternWeights for all 40 patterns in [0, 1]", async () => {
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse
 
   assert.equal(Object.keys(body.patternWeights).length, 40)
@@ -113,7 +49,7 @@ test("GET /recommendations includes patternWeights for all 40 patterns in [0, 1]
 })
 
 test("GET /recommendations only labels activities from the pool, labelling the recommendations screen's activities recommended", async () => {
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse
 
   const poolSlugs = new Set(RECOMMENDATIONS.map((a) => a.slug))
@@ -128,7 +64,7 @@ test("GET /recommendations includes the user's onboarding interests, dropping an
     interests: ["Music", "Not A Field", "Coding"],
   }))
 
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
   const body = (await res.json()) as RecommendationsResponse
 
   assert.deepEqual(body.interests, ["Music", "Coding"])
@@ -137,7 +73,7 @@ test("GET /recommendations includes the user's onboarding interests, dropping an
 test("GET /recommendations returns 401 when there is no session", async () => {
   getSessionUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
 
   assert.equal(res.status, 401)
   assert.equal(getProfileByAuthUserId.mock.callCount(), 0)
@@ -146,7 +82,7 @@ test("GET /recommendations returns 401 when there is no session", async () => {
 test("GET /recommendations returns 404 when the user has no profile yet", async () => {
   getProfileByAuthUserId.mock.mockImplementation(async () => null)
 
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
 
   assert.equal(res.status, 404)
   const body = (await res.json()) as { error: string }
@@ -158,7 +94,7 @@ test("GET /recommendations returns 500 when getSessionUserId throws", async () =
     throw new Error("session lookup failed")
   })
 
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
@@ -170,7 +106,7 @@ test("GET /recommendations returns 500 when the lookup fails", async () => {
     throw new Error("db down")
   })
 
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }
@@ -184,7 +120,7 @@ test("GET /recommendations returns 500 when the DB layer rejects malformed perso
     throw new Error("Invalid personality")
   })
 
-  const res = await fetch(`${baseUrl}/recommendations`)
+  const res = await fetch(`${api.baseUrl}/recommendations`)
 
   assert.equal(res.status, 500)
   const body = (await res.json()) as { error: string }

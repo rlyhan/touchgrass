@@ -33,3 +33,13 @@ export const onboardingFormSchema = z.object({
 })
 
 export type OnboardingFormPayload = z.infer<typeof onboardingFormSchema>
+
+export const profileUpdateSchema = onboardingFormSchema.pick({
+  interests: true,
+  personality: true,
+  motivations: true,
+}).partial()
+.strict()
+.refine((data) => Object.keys(data).length > 0, {
+  message: "At least one field must be provided for update",
+})

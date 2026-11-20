@@ -15,11 +15,8 @@ export type CreateProfileResponse = {
   profile: { id: string }
 }
 
-// There's no dedicated profile lookup endpoint, so this probes the cheapest
-// profile-backed one: /pattern-weights answers 404 when the signed-in user has
-// no profile yet and 200 once onboarding has created one.
 export async function fetchHasProfile(): Promise<boolean> {
-  const response = await authedFetch(apiUrl("/pattern-weights"))
+  const response = await authedFetch(apiUrl("/profile"))
 
   if (response.status === 401) throw new UnauthenticatedError()
   if (response.status === 404) return false
@@ -27,6 +24,43 @@ export async function fetchHasProfile(): Promise<boolean> {
     throw new Error(`Failed to check profile (${response.status})`)
   }
   return true
+}
+
+export type ProfilePreferences = Pick<
+  OnboardingFormValues,
+  "interests" | "personality" | "motivations"
+>
+
+export async function fetchProfilePreferences(): Promise<ProfilePreferences | null> {
+  const response = await authedFetch(apiUrl("/profile"))
+
+  if (response.status === 401) throw new UnauthenticatedError()
+  if (response.status === 404) return null
+  if (!response.ok) {
+    throw new Error(`Failed to load profile (${response.status})`)
+  }
+  const { profile } = (await response.json()) as { profile: ProfilePreferences }
+  return {
+    interests: profile.interests,
+    personality: profile.personality,
+    motivations: profile.motivations,
+  }
+}
+
+export async function updatePreferences(preferences: ProfilePreferences): Promise<void> {
+  const response = await authedFetch(apiUrl("/profile"), {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(preferences),
+  })
+
+  if (response.status === 401) throw new UnauthenticatedError()
+  if (!response.ok) {
+    const body = await response.text().catch(() => "")
+    throw new Error(
+      `Failed to update preferences (${response.status}): ${body || "<empty body>"}`,
+    )
+  }
 }
 
 export async function createProfile(
