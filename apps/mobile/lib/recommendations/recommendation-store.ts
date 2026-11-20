@@ -27,6 +27,10 @@ function getInterestsSnapshot() {
   return interests
 }
 
+function getGenerationSnapshot() {
+  return generation
+}
+
 export function setMatchLabels(next: Record<string, MatchLabel>): void {
   matchLabels = next
   notify()
@@ -37,7 +41,7 @@ export function setInterests(next: ActivityField[]): void {
   notify()
 }
 
-// Bumped on clear (logout) so a fetch started before it can tell its response is stale.
+// Bumped on clear (logout or a preferences save) so a fetch started before it can tell its response is stale.
 export function getRecommendationsGeneration(): number {
   return generation
 }
@@ -55,4 +59,8 @@ export function useMatchLabels(): Readonly<Record<string, MatchLabel>> {
 
 export function useInterests(): readonly ActivityField[] {
   return useSyncExternalStore(subscribe, getInterestsSnapshot, getInterestsSnapshot)
+}
+
+export function useRecommendationsGeneration(): number {
+  return useSyncExternalStore(subscribe, getGenerationSnapshot, getGenerationSnapshot)
 }

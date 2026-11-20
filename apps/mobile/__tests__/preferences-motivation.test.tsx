@@ -19,7 +19,10 @@ import { UnauthenticatedError } from "@/lib/auth/errors"
 import * as Api from "@/lib/onboarding/api"
 import { OnboardingProvider } from "@/lib/onboarding/context"
 import { ONBOARDING_DEFAULT_VALUES } from "@/lib/onboarding/options"
+import { getCachedPatternWeights, setCachedPatternWeights } from "@/lib/patterns/cache"
+import { getRecommendationsGeneration } from "@/lib/recommendations/recommendation-store"
 import { MOCK_USER_BFAS } from "@touchgrass/mocks/user"
+import type { UserPatternWeights } from "@touchgrass/types"
 import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 const mockUpdatePreferences = jest.mocked(Api.updatePreferences)
@@ -82,6 +85,30 @@ describe("PreferencesMotivationScreen", () => {
       motivations: [firstOption.value, secondOption.value],
     })
     expect(mockDismissTo).toHaveBeenCalledWith("/recommendations")
+  })
+
+  it("clears the cached recommendations after saving", async () => {
+    mockUpdatePreferences.mockResolvedValue()
+    setCachedPatternWeights({ "1-HH": 1 } as UserPatternWeights)
+    const generationBefore = getRecommendationsGeneration()
+    renderWithSaved([firstOption.value])
+
+    await save()
+
+    expect(getCachedPatternWeights()).toBeUndefined()
+    expect(getRecommendationsGeneration()).toBe(generationBefore + 1)
+  })
+
+  it("keeps the cached recommendations when saving fails", async () => {
+    mockUpdatePreferences.mockRejectedValue(new Error("Failed to update preferences (500)"))
+    setCachedPatternWeights({ "1-HH": 1 } as UserPatternWeights)
+    const generationBefore = getRecommendationsGeneration()
+    renderWithSaved([firstOption.value])
+
+    await save()
+
+    expect(getCachedPatternWeights()).toBeDefined()
+    expect(getRecommendationsGeneration()).toBe(generationBefore)
   })
 
   it("stays on the screen with an error when saving fails", async () => {

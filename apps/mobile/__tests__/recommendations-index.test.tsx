@@ -50,6 +50,7 @@ const mockFetchRecommendations = jest.mocked(Api.fetchRecommendations)
 const RECS: Activity[] = [RECOMMENDATIONS[0], RECOMMENDATIONS[1]]
 
 import RecommendationsPage from "@/app/(authed)/(tabs)/recommendations"
+import { clearRecommendationStore } from "@/lib/recommendations/recommendation-store"
 
 // ── tests ─────────────────────────────────────────────────────────────────────
 describe("RecommendationsPage", () => {
@@ -75,6 +76,23 @@ describe("RecommendationsPage", () => {
 
     expect(screen.getByText(RECS[0].title)).toBeTruthy()
     expect(screen.getByText(RECS[1].title)).toBeTruthy()
+  })
+
+  it("fetches again when the recommendation store is cleared", async () => {
+    mockFetchRecommendations.mockResolvedValueOnce(RECS)
+    mockFetchRecommendations.mockResolvedValueOnce([RECS[1]])
+    render(<RecommendationsPage />)
+    await screen.findByText(RECS[0].title)
+
+    act(() => {
+      clearRecommendationStore()
+    })
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId("activity-card")).toHaveLength(1)
+    })
+    expect(mockFetchRecommendations).toHaveBeenCalledTimes(2)
+    expect(screen.queryByText(RECS[0].title)).toBeNull()
   })
 
   it("pushes the activity's detail route when a card is pressed", async () => {

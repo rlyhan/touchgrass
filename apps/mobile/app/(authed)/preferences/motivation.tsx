@@ -8,7 +8,9 @@ import { PrimaryButton } from "@/components/ui/primary-button"
 import { UnauthenticatedError } from "@/lib/auth/errors"
 import { updatePreferences } from "@/lib/onboarding/api"
 import { useOnboardingForm } from "@/lib/onboarding/context"
+import { clearPatternWeightsCache } from "@/lib/patterns/cache"
 import { PREFERENCES_ROUTES } from "@/lib/preferences/routes"
+import { clearRecommendationStore } from "@/lib/recommendations/recommendation-store"
 
 export default function PreferencesMotivationScreen() {
   const { control, handleSubmit } = useOnboardingForm()
@@ -21,6 +23,8 @@ export default function PreferencesMotivationScreen() {
     setError(null)
     try {
       await updatePreferences({ interests, personality, motivations })
+      clearPatternWeightsCache()
+      clearRecommendationStore()
       router.dismissTo("/recommendations" as Href)
     } catch (err) {
       if (err instanceof UnauthenticatedError) {
