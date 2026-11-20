@@ -47,6 +47,22 @@ export async function fetchProfilePreferences(): Promise<ProfilePreferences | nu
   }
 }
 
+export async function updatePreferences(preferences: ProfilePreferences): Promise<void> {
+  const response = await authedFetch(apiUrl("/profile"), {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(preferences),
+  })
+
+  if (response.status === 401) throw new UnauthenticatedError()
+  if (!response.ok) {
+    const body = await response.text().catch(() => "")
+    throw new Error(
+      `Failed to update preferences (${response.status}): ${body || "<empty body>"}`,
+    )
+  }
+}
+
 export async function createProfile(
   values: OnboardingFormValues,
 ): Promise<CreateProfileResponse> {
