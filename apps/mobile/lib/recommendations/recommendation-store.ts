@@ -1,11 +1,17 @@
+// A module-level store rather than React context, because non-React code (fetchRecommendations in api.ts)
+// writes to it. useSyncExternalStore lets components re-render when it changes.
 import { useSyncExternalStore } from "react"
 
 import type { ActivityField, MatchLabel } from "@touchgrass/types"
 
-// Match labels and the user's interests from the last fetchRecommendations call, read by browse to sort and label cards and by the activity page to explain them.
-let matchLabels: Readonly<Record<string, MatchLabel>> = {}
-let interests: readonly ActivityField[] = []
-let generation = 0
+// Why each recommended activity matched, keyed by slug; browse sorts and labels cards with it, the activity page explains matches.
+let matchLabelsBySlug: Readonly<Record<string, MatchLabel>> = {}
+// The user's interests from the last recommendations fetch; the activity page uses them to explain why an activity matched.
+let lastFetchedInterests: readonly ActivityField[] = []
+// Counts store wipes (logout, preferences save); stale in-flight fetches skip writing, and the recommendations screen refetches when it changes.
+let clearCount = 0
+// Callbacks React adds through subscribe, one per useMatchLabels, useInterests or useRecommendationsGeneration
+// call in a mounted component; notify() runs them all.
 const listeners = new Set<() => void>()
 
 function notify() {
@@ -19,48 +25,50 @@ function subscribe(listener: () => void) {
   }
 }
 
-function getMatchLabelsSnapshot() {
-  return matchLabels
+function getMatchLabelsBySlugSnapshot() {
+  return matchLabelsBySlug
 }
 
-function getInterestsSnapshot() {
-  return interests
+function getLastFetchedInterestsSnapshot() {
+  return lastFetchedInterests
 }
 
-function getGenerationSnapshot() {
-  return generation
+function getClearCountSnapshot() {
+  return clearCount
 }
 
-export function setMatchLabels(next: Record<string, MatchLabel>): void {
-  matchLabels = next
+export function setMatchLabels(labelsBySlug: Record<string, MatchLabel>): void {
+  matchLabelsBySlug = labelsBySlug
   notify()
 }
 
-export function setInterests(next: ActivityField[]): void {
-  interests = next
+export function setInterests(interests: ActivityField[]): void {
+  lastFetchedInterests = interests
   notify()
 }
 
 // Bumped on clear (logout or a preferences save) so a fetch started before it can tell its response is stale.
 export function getRecommendationsGeneration(): number {
-  return generation
+  return clearCount
 }
 
 export function clearRecommendationStore(): void {
-  generation += 1
-  matchLabels = {}
-  interests = []
+  clearCount += 1
+  matchLabelsBySlug = {}
+  lastFetchedInterests = []
   notify()
 }
 
+// React hooks for reading the store. Each subscribes the calling component via useSyncExternalStore and
+// re-renders it only when the value it reads is replaced, so screens stay in sync with fetches and wipes.
 export function useMatchLabels(): Readonly<Record<string, MatchLabel>> {
-  return useSyncExternalStore(subscribe, getMatchLabelsSnapshot, getMatchLabelsSnapshot)
+  return useSyncExternalStore(subscribe, getMatchLabelsBySlugSnapshot, getMatchLabelsBySlugSnapshot)
 }
 
 export function useInterests(): readonly ActivityField[] {
-  return useSyncExternalStore(subscribe, getInterestsSnapshot, getInterestsSnapshot)
+  return useSyncExternalStore(subscribe, getLastFetchedInterestsSnapshot, getLastFetchedInterestsSnapshot)
 }
 
 export function useRecommendationsGeneration(): number {
-  return useSyncExternalStore(subscribe, getGenerationSnapshot, getGenerationSnapshot)
+  return useSyncExternalStore(subscribe, getClearCountSnapshot, getClearCountSnapshot)
 }
