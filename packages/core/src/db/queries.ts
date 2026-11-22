@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm"
 
 import { bfasScoresSchema } from "./validation.js"
 import { db } from "./client.js"
-import { type NewProfile, type Profile, profiles } from "./schema/index.js"
+import { type NewProfile, type Profile, type UpdateProfile, profiles } from "./schema/index.js"
 
 export type ProfileLookupDeps = {
   getProfileByAuthUserId: (authUserId: string) => Promise<Profile | null>
@@ -36,4 +36,18 @@ export async function getProfileByAuthUserId(
     .where(eq(profiles.authUserId, authUserId))
     .limit(1)
   return profile ? parsePersonality(profile) : null
+}
+
+export async function updateProfileByAuthUserId(
+  authUserId: string, updates: UpdateProfile
+): Promise<Profile | null> {
+  const [updatedProfile] = await db
+    .update(profiles)
+    .set({
+      ...updates,
+      personality: updates.personality ? bfasScoresSchema.parse(updates.personality) : undefined
+    })
+    .where(eq(profiles.authUserId, authUserId))
+    .returning()
+  return updatedProfile ? parsePersonality(updatedProfile) : null
 }

@@ -4,10 +4,15 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form"
 import { ONBOARDING_DEFAULT_VALUES } from "./options"
 import type { OnboardingFormValues } from "./types"
 
-export function OnboardingProvider({ children }: { children: ReactNode }) {
+type Props = {
+  children: ReactNode
+  defaultValues?: OnboardingFormValues
+}
+
+export function OnboardingProvider({ children, defaultValues = ONBOARDING_DEFAULT_VALUES }: Props) {
   const form = useForm<OnboardingFormValues>({
     mode: "onChange",
-    defaultValues: ONBOARDING_DEFAULT_VALUES,
+    defaultValues,
   })
 
   return <FormProvider {...form}>{children}</FormProvider>

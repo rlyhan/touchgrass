@@ -1,5 +1,5 @@
 import { router, type Href } from "expo-router"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { ActivityIndicator, Text, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
@@ -14,6 +14,7 @@ import {
   ProfileNotFoundError,
   UnauthenticatedError,
 } from "@/lib/recommendations/api"
+import { useRecommendationsGeneration } from "@/lib/recommendations/recommendation-store"
 import { colors } from "@/lib/theme/colors"
 import { useAsyncData } from "@/lib/use-async-data"
 import type { Activity } from "@touchgrass/types"
@@ -39,6 +40,14 @@ export default function RecommendationsPage() {
   }, [])
 
   const { data: recommendations = [], status, reload } = useAsyncData(fetcher)
+  const generation = useRecommendationsGeneration()
+  const loadedGeneration = useRef(generation)
+
+  useEffect(() => {
+    if (generation === loadedGeneration.current) return
+    loadedGeneration.current = generation
+    reload()
+  }, [generation, reload])
   const patternWeights = getCachedPatternWeights()
 
   const listHeader = useMemo(
