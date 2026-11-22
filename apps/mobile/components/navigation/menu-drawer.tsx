@@ -1,5 +1,5 @@
 import { router, type Href } from "expo-router"
-import { LogOut, X } from "lucide-react-native"
+import { LogOut, SlidersHorizontal, X } from "lucide-react-native"
 import { useState } from "react"
 import { Modal, Pressable, Text, View } from "react-native"
 import Animated, { SlideInRight } from "react-native-reanimated"
@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { signOut, useSession } from "@/lib/auth/client"
 import { clearPatternWeightsCache } from "@/lib/patterns/cache"
+import { PREFERENCES_ROUTES } from "@/lib/preferences/routes"
 import { clearRecommendationStore } from "@/lib/recommendations/recommendation-store"
 import { colors } from "@/lib/theme/colors"
 
@@ -47,6 +48,11 @@ export function MenuDrawer({ visible, onClose }: Props) {
     clearRecommendationStore()
     onClose()
     router.replace("/sign-in" as Href)
+  }
+
+  function handleEditPreferences() {
+    handleClose()
+    router.push(PREFERENCES_ROUTES.interests as Href)
   }
 
   return (
@@ -92,6 +98,15 @@ export function MenuDrawer({ visible, onClose }: Props) {
           </View>
 
           <View className="mt-6 border-t border-gray-200 pt-2">
+            <Pressable
+              onPress={handleEditPreferences}
+              className="flex-row items-center gap-3 py-4"
+              accessibilityRole="button"
+              accessibilityLabel="Edit preferences"
+            >
+              <SlidersHorizontal size={22} strokeWidth={2} color={colors.gray[900]} />
+              <Text className="text-base font-medium text-gray-900">Edit preferences</Text>
+            </Pressable>
             <Pressable
               onPress={handleLogOut}
               disabled={loggingOut}

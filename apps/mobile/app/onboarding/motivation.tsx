@@ -1,14 +1,10 @@
 import { router, type Href } from "expo-router"
-import { Controller, useWatch } from "react-hook-form"
-import { View } from "react-native"
+import { useWatch } from "react-hook-form"
 
-import { OnboardingScreenShell } from "@/components/onboarding/screen-shell"
-import { OptionCard } from "@/components/ui/option-card"
+import { MotivationStep } from "@/components/onboarding/motivation-step"
 import { PrimaryButton } from "@/components/ui/primary-button"
 import { useOnboardingForm } from "@/lib/onboarding/context"
 import { ONBOARDING_ROUTES } from "@/lib/onboarding/routes"
-import { toggleItem } from "@/lib/toggle-item"
-import { MOTIVATION_OPTIONS } from "@touchgrass/types/constants"
 
 export default function MotivationScreen() {
   const { control, handleSubmit } = useOnboardingForm()
@@ -18,11 +14,10 @@ export default function MotivationScreen() {
   const onSubmit = handleSubmit(() => router.replace(ONBOARDING_ROUTES.loading as Href))
 
   return (
-    <OnboardingScreenShell
+    <MotivationStep
       step={5}
       totalSteps={5}
       backHref={ONBOARDING_ROUTES.personality as Href}
-      title="Why are you looking for a new hobby/activity?"
       footer={
         <PrimaryButton
           label="Finish"
@@ -30,26 +25,6 @@ export default function MotivationScreen() {
           onPress={onSubmit}
         />
       }
-    >
-      <Controller
-        control={control}
-        name="motivations"
-        rules={{ validate: (v) => v.length >= 1 }}
-        render={({ field: { value, onChange } }) => {
-          return (
-            <View className="gap-3">
-              {MOTIVATION_OPTIONS.map((option) => (
-                <OptionCard
-                  key={option.value}
-                  label={option.label}
-                  selected={value.includes(option.value)}
-                  onPress={() => onChange(toggleItem(value, option.value))}
-                />
-              ))}
-            </View>
-          )
-        }}
-      />
-    </OnboardingScreenShell>
+    />
   )
 }
